@@ -18,7 +18,7 @@
     .sidebar a:hover,.sidebar a.active{background:var(--gold);color:var(--dark);}
     .main-content{margin-left:260px;margin-top:70px;padding:30px;}
     .page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--dark);margin-bottom:24px;}
-    .stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
+    .stats{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:14px;margin-bottom:20px;}
     .stat{background:white;border:1px solid #f0e3c4;border-radius:10px;padding:14px 16px;box-shadow:0 4px 12px rgba(0,0,0,.05);}
     .stat span{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;}
     .stat strong{font-size:1.35rem;color:var(--gold-dark);}
@@ -44,7 +44,6 @@
     .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.73rem;font-weight:600;white-space:nowrap;}
     .badge-active{background:#d4edda;color:#155724;}
     .badge-inactive{background:#f8d7da;color:#721c24;}
-    .badge-expired{background:#e2e3e5;color:#383d41;}
     .badge-warning{background:#fff3cd;color:#856404;}
     .action-btn{background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background .2s;font-size:1rem;color:var(--gold-dark);}
     .action-btn:hover{background:#f5f0e8;}
@@ -60,6 +59,7 @@
     .form-control{width:100%;padding:10px 14px;border:1.5px solid #e8dfd0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;}
     .form-control:focus{border-color:var(--gold);}
     .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px;}
+    @media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr);}}
     @media(max-width:900px){
       .sidebar{position:static;width:auto;height:auto;margin-top:70px;}
       .main-content{margin-left:0;margin-top:0;padding:18px;}
@@ -80,7 +80,6 @@
   </header>
 
   <aside class="sidebar">
-    
     <a href="products.html"><i class="bi bi-gem"></i> Quản Lý Sản Phẩm</a>
     <a href="categories.html"><i class="bi bi-tags"></i> Quản Lý Danh Mục</a>
     <a href="orders.html"><i class="bi bi-cart"></i> Quản Lý Đơn Hàng</a>
@@ -96,8 +95,9 @@
 
     <div class="stats">
       <div class="stat"><span>Tổng mã</span><strong id="totalVouchers">0</strong></div>
-      <div class="stat"><span>Đang áp dụng</span><strong id="activeVouchers">0</strong></div>
-      <div class="stat"><span>Hết hạn/khóa</span><strong id="inactiveVouchers">0</strong></div>
+      <div class="stat"><span>Công khai</span><strong id="activeVouchers">0</strong></div>
+      <div class="stat"><span>Riêng tư</span><strong id="privateVouchers">0</strong></div>
+      <div class="stat"><span>Hết hạn</span><strong id="expiredVouchers">0</strong></div>
       <div class="stat"><span>Lượt đã dùng</span><strong id="usedTotal">0</strong></div>
     </div>
 
@@ -108,10 +108,8 @@
         <input type="text" id="searchInput" placeholder="Tìm theo mã giảm giá..." oninput="filterVouchers()">
         <select id="filterStatus" onchange="filterVouchers()">
           <option value="">Tất cả trạng thái</option>
-          <option value="active">Đang áp dụng</option>
-          <option value="inactive">Tạm khóa</option>
-          <option value="expired">Hết hạn</option>
-          <option value="soldout">Hết lượt</option>
+          <option value="active">Công khai</option>
+          <option value="inactive">Riêng tư</option>
         </select>
         <button class="btn btn-outline" onclick="loadVouchers()"><i class="bi bi-arrow-clockwise"></i> Tải lại</button>
         <button class="btn btn-gold" onclick="openModal()"><i class="bi bi-plus-lg"></i> Thêm mã</button>
@@ -152,8 +150,8 @@
         <div class="form-group">
           <label class="form-label">Trạng thái</label>
           <select class="form-control" id="vStatus">
-            <option value="true">Đang áp dụng</option>
-            <option value="false">Tạm khóa</option>
+            <option value="true">Công khai</option>
+            <option value="false">Riêng tư</option>
           </select>
         </div>
       </div>
@@ -216,18 +214,15 @@
     async function fetchJson(path) {
       const url = `${API}${path}`;
       let res;
-
       try {
         res = await fetch(url, { headers: { 'Accept': 'application/json' } });
       } catch (e) {
         throw new Error(`Không gọi được ${url}. Kiểm tra backend đã chạy, đúng port 8080, CORS và Spring Security.`);
       }
-
       const text = await res.text();
       if (!res.ok) {
         throw new Error(`${url} trả HTTP ${res.status}${text ? ': ' + text.slice(0, 300) : ''}`);
       }
-
       try {
         const data = text ? JSON.parse(text) : [];
         return Array.isArray(data) ? data : (data.content || data.data || []);
@@ -240,7 +235,6 @@
       hideServerError();
       document.getElementById('voucherTableBody').innerHTML =
         `<tr><td colspan="8" class="empty-state">Đang tải dữ liệu...</td></tr>`;
-
       try {
         allVouchers = await fetchJson('/vouchers');
         currentVouchers = allVouchers;
@@ -258,20 +252,19 @@
     function renderStats(vouchers) {
       document.getElementById('totalVouchers').textContent = vouchers.length;
       document.getElementById('activeVouchers').textContent = vouchers.filter(v => getVoucherState(v) === 'active').length;
-      document.getElementById('inactiveVouchers').textContent = vouchers.filter(v => getVoucherState(v) !== 'active').length;
+      document.getElementById('privateVouchers').textContent = vouchers.filter(v => getVoucherState(v) === 'inactive').length;
+      document.getElementById('expiredVouchers').textContent = vouchers.filter(v => isExpired(v.endDate || v.end_date)).length;
       document.getElementById('usedTotal').textContent = vouchers.reduce((sum, v) => sum + getUsedCount(v), 0);
     }
 
     function filterVouchers() {
       const kw = document.getElementById('searchInput').value.trim().toLowerCase();
       const state = document.getElementById('filterStatus').value;
-
       currentVouchers = allVouchers.filter(v => {
         const matchKeyword = !kw || String(v.code || '').toLowerCase().includes(kw);
         const matchState = !state || getVoucherState(v) === state;
         return matchKeyword && matchState;
       });
-
       renderTable(currentVouchers);
     }
 
@@ -281,12 +274,11 @@
         tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>Không có mã giảm giá nào</td></tr>`;
         return;
       }
-
       tbody.innerHTML = vouchers.map(v => {
         const id = Number(v.id);
         const code = escapeHtml(v.code || '');
         const state = getVoucherState(v);
-
+        const expired = isExpired(v.endDate || v.end_date);
         return `
           <tr>
             <td>
@@ -298,6 +290,7 @@
             <td>
               <div>${formatDateOnly(v.startDate || v.start_date)}</div>
               <div class="muted">đến ${formatDateOnly(v.endDate || v.end_date)}</div>
+              ${expired ? `<div style="color:#dc3545;font-size:.72rem;margin-top:3px;"><i class="bi bi-clock-history"></i> Đã hết hạn</div>` : ''}
             </td>
             <td>${getQuantity(v)}</td>
             <td>${getUsedCount(v)}</td>
@@ -313,7 +306,6 @@
 
     function openModal(id = null) {
       const voucher = id ? allVouchers.find(v => Number(v.id) === Number(id)) : null;
-
       document.getElementById('modalTitle').textContent = voucher ? `Sửa Mã ${voucher.code}` : 'Thêm Mã Giảm Giá';
       document.getElementById('voucherId').value = voucher ? voucher.id : '';
       document.getElementById('vCode').value = voucher ? (voucher.code || '') : '';
@@ -335,14 +327,10 @@
     async function saveVoucher() {
       const id = document.getElementById('voucherId').value;
       const code = document.getElementById('vCode').value.trim().toUpperCase();
-      if (!code) {
-        alert('Vui lòng nhập mã giảm giá!');
-        return;
-      }
+      if (!code) { alert('Vui lòng nhập mã giảm giá!'); return; }
 
       const discountPercent = numberOrNull(document.getElementById('vDiscountPercent').value);
       const discountAmount = numberOrNull(document.getElementById('vDiscountAmount').value);
-
       if ((discountPercent === null || discountPercent === 0) && (discountAmount === null || discountAmount === 0)) {
         alert('Vui lòng nhập phần trăm giảm hoặc số tiền giảm!');
         return;
@@ -366,11 +354,7 @@
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify(body)
         });
-
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        }
-
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         closeModal();
         await loadVouchers();
         alert(id ? 'Cập nhật mã giảm giá thành công!' : 'Thêm mã giảm giá thành công!');
@@ -381,12 +365,9 @@
 
     async function deleteVoucher(id, code) {
       if (!confirm(`Bạn có chắc muốn xóa mã "${code}"?`)) return;
-
       try {
         const res = await fetch(`${API}/vouchers/${id}`, { method: 'DELETE' });
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         await loadVouchers();
         alert('Đã xóa mã giảm giá!');
       } catch (e) {
@@ -404,10 +385,7 @@
     }
 
     function getVoucherState(v) {
-      if (!getStatus(v)) return 'inactive';
-      if (isExpired(v.endDate || v.end_date)) return 'expired';
-      if (getUsedCount(v) >= getQuantity(v)) return 'soldout';
-      return 'active';
+      return getStatus(v) ? 'active' : 'inactive';
     }
 
     function getStatus(v) {
@@ -429,21 +407,11 @@
     }
 
     function stateLabel(state) {
-      return {
-        active: 'Đang áp dụng',
-        inactive: 'Tạm khóa',
-        expired: 'Hết hạn',
-        soldout: 'Hết lượt'
-      }[state] || state;
+      return { active: 'Công khai', inactive: 'Riêng tư' }[state] || state;
     }
 
     function stateClass(state) {
-      return {
-        active: 'badge-active',
-        inactive: 'badge-inactive',
-        expired: 'badge-expired',
-        soldout: 'badge-warning'
-      }[state] || 'badge-expired';
+      return { active: 'badge-active', inactive: 'badge-inactive' }[state] || 'badge-inactive';
     }
 
     function getNumber(value) {

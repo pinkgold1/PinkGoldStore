@@ -77,7 +77,7 @@
     .pay-info strong{display:block;font-size:.88rem;margin-bottom:2px;}
     .pay-info small{font-size:.73rem;color:var(--muted);}
 
-    /* VOUCHER SECTION */
+    /* VOUCHER */
     .voucher-row{display:flex;gap:10px;align-items:flex-start;}
     .voucher-input{flex:1;padding:11px 14px;border:1.5px solid #e8dfd0;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);outline:none;transition:border-color .2s;background:white;text-transform:uppercase;letter-spacing:1px;}
     .voucher-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
@@ -90,6 +90,15 @@
     .voucher-result.error{background:#fff0f3;color:var(--error);border:1px solid #ffd4d4;display:flex;align-items:center;gap:8px;}
     .voucher-remove{background:none;border:none;cursor:pointer;color:var(--error);font-size:.8rem;margin-left:auto;padding:0 4px;transition:opacity .2s;}
     .voucher-remove:hover{opacity:.7;}
+
+    /* PUBLIC VOUCHER LIST */
+    .voucher-chip{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1.5px dashed rgba(201,168,76,.4);border-radius:var(--radius);background:var(--gold-pale);cursor:pointer;transition:all .2s;gap:12px;}
+    .voucher-chip:hover{border-color:var(--gold);background:#fdf0ce;}
+    .voucher-chip-left{display:flex;flex-direction:column;gap:2px;}
+    .voucher-chip-code{font-family:Consolas,monospace;font-weight:700;color:var(--gold-dark);font-size:.88rem;letter-spacing:1px;}
+    .voucher-chip-desc{font-size:.75rem;color:var(--muted);}
+    .voucher-chip-btn{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-dark);font-weight:600;white-space:nowrap;background:none;border:1.5px solid var(--gold);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .2s;}
+    .voucher-chip:hover .voucher-chip-btn{background:var(--gold);color:var(--dark);}
 
     /* ORDER SUMMARY */
     .summary-card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:26px;position:sticky;top:88px;}
@@ -240,6 +249,12 @@
           <button class="btn-voucher" id="voucherBtn" onclick="applyVoucher()">Áp dụng</button>
         </div>
         <div class="voucher-result" id="voucherResult"></div>
+
+        <!-- Danh sách mã công khai -->
+        <div id="publicVoucherList" style="margin-top:16px;display:none;">
+          <div style="font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Mã khuyến mãi hiện có</div>
+          <div id="publicVoucherItems" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
       </div>
 
       <!-- Payment Method -->
@@ -312,8 +327,8 @@
     <p>Mã đơn hàng của bạn:</p>
     <div class="modal-code" id="orderCodeDisplay"></div>
     <div class="modal-actions">
-      <button class="btn-modal-primary" onclick="location.href='orders.html'">
-        <i class="bi bi-receipt"></i> Đơn hàng của tôi
+      <button class="btn-modal-primary" onclick="location.href='order-tracking.html'">
+        <i class="bi bi-receipt"></i> Theo dõi đơn hàng
       </button>
       <a href="products.html" class="btn-modal-sec">Tiếp tục mua sắm</a>
     </div>
@@ -342,13 +357,11 @@ function esc(s) {
 }
 
 /* ── VOUCHER STATE ── */
-let _appliedVoucher = null; // { code, discountPercent, discountAmount, minOrderAmount }
+let _appliedVoucher = null;
 
 /* ── RENDER SUMMARY ── */
 function renderSummary() {
-  const cart     = getCart();
-  const checkout = JSON.parse(localStorage.getItem('pinkgold_checkout') || '{}');
-
+  const cart = getCart();
   if (!cart.length) { window.location.href = 'cart.html'; return; }
 
   document.getElementById('orderItemsList').innerHTML = cart.map(item => `
@@ -371,7 +384,7 @@ function renderSummary() {
 }
 
 function recalcTotals() {
-  const cart    = getCart();
+  const cart     = getCart();
   const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const shipping = subtotal >= 2000000 ? 0 : 30000;
 
@@ -386,8 +399,8 @@ function recalcTotals() {
 
   const total = subtotal - discount + shipping;
 
-  document.getElementById('co-sub').textContent  = fmt(subtotal);
-  document.getElementById('co-ship').textContent = shipping === 0 ? 'Miễn phí' : fmt(shipping);
+  document.getElementById('co-sub').textContent   = fmt(subtotal);
+  document.getElementById('co-ship').textContent  = shipping === 0 ? 'Miễn phí' : fmt(shipping);
   document.getElementById('co-total').textContent = fmt(total);
 
   const discRow = document.getElementById('co-discount-row');
@@ -401,55 +414,123 @@ function recalcTotals() {
   window._summary = { subtotal, shipping, discount, total };
 }
 
-/* ── VOUCHER ── */
+/* ── PUBLIC VOUCHERS ── */
+async function loadPublicVouchers() {
+  try {
+    const res = await fetch(`${API}/vouchers`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const vouchers = Array.isArray(data) ? data : (data.content || []);
+    const cart = getCart();
+    const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+    const now = new Date();
+
+    const publicList = vouchers
+      .filter(v => {
+        // Chỉ lấy mã công khai (status = true)
+        if (v.status === false) return false;
+        // Chưa hết hạn
+        if (v.endDate || v.end_date) {
+          const end = new Date(String(v.endDate || v.end_date).slice(0, 10) + 'T23:59:59');
+          if (end < now) return false;
+        }
+        // Còn lượt dùng
+        const qty  = Number(v.quantity || 0);
+        const used = Number(v.usedCount || v.used_count || 0);
+        if (qty > 0 && used >= qty) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        // Ưu tiên mã giảm nhiều nhất dựa trên đơn hàng hiện tại
+        const calcDiscount = v => {
+          if (v.discountPercent) return subtotal * v.discountPercent / 100;
+          if (v.discountAmount)  return Number(v.discountAmount);
+          return 0;
+        };
+        return calcDiscount(b) - calcDiscount(a);
+      });
+
+    if (!publicList.length) return;
+
+    const container = document.getElementById('publicVoucherItems');
+    container.innerHTML = publicList.map(v => {
+      const discText = v.discountPercent
+        ? `Giảm ${v.discountPercent}%`
+        : `Giảm ${fmt(v.discountAmount)}`;
+      const minText = v.minOrderAmount
+        ? ` · Đơn từ ${fmt(v.minOrderAmount)}`
+        : '';
+      const endText = (v.endDate || v.end_date)
+        ? ` · HSD: ${new Date(v.endDate || v.end_date).toLocaleDateString('vi-VN')}`
+        : '';
+      return `
+        <div class="voucher-chip" onclick="pickVoucher('${esc(v.code)}')">
+          <div class="voucher-chip-left">
+            <span class="voucher-chip-code">${esc(v.code)}</span>
+            <span class="voucher-chip-desc">${discText}${minText}${endText}</span>
+          </div>
+          <button class="voucher-chip-btn" onclick="event.stopPropagation();pickVoucher('${esc(v.code)}')">Dùng</button>
+        </div>`;
+    }).join('');
+
+    document.getElementById('publicVoucherList').style.display = 'block';
+  } catch {
+    // Không hiện lỗi, ẩn phần gợi ý
+  }
+}
+
+function pickVoucher(code) {
+  document.getElementById('voucherInput').value = code;
+  applyVoucher();
+}
+
+/* ── APPLY VOUCHER ── */
 async function applyVoucher() {
-  const code = document.getElementById('voucherInput').value.trim().toUpperCase();
-  const resultEl = document.getElementById('voucherResult');
-  const btn = document.getElementById('voucherBtn');
+  const code    = document.getElementById('voucherInput').value.trim().toUpperCase();
+  const btn     = document.getElementById('voucherBtn');
 
   if (!code) {
     showVoucherMsg('Vui lòng nhập mã giảm giá!', 'error');
     return;
   }
 
-  // Nếu đang có voucher đang áp dụng → xóa
+  // Nếu đang có voucher → xóa
   if (_appliedVoucher && _appliedVoucher.code === code) {
     removeVoucher();
     return;
   }
 
-  btn.disabled = true;
+  btn.disabled    = true;
   btn.textContent = '...';
 
   try {
-    const res = await fetch(`${API}/vouchers/check/${code}`);
+    const res  = await fetch(`${API}/vouchers/check/${code}`);
     const text = await res.text();
 
     if (!res.ok) {
       showVoucherMsg(text || 'Mã giảm giá không hợp lệ!', 'error');
-      btn.disabled = false;
+      btn.disabled    = false;
       btn.textContent = 'Áp dụng';
       return;
     }
 
-    const voucher = JSON.parse(text);
-    const cart    = getCart();
+    const voucher  = JSON.parse(text);
+    const cart     = getCart();
     const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-    const min = voucher.minOrderAmount || 0;
+    const min      = voucher.minOrderAmount || 0;
 
     if (subtotal < min) {
       showVoucherMsg(`Đơn hàng tối thiểu ${fmt(min)} để dùng mã này!`, 'error');
-      btn.disabled = false;
+      btn.disabled    = false;
       btn.textContent = 'Áp dụng';
       return;
     }
 
-    // Áp dụng thành công
     _appliedVoucher = {
-      code: voucher.code,
-      discountPercent: voucher.discountPercent || 0,
-      discountAmount: voucher.discountAmount || 0,
-      minOrderAmount: voucher.minOrderAmount || 0,
+      code:            voucher.code,
+      discountPercent: voucher.discountPercent  || 0,
+      discountAmount:  voucher.discountAmount   || 0,
+      minOrderAmount:  voucher.minOrderAmount   || 0,
     };
 
     const discText = voucher.discountPercent
@@ -459,12 +540,12 @@ async function applyVoucher() {
     showVoucherMsg(`✓ Áp dụng thành công! ${discText}`, 'success', true);
     document.getElementById('voucherInput').classList.add('applied');
     btn.textContent = 'Xóa';
-    btn.disabled = false;
+    btn.disabled    = false;
     recalcTotals();
 
   } catch {
     showVoucherMsg('Lỗi kết nối. Vui lòng thử lại!', 'error');
-    btn.disabled = false;
+    btn.disabled    = false;
     btn.textContent = 'Áp dụng';
   }
 }
@@ -566,12 +647,9 @@ async function placeOrder() {
     clearCart();
 
     if (payMethod === 'COD') {
-      // COD → modal thành công
       showSuccessModal(orderCode);
     } else {
-      // VNPay → chuyển sang trang thanh toán VNPay riêng
       const vnpayUrl = data.vnpayUrl || '#';
-      // Lưu thông tin để trang VNPay dùng
       localStorage.setItem('pinkgold_vnpay', JSON.stringify({
         orderCode,
         vnpayUrl,
@@ -625,6 +703,7 @@ document.getElementById('voucherInput')?.addEventListener('keydown', e => {
 /* ── INIT ── */
 renderSummary();
 prefillUserInfo();
+loadPublicVouchers();
 </script>
 </body>
 </html>

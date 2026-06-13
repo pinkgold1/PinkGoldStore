@@ -323,7 +323,15 @@
 
 <script>
 const API = 'http://localhost:8080/api';
+const IMG_BASE = 'http://localhost:8080';
 const CART_KEY = 'pinkgold_cart';
+
+/* ===== IMAGE URL HELPER ===== */
+function imgUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${IMG_BASE}/${path.replace(/^\//, '')}`;
+}
 
 /* ===== CART BADGE ===== */
 function cartTotal() {
@@ -416,9 +424,10 @@ async function loadOrders() {
   document.getElementById('sidebarName').textContent = name;
   document.getElementById('sidebarEmail').textContent = user.email || '';
 
-  // Load đơn hàng
+  // Load đơn hàng của riêng user này
   try {
-    const res = await fetch(`${API}/orders/my-orders`);
+    // ★ Truyền userId của người đang đăng nhập
+    const res = await fetch(`${API}/orders/my-orders?userId=${user.id}`);
     if (res.ok) {
       const data = await res.json();
       const orders = Array.isArray(data) ? data : (data.content || []);
@@ -432,7 +441,7 @@ async function loadOrders() {
 
   // Load reviews của user (để biết sản phẩm nào đã đánh giá)
   try {
-    const res = await fetch(`${API}/reviews/my-reviews`);
+    const res = await fetch(`${API}/reviews/my-reviews?userId=${user.id}`);
     if (res.ok) {
       const data = await res.json();
       myReviews = Array.isArray(data) ? data : (data.content || []);
@@ -485,7 +494,7 @@ function orderCardHTML(o) {
   const itemRows = items.map(item => {
     const pid = item.product?.id ?? item.productId ?? item.product_id;
     const name = item.product?.name ?? item.productName ?? `Sản phẩm #${pid ?? ''}`;
-    const img = item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '';
+    const img = imgUrl(item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '');
     const qty = item.quantity ?? 0;
     const price = Number(item.price ?? 0);
     const alreadyReviewed = pid != null && reviewedProductIds.has(Number(pid));
@@ -558,7 +567,7 @@ function openDetail(id) {
 
   const itemsHTML = items.map(item => {
     const name = item.product?.name ?? item.productName ?? `Sản phẩm #${item.productId ?? ''}`;
-    const img = item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '';
+    const img = imgUrl(item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '');
     const qty = item.quantity ?? 0;
     const price = Number(item.price ?? 0);
     return `
@@ -693,7 +702,7 @@ function reorder(id) {
     const pId = item.product?.id ?? item.productId;
     const pName = item.product?.name ?? item.productName ?? 'Sản phẩm';
     const price = Number(item.price ?? 0);
-    const img = item.product?.imageUrl ?? '';
+    const img = item.product?.imageUrl ?? item.product?.image_url ?? '';
     const qty = Number(item.quantity ?? 1);
     const idx = cart.findIndex(c => c.id === pId);
     if (idx > -1) cart[idx].quantity += qty;

@@ -202,13 +202,7 @@
         <span id="discountAmount" style="color:var(--pink);">-0 ₫</span>
       </div>
 
-      <div class="voucher-box">
-        <div class="voucher-input">
-          <input type="text" id="voucherCode" placeholder="Nhập mã giảm giá...">
-          <button onclick="applyVoucher()">Áp dụng</button>
-        </div>
-        <div class="voucher-msg" id="voucherMsg"></div>
-      </div>
+    
 
       <div class="summary-row total">
         <span>Tổng cộng</span>
@@ -234,7 +228,7 @@
 const API = '[localhost](http://localhost:8080/api)';
 const CART_KEY = 'pinkgold_cart';
 
-let appliedVoucher = null;
+
 
 function getCart() {
   try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
@@ -315,14 +309,7 @@ function updateSummary() {
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
   const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
 
-  let discount = 0;
-  if (appliedVoucher) {
-    if (appliedVoucher.discountPercent) {
-      discount = subtotal * appliedVoucher.discountPercent / 100;
-    } else if (appliedVoucher.discountAmount) {
-      discount = Number(appliedVoucher.discountAmount);
-    }
-  }
+  const discount = 0;
 
   const shipping = subtotal >= 2000000 ? 0 : 50000;
   const total = Math.max(0, subtotal - discount + shipping);
@@ -342,9 +329,9 @@ function updateSummary() {
   document.getElementById('totalAmount').textContent = formatPrice(total);
 
   // Lưu tổng tiền để checkout dùng
+  // thay bằng:
   localStorage.setItem('pinkgold_checkout', JSON.stringify({
-    subtotal, discount, shipping, total,
-    voucher: appliedVoucher ? appliedVoucher.code : null
+    subtotal, discount, shipping, total
   }));
 }
 
@@ -380,46 +367,6 @@ async function removeItem(idx) {
   showToast(`Đã xóa "${removed?.name || 'sản phẩm'}" khỏi giỏ hàng`);
 }
 
-async function applyVoucher() {
-  const code = document.getElementById('voucherCode').value.trim().toUpperCase();
-  const msgEl = document.getElementById('voucherMsg');
-
-  if (!code) {
-    msgEl.className = 'voucher-msg error';
-    msgEl.textContent = 'Vui lòng nhập mã giảm giá';
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API}/vouchers/check/${code}`);
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Mã không hợp lệ');
-    }
-    const voucher = await res.json();
-
-    const cart = getCart();
-    const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
-
-    if (voucher.minOrderAmount && subtotal < voucher.minOrderAmount) {
-      msgEl.className = 'voucher-msg error';
-      msgEl.textContent = `Đơn hàng tối thiểu ${formatPrice(voucher.minOrderAmount)}`;
-      return;
-    }
-
-    appliedVoucher = voucher;
-    msgEl.className = 'voucher-msg success';
-    msgEl.textContent = `✓ Áp dụng thành công: giảm ${voucher.discountPercent ? voucher.discountPercent + '%' : formatPrice(voucher.discountAmount)}`;
-    updateSummary();
-    showToast('Áp dụng mã giảm giá thành công!');
-
-  } catch (e) {
-    appliedVoucher = null;
-    msgEl.className = 'voucher-msg error';
-    msgEl.textContent = e.message || 'Mã giảm giá không hợp lệ';
-    updateSummary();
-  }
-}
 
 // Init
 renderCart();

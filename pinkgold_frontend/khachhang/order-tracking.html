@@ -24,7 +24,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
 
-    /* ===== NAVBAR ===== */
     .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 70px; display: flex; align-items: center; padding: 0 40px; gap: 24px; background: rgba(250,246,240,.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(201,168,76,.2); box-shadow: 0 2px 20px rgba(26,18,8,.07); }
     .navbar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 600; color: var(--gold-dark); letter-spacing: 4px; }
     .navbar-nav { display: flex; gap: 4px; list-style: none; margin: 0 auto; }
@@ -44,7 +43,6 @@
     .user-menu .divider { height: 1px; background: var(--line); margin: 4px 0; }
     .user-menu .logout { color: var(--pink); }
 
-    /* ===== PAGE ===== */
     .page-wrapper { padding-top: 70px; }
     .page-header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-mid) 100%); padding: 48px 0 40px; position: relative; overflow: hidden; }
     .page-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,.12) 0%, transparent 70%); }
@@ -54,7 +52,6 @@
 
     .content-area { max-width: 1200px; margin: 0 auto; padding: 40px 40px 80px; display: grid; grid-template-columns: 260px 1fr; gap: 32px; align-items: start; }
 
-    /* ===== SIDEBAR ===== */
     .sidebar { background: white; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); position: sticky; top: 90px; }
     .sidebar-avatar { background: linear-gradient(135deg, var(--dark), var(--dark-mid)); padding: 32px 24px; text-align: center; }
     .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-light), var(--gold)); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: var(--dark); border: 3px solid rgba(201,168,76,.4); }
@@ -68,33 +65,23 @@
     .sidebar-nav .logout { color: var(--pink); }
     .sidebar-nav .logout:hover { background: #fff0f3; }
 
-    /* ===== MAIN ===== */
     .main-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); animation: fadeUp .4s ease; }
     .card-header { padding: 24px 28px 20px; border-bottom: 1px solid var(--line); }
     .card-header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400; }
     .card-subtitle { font-size: .82rem; color: var(--text-muted); margin-top: 4px; }
 
-    /* ===== FILTER ROW ===== */
     .filter-row { padding: 16px 28px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: center; }
     .filter-search { position: relative; flex: 1; }
     .filter-search input { width: 100%; padding: 9px 14px 9px 36px; border: 1.5px solid var(--line); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .875rem; outline: none; background: var(--cream); }
     .filter-search input:focus { border-color: var(--gold); }
     .filter-search i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: .85rem; }
 
-    /* ===== ORDER LIST ===== */
     .order-list { padding: 20px 28px 28px; display: flex; flex-direction: column; gap: 18px; }
 
-    .track-card {
-      border: 1.5px solid var(--line); border-radius: var(--radius-lg);
-      overflow: hidden; transition: var(--transition);
-    }
+    .track-card { border: 1.5px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); }
     .track-card:hover { border-color: rgba(201,168,76,.35); box-shadow: var(--shadow); }
-
-    .track-head {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 22px; background: var(--cream-dark); gap: 12px; flex-wrap: wrap;
-    }
+    .track-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px; background: var(--cream-dark); gap: 12px; flex-wrap: wrap; }
     .track-code { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; color: var(--gold-dark); }
     .track-date { font-size: .78rem; color: var(--text-muted); }
     .track-head-right { display: flex; align-items: center; gap: 10px; }
@@ -109,35 +96,21 @@
     .badge-unpaid    { background: #f8d7da; color: #721c24; }
     .badge-refunded  { background: #e2e3e5; color: #383d41; }
 
-    /* ===== PROGRESS TRACKER ===== */
     .track-progress { padding: 28px 28px 8px; }
     .progress-steps { display: flex; align-items: flex-start; position: relative; }
     .progress-step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; text-align: center; }
-    .progress-step:not(:last-child)::after {
-      content: ''; position: absolute; top: 17px; left: 50%; width: 100%; height: 2px;
-      background: var(--line); z-index: 1;
-    }
+    .progress-step:not(:last-child)::after { content: ''; position: absolute; top: 17px; left: 50%; width: 100%; height: 2px; background: var(--line); z-index: 1; }
     .progress-step.done:not(:last-child)::after { background: var(--gold); }
-    .progress-circle {
-      width: 36px; height: 36px; border-radius: 50%; background: white;
-      border: 2px solid var(--line); display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; color: var(--text-muted); position: relative; z-index: 2; transition: var(--transition);
-      margin-bottom: 10px;
-    }
+    .progress-circle { width: 36px; height: 36px; border-radius: 50%; background: white; border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--text-muted); position: relative; z-index: 2; transition: var(--transition); margin-bottom: 10px; }
     .progress-step.done .progress-circle { background: var(--gold); border-color: var(--gold); color: var(--dark); }
     .progress-step.current .progress-circle { background: var(--dark); border-color: var(--dark); color: var(--gold-light); animation: pulse 1.8s ease-in-out infinite; }
     .progress-step.cancelled .progress-circle { background: var(--pink); border-color: var(--pink); color: white; }
     .progress-label { font-size: .72rem; letter-spacing: .5px; color: var(--text-muted); font-weight: 500; max-width: 90px; }
-    .progress-step.done .progress-label,
-    .progress-step.current .progress-label { color: var(--dark); font-weight: 600; }
+    .progress-step.done .progress-label, .progress-step.current .progress-label { color: var(--dark); font-weight: 600; }
     .progress-time { font-size: .65rem; color: var(--text-muted); margin-top: 2px; }
 
-    .track-cancelled-note {
-      margin: 0 28px 8px; padding: 12px 16px; background: #fff0f3; border-left: 3px solid var(--pink);
-      border-radius: var(--radius); font-size: .82rem; color: #a3273f; display: flex; align-items: center; gap: 8px;
-    }
+    .track-cancelled-note { margin: 0 28px 8px; padding: 12px 16px; background: #fff0f3; border-left: 3px solid var(--pink); border-radius: var(--radius); font-size: .82rem; color: #a3273f; display: flex; align-items: center; gap: 8px; }
 
-    /* ===== ITEMS PREVIEW ===== */
     .track-body { padding: 16px 22px; border-top: 1px solid var(--line); }
     .order-items-preview { display: flex; flex-direction: column; gap: 10px; }
     .order-item-row { display: flex; align-items: center; gap: 14px; }
@@ -149,10 +122,7 @@
     .order-item-price { font-size: .86rem; font-weight: 600; color: var(--gold-dark); white-space: nowrap; }
     .more-items { font-size: .78rem; color: var(--text-muted); padding: 4px 0; }
 
-    .track-foot {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 22px; border-top: 1px solid var(--line); gap: 12px; flex-wrap: wrap;
-    }
+    .track-foot { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-top: 1px solid var(--line); gap: 12px; flex-wrap: wrap; }
     .track-total { font-size: .85rem; color: var(--text-muted); }
     .track-total strong { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--gold-dark); margin-left: 6px; }
     .track-actions { display: flex; gap: 8px; }
@@ -166,17 +136,14 @@
     .btn-danger:hover { background: var(--pink); color: white; }
     .btn-sm { padding: 7px 14px; font-size: .68rem; }
 
-    /* ===== EMPTY ===== */
     .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); }
     .empty-icon { font-size: 3.5rem; margin-bottom: 16px; color: rgba(201,168,76,.3); }
     .empty-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 8px; }
     .empty-sub { font-size: .875rem; margin-bottom: 24px; }
 
-    /* ===== LOADING ===== */
     .loading-state { text-align: center; padding: 64px 20px; color: var(--text-muted); }
     .spinner { width: 36px; height: 36px; border: 3px solid var(--gold); border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
 
-    /* ===== MODAL DETAIL ===== */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.open { display: flex; }
     .modal { background: white; border-radius: var(--radius-lg); width: 680px; max-width: 96%; max-height: 90vh; overflow-y: auto; animation: fadeUp .25s ease; }
@@ -206,13 +173,11 @@
     .summary-row.total { font-weight: 600; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-size: 1rem; }
     .summary-row.total span:last-child { color: var(--gold-dark); font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
 
-    /* ===== TOAST ===== */
     .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
     .toast { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: var(--radius); font-size: .85rem; font-weight: 500; animation: fadeUp .3s ease; box-shadow: var(--shadow-lg); max-width: 340px; }
     .toast-success { background: var(--dark); color: var(--gold-light); border-left: 3px solid var(--gold); }
     .toast-error { background: #2d0810; color: #f0a0b0; border-left: 3px solid var(--pink); }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 900px) {
       .navbar { padding: 0 20px; }
       .navbar-nav { display: none; }
@@ -236,7 +201,6 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="navbar-logo">PINKGOLD</a>
   <ul class="navbar-nav">
@@ -262,7 +226,6 @@
   </div>
 
   <div class="content-area">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-avatar">
         <div class="avatar-circle" id="sidebarAvatar">–</div>
@@ -278,7 +241,6 @@
       </nav>
     </aside>
 
-    <!-- Main -->
     <div class="main-card">
       <div class="card-header">
         <div class="card-header-row">
@@ -290,7 +252,6 @@
         </div>
       </div>
 
-      <!-- Search -->
       <div class="filter-row">
         <div class="filter-search">
           <i class="bi bi-search"></i>
@@ -298,7 +259,6 @@
         </div>
       </div>
 
-      <!-- Order list -->
       <div class="order-list" id="orderList">
         <div class="loading-state">
           <div class="spinner"></div>
@@ -311,7 +271,7 @@
 
 <!-- Order Detail Modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal" id="modalContent">
+  <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="modalTitle">Chi Tiết Đơn Hàng</div>
       <button class="modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
@@ -323,10 +283,38 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const API = 'http://localhost:8080/api';
+const API      = 'http://localhost:8080/api';
+const IMG_BASE = 'http://localhost:8080';
 const CART_KEY = 'pinkgold_cart';
 
-/* ===== CART BADGE ===== */
+/* ── Image URL helper (giống product-detail.html) ── */
+function imgUrl(raw) {
+  if (!raw) return '';
+  raw = String(raw).trim();
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('//')) return raw;
+  return IMG_BASE + '/' + raw.replace(/^\/+/, '');
+}
+
+/* ── Cache ảnh gallery (lấy từ product_images, không dùng image_url giấy KĐ) ── */
+const _imgCache = {};
+async function getProductPrimaryImg(pid) {
+  if (!pid) return '';
+  if (_imgCache[pid] !== undefined) return _imgCache[pid];
+  try {
+    const res = await fetch(`${API}/product-images/product/${pid}`);
+    if (!res.ok) { _imgCache[pid] = ''; return ''; }
+    const list = await res.json();
+    const imgs = Array.isArray(list) ? list : (list.content || []);
+    if (!imgs.length) { _imgCache[pid] = ''; return ''; }
+    // Ưu tiên ảnh isPrimary, fallback ảnh đầu tiên
+    imgs.sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
+    const primary = imgs[0];
+    _imgCache[pid] = imgUrl(primary.imageUrl || primary.image_url || '');
+  } catch { _imgCache[pid] = ''; }
+  return _imgCache[pid];
+}
+
+/* ── Cart badge ── */
 function cartTotal() {
   try { return (JSON.parse(localStorage.getItem(CART_KEY)) || []).reduce((s, i) => s + (i.quantity || 0), 0); } catch { return 0; }
 }
@@ -338,7 +326,7 @@ function updateCartBadge() {
   b.style.display = total > 0 ? 'flex' : 'none';
 }
 
-/* ===== TOAST ===== */
+/* ── Toast ── */
 function showToast(msg, type = 'success') {
   const t = document.createElement('div');
   t.className = `toast toast-${type}`;
@@ -363,7 +351,7 @@ function formatDateTime(v) {
   return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
 
-/* ===== NAVBAR USER ===== */
+/* ── Navbar user ── */
 function renderNavUser() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const area = document.getElementById('navUserArea');
@@ -373,7 +361,7 @@ function renderNavUser() {
     area.innerHTML = `
       <div class="user-dropdown">
         <button class="nav-user-btn" onclick="toggleUserMenu(event)">
-          <i class="bi bi-person-circle"></i><span>${name}</span>
+          <i class="bi bi-person-circle"></i><span>${escHtml(name)}</span>
           <i class="bi bi-chevron-down" style="font-size:.6rem;"></i>
         </button>
         <div class="user-menu" id="userMenu">
@@ -400,31 +388,25 @@ function logout() {
   }
 }
 
-/* ===== STATE ===== */
+/* ── State ── */
 let allOrders = [];
 
-/* ===== STATUS HELPERS ===== */
-const STATUS_LABELS = { PENDING: 'Chờ xác nhận', CONFIRMED: 'Đã xác nhận', SHIPPING: 'Đang giao', DELIVERED: 'Đã giao', CANCELLED: 'Đã hủy' };
-const STATUS_CLASSES = { PENDING: 'badge-pending', CONFIRMED: 'badge-confirmed', SHIPPING: 'badge-shipping', DELIVERED: 'badge-delivered', CANCELLED: 'badge-cancelled' };
-const PAY_LABELS = { UNPAID: 'Chưa TT', PAID: 'Đã TT', REFUNDED: 'Hoàn tiền' };
-const PAY_CLASSES = { UNPAID: 'badge-unpaid', PAID: 'badge-paid', REFUNDED: 'badge-refunded' };
+const STATUS_LABELS  = { PENDING:'Chờ xác nhận', CONFIRMED:'Đã xác nhận', SHIPPING:'Đang giao', DELIVERED:'Đã giao', CANCELLED:'Đã hủy' };
+const STATUS_CLASSES = { PENDING:'badge-pending', CONFIRMED:'badge-confirmed', SHIPPING:'badge-shipping', DELIVERED:'badge-delivered', CANCELLED:'badge-cancelled' };
+const PAY_LABELS     = { UNPAID:'Chưa TT', PAID:'Đã TT', REFUNDED:'Hoàn tiền' };
+const PAY_CLASSES    = { UNPAID:'badge-unpaid', PAID:'badge-paid', REFUNDED:'badge-refunded' };
 
-// Các bước trong tiến trình (không bao gồm CANCELLED)
 const PROGRESS_STEPS = [
-  { key: 'PENDING',   label: 'Đặt hàng',   icon: 'bi-bag-check' },
-  { key: 'CONFIRMED', label: 'Xác nhận',   icon: 'bi-clipboard-check' },
-  { key: 'SHIPPING',  label: 'Đang giao',  icon: 'bi-truck' },
-  { key: 'DELIVERED', label: 'Đã giao',    icon: 'bi-house-check' },
+  { key:'PENDING',   label:'Đặt hàng',  icon:'bi-bag-check' },
+  { key:'CONFIRMED', label:'Xác nhận',  icon:'bi-clipboard-check' },
+  { key:'SHIPPING',  label:'Đang giao', icon:'bi-truck' },
+  { key:'DELIVERED', label:'Đã giao',   icon:'bi-house-check' },
 ];
 
-function statusBadge(s) {
-  return `<span class="badge ${STATUS_CLASSES[s] || 'badge-pending'}">${STATUS_LABELS[s] || s}</span>`;
-}
-function payBadge(s) {
-  return `<span class="badge ${PAY_CLASSES[s] || 'badge-unpaid'}">${PAY_LABELS[s] || s}</span>`;
-}
+function statusBadge(s) { return `<span class="badge ${STATUS_CLASSES[s]||'badge-pending'}">${STATUS_LABELS[s]||s}</span>`; }
+function payBadge(s)    { return `<span class="badge ${PAY_CLASSES[s]||'badge-unpaid'}">${PAY_LABELS[s]||s}</span>`; }
 
-/* ===== LOAD ORDERS ===== */
+/* ── Load orders ── */
 async function loadOrders() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (!user) { location.href = 'login.html'; return; }
@@ -432,64 +414,74 @@ async function loadOrders() {
   const name = user.fullName || user.username || 'Khách hàng';
   const initials = name.trim().split(/\s+/).slice(-2).map(w => w[0].toUpperCase()).join('');
   document.getElementById('sidebarAvatar').textContent = initials;
-  document.getElementById('sidebarName').textContent = name;
-  document.getElementById('sidebarEmail').textContent = user.email || '';
+  document.getElementById('sidebarName').textContent   = name;
+  document.getElementById('sidebarEmail').textContent  = user.email || '';
 
   try {
-    const res = await fetch(`${API}/orders/my-orders`);
+    const res = await fetch(`${API}/orders/my-orders?userId=${user.id}`);
     if (res.ok) {
-      const data = await res.json();
+      const data   = await res.json();
       const orders = Array.isArray(data) ? data : (data.content || []);
-      // Chỉ giữ đơn đang xử lý: PENDING, CONFIRMED, SHIPPING
-      allOrders = orders.filter(o => ['PENDING', 'CONFIRMED', 'SHIPPING', 'CANCELLED'].includes(getStatus(o)));
+      allOrders = orders
+        // Lọc theo userId phía frontend để chắc chắn chỉ hiện đơn của user đang đăng nhập
+        .filter(o => {
+          const oUid = o.user?.id ?? o.userId ?? o.user_id;
+          return String(oUid) === String(user.id);
+        })
+        // Chỉ hiện đơn đang xử lý
+        .filter(o => ['PENDING','CONFIRMED','SHIPPING','CANCELLED'].includes(getStatus(o)));
     } else {
       allOrders = [];
     }
-  } catch {
-    allOrders = [];
-  }
+  } catch { allOrders = []; }
+
+  // Pre-load ảnh gallery cho tất cả sản phẩm trong danh sách đơn hàng
+  const pids = [...new Set(
+    allOrders
+      .flatMap(o => getItems(o).map(i => i.product?.id ?? i.productId ?? i.product_id))
+      .filter(Boolean)
+  )];
+  await Promise.all(pids.map(pid => getProductPrimaryImg(pid)));
 
   renderOrders();
 }
 
 function renderOrders() {
-  const kw = document.getElementById('searchInput').value.trim().toLowerCase();
-  let list = allOrders.filter(o => !kw || getOrderCode(o).toLowerCase().includes(kw));
-
-  // Sort: newest first
+  const kw   = document.getElementById('searchInput').value.trim().toLowerCase();
+  let   list = allOrders.filter(o => !kw || getOrderCode(o).toLowerCase().includes(kw));
   list.sort((a, b) => new Date(getCreatedAt(b) || 0) - new Date(getCreatedAt(a) || 0));
 
   const container = document.getElementById('orderList');
-
   if (!list.length) {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon"><i class="bi bi-truck"></i></div>
         <div class="empty-title">Không có đơn hàng nào cần theo dõi</div>
-        <div class="empty-sub">Các đơn hàng đang xử lý sẽ hiển thị tại đây để bạn theo dõi tiến trình.</div>
+        <div class="empty-sub">Các đơn hàng đang xử lý sẽ hiển thị tại đây.</div>
         <a href="products.html" class="btn btn-gold"><i class="bi bi-gem"></i> Khám Phá Sản Phẩm</a>
       </div>`;
     return;
   }
-
   container.innerHTML = list.map(o => trackCardHTML(o)).join('');
 }
 
 function trackCardHTML(o) {
-  const id = o.id ?? '';
-  const code = getOrderCode(o);
-  const status = getStatus(o);
-  const payStatus = getPayStatus(o);
-  const createdAt = formatDate(getCreatedAt(o));
-  const items = getItems(o);
-  const total = getTotal(o);
-  const canCancel = status === 'PENDING';
+  const id       = o.id ?? '';
+  const code     = getOrderCode(o);
+  const status   = getStatus(o);
+  const payStatus= getPayStatus(o);
+  const createdAt= formatDate(getCreatedAt(o));
+  const items    = getItems(o);
+  const total    = getTotal(o);
+  const canCancel= status === 'PENDING';
 
   const previewItems = items.slice(0, 2).map(item => {
-    const name = item.product?.name ?? item.productName ?? `Sản phẩm #${item.productId ?? ''}`;
-    const img = item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '';
-    const qty = item.quantity ?? 0;
-    const price = Number(item.price ?? 0);
+    const pid  = item.product?.id ?? item.productId ?? item.product_id;
+    const name = item.product?.name ?? item.productName ?? `Sản phẩm #${pid ?? ''}`;
+    // Lấy ảnh từ cache gallery (không dùng imageUrl của bảng products)
+    const img  = _imgCache[pid] || '';
+    const qty  = item.quantity ?? 0;
+    const price= Number(item.price ?? 0);
     return `
       <div class="order-item-row">
         <div class="order-item-img">
@@ -530,13 +522,9 @@ function trackCardHTML(o) {
       </div>
 
       <div class="track-foot">
-        <div class="track-total">
-          Tổng cộng:<strong>${formatPrice(total)}</strong>
-        </div>
+        <div class="track-total">Tổng cộng:<strong>${formatPrice(total)}</strong></div>
         <div class="track-actions">
-          <button class="btn btn-outline btn-sm" onclick="openDetail(${id})">
-            <i class="bi bi-eye"></i> Chi Tiết
-          </button>
+          <button class="btn btn-outline btn-sm" onclick="openDetail(${id})"><i class="bi bi-eye"></i> Chi Tiết</button>
           ${canCancel ? `<button class="btn btn-danger btn-sm" onclick="cancelOrder('${escHtml(code)}', ${id})"><i class="bi bi-x-circle"></i> Hủy</button>` : ''}
         </div>
       </div>
@@ -545,20 +533,15 @@ function trackCardHTML(o) {
 
 function progressTrackerHTML(currentStatus, order) {
   const currentIndex = PROGRESS_STEPS.findIndex(s => s.key === currentStatus);
-
   return `<div class="progress-steps">
     ${PROGRESS_STEPS.map((step, idx) => {
       let cls = '';
       if (idx < currentIndex) cls = 'done';
       else if (idx === currentIndex) cls = 'current';
-
-      // Thời gian: chỉ hiện cho bước hiện tại / đã qua, dùng updatedAt cho bước hiện tại, createdAt cho bước đầu
       let timeLabel = '';
       if (idx === 0) timeLabel = formatDateTime(getCreatedAt(order));
       else if (idx === currentIndex) timeLabel = formatDateTime(getUpdatedAt(order));
-
       const icon = (idx < currentIndex) ? 'bi-check-lg' : step.icon;
-
       return `
         <div class="progress-step ${cls}">
           <div class="progress-circle"><i class="bi ${icon}"></i></div>
@@ -569,27 +552,32 @@ function progressTrackerHTML(currentStatus, order) {
   </div>`;
 }
 
-/* ===== DETAIL MODAL ===== */
-function openDetail(id) {
+/* ── Detail modal ── */
+async function openDetail(id) {
   const o = allOrders.find(x => Number(x.id) === Number(id));
   if (!o) return;
 
-  const code = getOrderCode(o);
-  const status = getStatus(o);
+  // Load ảnh cho các sản phẩm chưa có trong cache
+  const pids = getItems(o).map(i => i.product?.id ?? i.productId ?? i.product_id).filter(Boolean);
+  await Promise.all(pids.map(pid => getProductPrimaryImg(pid)));
+
+  const code      = getOrderCode(o);
+  const status    = getStatus(o);
   const payStatus = getPayStatus(o);
-  const items = getItems(o);
-  const total = getTotal(o);
-  const discount = Number(o.discountAmount ?? o.discount_amount ?? 0);
-  const shipping = o.shippingAddress ?? o.shipping_address ?? '–';
-  const note = o.note ?? '–';
+  const items     = getItems(o);
+  const total     = getTotal(o);
+  const discount  = Number(o.discountAmount ?? o.discount_amount ?? 0);
+  const shipping  = o.shippingAddress ?? o.shipping_address ?? '–';
+  const note      = o.note ?? '–';
 
   document.getElementById('modalTitle').textContent = `Đơn Hàng ${code}`;
 
   const itemsHTML = items.map(item => {
-    const name = item.product?.name ?? item.productName ?? `Sản phẩm #${item.productId ?? ''}`;
-    const img = item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '';
-    const qty = item.quantity ?? 0;
-    const price = Number(item.price ?? 0);
+    const pid  = item.product?.id ?? item.productId ?? item.product_id;
+    const name = item.product?.name ?? item.productName ?? `Sản phẩm #${pid ?? ''}`;
+    const img  = _imgCache[pid] || '';
+    const qty  = item.quantity ?? 0;
+    const price= Number(item.price ?? 0);
     return `
       <div class="modal-item-row">
         <div class="modal-item-img">
@@ -619,7 +607,7 @@ function openDetail(id) {
         <div class="detail-box-value">${formatDate(getCreatedAt(o))}</div>
       </div>
       <div class="detail-box">
-        <div class="detail-box-label">Trạng thái đơn hàng</div>
+        <div class="detail-box-label">Trạng thái</div>
         <div class="detail-box-value">${statusBadge(status)}</div>
       </div>
       <div class="detail-box">
@@ -632,12 +620,9 @@ function openDetail(id) {
       </div>
       ${note !== '–' ? `<div class="detail-box full"><div class="detail-box-label">Ghi chú</div><div class="detail-box-value">${escHtml(note)}</div></div>` : ''}
     </div>
-
     ${status !== 'CANCELLED' ? `<div class="modal-items-title">Tiến Trình Đơn Hàng</div>${progressTrackerHTML(status, o)}<div style="height:24px"></div>` : ''}
-
     <div class="modal-items-title">Sản Phẩm Đặt Mua</div>
     ${itemsHTML || '<div style="color:var(--text-muted);font-size:.875rem;padding:12px 0;">Không có thông tin chi tiết sản phẩm.</div>'}
-
     <div class="modal-summary">
       <div class="summary-row"><span>Tạm tính</span><span>${formatPrice(subtotal)}</span></div>
       ${discount > 0 ? `<div class="summary-row"><span>Giảm giá</span><span style="color:var(--pink)">-${formatPrice(discount)}</span></div>` : ''}
@@ -646,12 +631,9 @@ function openDetail(id) {
 
   document.getElementById('modalOverlay').classList.add('open');
 }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-
-/* ===== CANCEL ORDER ===== */
+/* ── Cancel order ── */
 async function cancelOrder(code, id) {
   if (!confirm(`Bạn có chắc muốn hủy đơn hàng "${code}"?\nThao tác này không thể hoàn tác.`)) return;
   try {
@@ -664,22 +646,20 @@ async function cancelOrder(code, id) {
     } else {
       showToast('Không thể hủy đơn hàng này.', 'error');
     }
-  } catch {
-    showToast('Lỗi kết nối server.', 'error');
-  }
+  } catch { showToast('Lỗi kết nối server.', 'error'); }
 }
 
-/* ===== HELPERS ===== */
+/* ── Helpers ── */
 function getOrderCode(o) { return o.orderCode ?? o.order_code ?? `ORDER-${o.id ?? ''}`; }
-function getStatus(o) { return o.status ?? 'PENDING'; }
+function getStatus(o)    { return o.status ?? 'PENDING'; }
 function getPayStatus(o) { return o.paymentStatus ?? o.payment_status ?? o.payment?.status ?? 'UNPAID'; }
 function getCreatedAt(o) { return o.createdAt ?? o.created_at ?? ''; }
 function getUpdatedAt(o) { return o.updatedAt ?? o.updated_at ?? o.createdAt ?? o.created_at ?? ''; }
-function getItems(o) { return o.orderItems ?? o.order_items ?? o.items ?? []; }
-function getTotal(o) { return Number(o.finalAmount ?? o.final_amount ?? o.totalAmount ?? o.total_amount ?? 0); }
-function escHtml(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function getItems(o)     { return o.orderItems ?? o.order_items ?? o.items ?? []; }
+function getTotal(o)     { return Number(o.finalAmount ?? o.final_amount ?? o.totalAmount ?? o.total_amount ?? 0); }
+function escHtml(v)      { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-/* ===== INIT ===== */
+/* ── Init ── */
 renderNavUser();
 updateCartBadge();
 loadOrders();
