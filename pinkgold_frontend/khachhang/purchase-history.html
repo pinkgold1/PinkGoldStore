@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lịch Sử Mua Hàng - PinkGold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8b6914;
+      --gold-pale: #fdf5e4; --pink: #d4637a; --cream: #faf6f0;
+      --cream-dark: #f2ebe0; --dark: #1a1208; --dark-mid: #2d1a05;
+      --text: #1a1208; --text-muted: #8a7a60; --line: #ede4d4;
+      --shadow: 0 4px 20px rgba(26,18,8,.08); --shadow-lg: 0 8px 40px rgba(26,18,8,.14);
+      --radius: 8px; --radius-lg: 12px; --transition: all .25s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== NAVBAR ===== */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 70px; display: flex; align-items: center; padding: 0 40px; gap: 24px; background: rgba(250,246,240,.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(201,168,76,.2); box-shadow: 0 2px 20px rgba(26,18,8,.07); }
+    .navbar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 600; color: var(--gold-dark); letter-spacing: 4px; }
+    .navbar-nav { display: flex; gap: 4px; list-style: none; margin: 0 auto; }
+    .navbar-nav a { display: block; padding: 8px 12px; border-radius: 6px; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); transition: var(--transition); }
+    .navbar-nav a:hover { color: var(--gold-dark); background: var(--gold-pale); }
+    .navbar-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+    .nav-icon-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; background: none; border: none; color: var(--text); font-size: 1.05rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); cursor: pointer; }
+    .nav-icon-btn:hover { background: var(--gold-pale); color: var(--gold-dark); }
+    .nav-badge { position: absolute; top: 2px; right: 2px; background: var(--pink); color: white; width: 17px; height: 17px; border-radius: 50%; font-size: .58rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cream); }
+    .nav-user-btn { display: flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 20px; background: none; border: 1.5px solid var(--line); font-size: .8rem; color: var(--text); transition: var(--transition); cursor: pointer; white-space: nowrap; }
+    .nav-user-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+    .user-dropdown { position: relative; }
+    .user-menu { display: none; position: absolute; right: 0; top: calc(100% + 10px); background: white; border: 1.5px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 190px; overflow: hidden; z-index: 300; }
+    .user-menu.open { display: block; animation: fadeUp .15s ease; }
+    .user-menu a, .user-menu button { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: .875rem; color: var(--text); transition: background .15s; text-decoration: none; background: none; border: none; width: 100%; cursor: pointer; font-family: inherit; text-align: left; }
+    .user-menu a:hover, .user-menu button:hover { background: var(--gold-pale); }
+    .user-menu .divider { height: 1px; background: var(--line); margin: 4px 0; }
+    .user-menu .logout { color: var(--pink); }
+
+    /* ===== PAGE ===== */
+    .page-wrapper { padding-top: 70px; }
+    .page-header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-mid) 100%); padding: 48px 0 40px; position: relative; overflow: hidden; }
+    .page-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,.12) 0%, transparent 70%); }
+    .page-header-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+    .page-eyebrow { font-size: .62rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; display: block; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 400; color: white; }
+
+    .content-area { max-width: 1200px; margin: 0 auto; padding: 40px 40px 80px; display: grid; grid-template-columns: 260px 1fr; gap: 32px; align-items: start; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { background: white; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); position: sticky; top: 90px; }
+    .sidebar-avatar { background: linear-gradient(135deg, var(--dark), var(--dark-mid)); padding: 32px 24px; text-align: center; }
+    .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-light), var(--gold)); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: var(--dark); border: 3px solid rgba(201,168,76,.4); }
+    .sidebar-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: white; font-weight: 400; }
+    .sidebar-email { font-size: .78rem; color: rgba(255,255,255,.45); margin-top: 4px; }
+    .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 13px 24px; font-size: .85rem; color: var(--text-muted); transition: var(--transition); border-left: 3px solid transparent; }
+    .sidebar-nav a:hover { color: var(--gold-dark); background: var(--gold-pale); }
+    .sidebar-nav a.active { color: var(--gold-dark); background: var(--gold-pale); border-left-color: var(--gold); font-weight: 500; }
+    .sidebar-nav a i { font-size: 1rem; width: 18px; text-align: center; }
+    .sidebar-nav .divider { height: 1px; background: var(--line); margin: 8px 0; }
+    .sidebar-nav .logout { color: var(--pink); }
+    .sidebar-nav .logout:hover { background: #fff0f3; }
+
+    /* ===== MAIN ===== */
+    .main-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); animation: fadeUp .4s ease; }
+    .card-header { padding: 24px 28px 20px; border-bottom: 1px solid var(--line); }
+    .card-header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400; }
+    .card-subtitle { font-size: .82rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ===== FILTER ROW ===== */
+    .filter-row { padding: 16px 28px; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: center; }
+    .filter-search { position: relative; flex: 1; }
+    .filter-search input { width: 100%; padding: 9px 14px 9px 36px; border: 1.5px solid var(--line); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .875rem; outline: none; background: var(--cream); }
+    .filter-search input:focus { border-color: var(--gold); }
+    .filter-search i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: .85rem; }
+
+    /* ===== ORDER LIST ===== */
+    .order-list { padding: 20px 28px 28px; display: flex; flex-direction: column; gap: 16px; }
+
+    .order-card { border: 1.5px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); }
+    .order-card:hover { border-color: rgba(201,168,76,.35); box-shadow: var(--shadow); }
+
+    .order-card-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--cream-dark); gap: 12px; flex-wrap: wrap; }
+    .order-code { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; color: var(--gold-dark); }
+    .order-date { font-size: .78rem; color: var(--text-muted); }
+    .order-head-right { display: flex; align-items: center; gap: 10px; }
+
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: .7rem; font-weight: 600; letter-spacing: .5px; white-space: nowrap; }
+    .badge-delivered { background: #d4edda; color: #155724; }
+    .badge-paid      { background: #d4edda; color: #155724; }
+    .badge-unpaid    { background: #f8d7da; color: #721c24; }
+    .badge-refunded  { background: #e2e3e5; color: #383d41; }
+
+    .order-card-body { padding: 16px 20px; }
+    .order-items-preview { display: flex; flex-direction: column; gap: 12px; }
+    .order-item-row { display: flex; align-items: center; gap: 14px; }
+    .order-item-img { width: 56px; height: 56px; border-radius: var(--radius); background: var(--cream-dark); overflow: hidden; flex: none; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .order-item-info { flex: 1; min-width: 0; }
+    .order-item-name { font-size: .9rem; font-weight: 500; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .order-item-meta { font-size: .76rem; color: var(--text-muted); }
+    .order-item-price { font-size: .88rem; font-weight: 600; color: var(--gold-dark); white-space: nowrap; margin-right: 6px; }
+    .order-item-actions { display: flex; gap: 6px; flex: none; }
+    .more-items { font-size: .78rem; color: var(--text-muted); padding: 4px 0; }
+
+    .order-card-foot { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--line); gap: 12px; flex-wrap: wrap; }
+    .order-total { font-size: .85rem; color: var(--text-muted); }
+    .order-total strong { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--gold-dark); margin-left: 6px; }
+    .order-actions { display: flex; gap: 8px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: var(--radius); border: none; font-size: .72rem; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; transition: var(--transition); cursor: pointer; }
+    .btn-gold { background: var(--gold); color: var(--dark); }
+    .btn-gold:hover { background: var(--gold-dark); color: white; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--line); color: var(--text-muted); }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold-dark); }
+    .btn-sm { padding: 7px 14px; font-size: .68rem; }
+    .btn-xs { padding: 5px 10px; font-size: .64rem; }
+    .btn-review { background: transparent; border: 1.5px solid var(--gold); color: var(--gold-dark); }
+    .btn-review:hover { background: var(--gold); color: var(--dark); }
+    .btn-review.reviewed { background: var(--gold-pale); border-color: var(--gold-pale); color: var(--gold-dark); cursor: default; }
+    .btn-review.reviewed:hover { background: var(--gold-pale); }
+
+    /* ===== EMPTY ===== */
+    .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 16px; color: rgba(201,168,76,.3); }
+    .empty-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 8px; }
+    .empty-sub { font-size: .875rem; margin-bottom: 24px; }
+
+    /* ===== LOADING ===== */
+    .loading-state { text-align: center; padding: 64px 20px; color: var(--text-muted); }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--gold); border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+
+    /* ===== MODAL DETAIL ===== */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: var(--radius-lg); width: 680px; max-width: 96%; max-height: 90vh; overflow-y: auto; animation: fadeUp .25s ease; }
+    .modal-header { padding: 24px 28px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; }
+    .modal-close { width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--cream-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: var(--transition); }
+    .modal-close:hover { background: var(--line); }
+    .modal-body { padding: 24px 28px 28px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .detail-box { background: var(--cream-dark); border-radius: var(--radius); padding: 12px 14px; }
+    .detail-box-label { font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; }
+    .detail-box-value { font-size: .9rem; font-weight: 500; }
+    .detail-box.full { grid-column: 1/-1; }
+    .modal-items-title { font-size: .7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; }
+    .modal-item-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .modal-item-row:last-child { border-bottom: none; }
+    .modal-item-img { width: 56px; height: 56px; border-radius: var(--radius); background: var(--cream-dark); overflow: hidden; flex: none; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+    .modal-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-item-info { flex: 1; }
+    .modal-item-name { font-size: .9rem; font-weight: 500; }
+    .modal-item-meta { font-size: .78rem; color: var(--text-muted); }
+    .modal-item-price { text-align: right; }
+    .modal-item-unit { font-size: .78rem; color: var(--text-muted); }
+    .modal-item-total { font-size: .9rem; font-weight: 600; color: var(--gold-dark); }
+    .modal-summary { background: var(--cream-dark); border-radius: var(--radius); padding: 16px; margin-top: 16px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: .875rem; }
+    .summary-row.total { font-weight: 600; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-size: 1rem; }
+    .summary-row.total span:last-child { color: var(--gold-dark); font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
+
+    /* ===== REVIEW MODAL ===== */
+    .review-product-mini { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--cream-dark); border-radius: var(--radius); margin-bottom: 20px; }
+    .review-product-mini .order-item-img { width: 52px; height: 52px; }
+    .star-pick { display: flex; gap: 8px; margin-bottom: 18px; }
+    .star-pick i { font-size: 1.7rem; color: #ddd; cursor: pointer; transition: color .15s, transform .1s; }
+    .star-pick i.lit { color: var(--gold); }
+    .star-pick i:hover { transform: scale(1.1); }
+    .form-control { width: 100%; padding: 11px 14px; border: 1.5px solid #e8dfd0; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none; margin-bottom: 16px; resize: vertical; transition: border-color .2s; }
+    .form-control:focus { border-color: var(--gold); }
+    .modal-form-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: var(--radius); font-size: .85rem; font-weight: 500; animation: fadeUp .3s ease; box-shadow: var(--shadow-lg); max-width: 340px; }
+    .toast-success { background: var(--dark); color: var(--gold-light); border-left: 3px solid var(--gold); }
+    .toast-error { background: #2d0810; color: #f0a0b0; border-left: 3px solid var(--pink); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .navbar { padding: 0 20px; }
+      .navbar-nav { display: none; }
+      .content-area { grid-template-columns: 1fr; padding: 24px 20px 60px; }
+      .sidebar { position: static; }
+      .page-header-inner { padding: 0 20px; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .order-card-head, .order-card-foot { flex-direction: column; align-items: flex-start; }
+      .order-head-right { flex-wrap: wrap; }
+      .order-item-row { flex-wrap: wrap; }
+      .order-item-actions { width: 100%; justify-content: flex-end; margin-top: 6px; }
+    }
+    @media (max-width: 560px) {
+      .filter-row { padding: 12px 20px; }
+      .order-list { padding: 16px 20px 24px; }
+      .modal-body { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-logo">PINKGOLD</a>
+  <ul class="navbar-nav">
+    <li><a href="index.html">Trang Chủ</a></li>
+    <li><a href="products.html">Sản Phẩm</a></li>
+    <li><a href="products.html?cat=6">Trang Sức Cưới</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <button class="nav-icon-btn" onclick="location.href='cart.html'" title="Giỏ hàng">
+      <i class="bi bi-bag"></i>
+      <span class="nav-badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <div id="navUserArea"></div>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <span class="page-eyebrow">Mua Sắm</span>
+      <h1 class="page-title">Lịch Sử Mua Hàng</h1>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-avatar">
+        <div class="avatar-circle" id="sidebarAvatar">–</div>
+        <div class="sidebar-name" id="sidebarName">Đang tải...</div>
+        <div class="sidebar-email" id="sidebarEmail"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="profile.html"><i class="bi bi-person"></i> Thông Tin Cá Nhân</a>
+        <a href="order-tracking.html"><i class="bi bi-truck"></i> Theo Dõi Đơn Hàng</a>
+        <a href="purchase-history.html" class="active"><i class="bi bi-bag-check"></i> Lịch Sử Mua Hàng</a>
+        <div class="divider"></div>
+        <a href="#" class="logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-card">
+      <div class="card-header">
+        <div class="card-header-row">
+          <div>
+            <div class="card-title">Đơn Hàng Đã Giao</div>
+            <div class="card-subtitle">Xem lại đơn đã mua, đánh giá sản phẩm hoặc mua lại nhanh</div>
+          </div>
+          <a href="products.html" class="btn btn-gold btn-sm"><i class="bi bi-gem"></i> Mua Tiếp</a>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="filter-row">
+        <div class="filter-search">
+          <i class="bi bi-search"></i>
+          <input type="text" id="searchInput" placeholder="Tìm theo mã đơn hàng hoặc tên sản phẩm..." oninput="renderOrders()">
+        </div>
+      </div>
+
+      <!-- Order list -->
+      <div class="order-list" id="orderList">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          Đang tải lịch sử mua hàng...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Chi Tiết Đơn Hàng</div>
+      <button class="modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody">Đang tải...</div>
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal-overlay" id="reviewOverlay" onclick="if(event.target===this)closeReviewModal()">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">Đánh Giá Sản Phẩm</div>
+      <button class="modal-close" onclick="closeReviewModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="review-product-mini" id="reviewProductMini"></div>
+
+      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:10px;">Chất lượng sản phẩm</div>
+      <div class="star-pick" id="starPick">
+        <i class="bi bi-star" data-v="1"></i>
+        <i class="bi bi-star" data-v="2"></i>
+        <i class="bi bi-star" data-v="3"></i>
+        <i class="bi bi-star" data-v="4"></i>
+        <i class="bi bi-star" data-v="5"></i>
+      </div>
+
+      <textarea class="form-control" id="reviewComment" rows="4" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+
+      <div class="modal-form-actions">
+        <button class="btn btn-outline" onclick="closeReviewModal()">Hủy</button>
+        <button class="btn btn-gold" onclick="submitReview()"><i class="bi bi-send"></i> Gửi Đánh Giá</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'http://localhost:8080/api';
+const CART_KEY = 'pinkgold_cart';
+
+/* ===== CART BADGE ===== */
+function cartTotal() {
+  try { return (JSON.parse(localStorage.getItem(CART_KEY)) || []).reduce((s, i) => s + (i.quantity || 0), 0); } catch { return 0; }
+}
+function updateCartBadge() {
+  const total = cartTotal();
+  const b = document.getElementById('cartBadge');
+  if (!b) return;
+  b.textContent = total;
+  b.style.display = total > 0 ? 'flex' : 'none';
+}
+
+/* ===== TOAST ===== */
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2800);
+  setTimeout(() => t.remove(), 3200);
+}
+
+function formatPrice(v) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(v || 0));
+}
+function formatDate(v) {
+  if (!v) return '–';
+  const d = new Date(v);
+  return isNaN(d) ? String(v).slice(0, 10) : d.toLocaleDateString('vi-VN');
+}
+
+/* ===== NAVBAR USER ===== */
+function renderNavUser() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const area = document.getElementById('navUserArea');
+  if (!area) return;
+  if (user) {
+    const name = user.fullName || user.username || 'Tài khoản';
+    area.innerHTML = `
+      <div class="user-dropdown">
+        <button class="nav-user-btn" onclick="toggleUserMenu(event)">
+          <i class="bi bi-person-circle"></i><span>${name}</span>
+          <i class="bi bi-chevron-down" style="font-size:.6rem;"></i>
+        </button>
+        <div class="user-menu" id="userMenu">
+          <a href="profile.html"><i class="bi bi-person"></i> Tài Khoản</a>
+          <a href="order-tracking.html"><i class="bi bi-truck"></i> Theo Dõi Đơn Hàng</a>
+          <a href="purchase-history.html"><i class="bi bi-bag-check"></i> Lịch Sử Mua Hàng</a>
+          <div class="divider"></div>
+          <button class="logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</button>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML = `<a href="login.html" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:var(--gold);color:var(--dark);font-size:.72rem;letter-spacing:2px;text-transform:uppercase;font-family:inherit;"><i class="bi bi-person"></i> Đăng Nhập</a>`;
+  }
+}
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  document.getElementById('userMenu')?.classList.toggle('open');
+}
+document.addEventListener('click', () => document.getElementById('userMenu')?.classList.remove('open'));
+function logout() {
+  if (confirm('Bạn có chắc muốn đăng xuất?')) {
+    localStorage.removeItem('user'); localStorage.removeItem('token');
+    location.href = 'index.html';
+  }
+}
+
+/* ===== STATE ===== */
+let allOrders = [];
+let myReviews = [];          // danh sách review user đã viết
+let reviewedProductIds = new Set();
+
+const PAY_LABELS = { UNPAID: 'Chưa TT', PAID: 'Đã TT', REFUNDED: 'Hoàn tiền' };
+const PAY_CLASSES = { UNPAID: 'badge-unpaid', PAID: 'badge-paid', REFUNDED: 'badge-refunded' };
+
+function payBadge(s) {
+  return `<span class="badge ${PAY_CLASSES[s] || 'badge-unpaid'}">${PAY_LABELS[s] || s}</span>`;
+}
+
+/* ===== LOAD ===== */
+async function loadOrders() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!user) { location.href = 'login.html'; return; }
+
+  const name = user.fullName || user.username || 'Khách hàng';
+  const initials = name.trim().split(/\s+/).slice(-2).map(w => w[0].toUpperCase()).join('');
+  document.getElementById('sidebarAvatar').textContent = initials;
+  document.getElementById('sidebarName').textContent = name;
+  document.getElementById('sidebarEmail').textContent = user.email || '';
+
+  // Load đơn hàng
+  try {
+    const res = await fetch(`${API}/orders/my-orders`);
+    if (res.ok) {
+      const data = await res.json();
+      const orders = Array.isArray(data) ? data : (data.content || []);
+      allOrders = orders.filter(o => getStatus(o) === 'DELIVERED');
+    } else {
+      allOrders = [];
+    }
+  } catch {
+    allOrders = [];
+  }
+
+  // Load reviews của user (để biết sản phẩm nào đã đánh giá)
+  try {
+    const res = await fetch(`${API}/reviews/my-reviews`);
+    if (res.ok) {
+      const data = await res.json();
+      myReviews = Array.isArray(data) ? data : (data.content || []);
+      reviewedProductIds = new Set(myReviews.map(r => Number(r.product?.id ?? r.productId ?? r.product_id)));
+    }
+  } catch {
+    myReviews = [];
+  }
+
+  renderOrders();
+}
+
+function renderOrders() {
+  const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+  let list = allOrders.filter(o => {
+    if (!kw) return true;
+    if (getOrderCode(o).toLowerCase().includes(kw)) return true;
+    return getItems(o).some(item => {
+      const name = (item.product?.name ?? item.productName ?? '').toLowerCase();
+      return name.includes(kw);
+    });
+  });
+
+  list.sort((a, b) => new Date(getCreatedAt(b) || 0) - new Date(getCreatedAt(a) || 0));
+
+  const container = document.getElementById('orderList');
+
+  if (!list.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-bag-check"></i></div>
+        <div class="empty-title">Chưa có đơn hàng nào hoàn tất</div>
+        <div class="empty-sub">${kw ? 'Không tìm thấy đơn hàng phù hợp.' : 'Các đơn hàng đã giao thành công sẽ hiển thị tại đây.'}</div>
+        ${!kw ? `<a href="products.html" class="btn btn-gold"><i class="bi bi-gem"></i> Khám Phá Sản Phẩm</a>` : ''}
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(o => orderCardHTML(o)).join('');
+}
+
+function orderCardHTML(o) {
+  const id = o.id ?? '';
+  const code = getOrderCode(o);
+  const payStatus = getPayStatus(o);
+  const createdAt = formatDate(getCreatedAt(o));
+  const items = getItems(o);
+  const total = getTotal(o);
+
+  const itemRows = items.map(item => {
+    const pid = item.product?.id ?? item.productId ?? item.product_id;
+    const name = item.product?.name ?? item.productName ?? `Sản phẩm #${pid ?? ''}`;
+    const img = item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '';
+    const qty = item.quantity ?? 0;
+    const price = Number(item.price ?? 0);
+    const alreadyReviewed = pid != null && reviewedProductIds.has(Number(pid));
+
+    return `
+      <div class="order-item-row">
+        <div class="order-item-img">
+          ${img ? `<img src="${img}" alt="${escHtml(name)}" onerror="this.style.display='none'">` : '💍'}
+        </div>
+        <div class="order-item-info">
+          <div class="order-item-name">${escHtml(name)}</div>
+          <div class="order-item-meta">x${qty} · ${formatPrice(price)}</div>
+        </div>
+        <div class="order-item-price">${formatPrice(price * qty)}</div>
+        <div class="order-item-actions">
+          ${pid != null
+            ? alreadyReviewed
+              ? `<button class="btn btn-review reviewed btn-xs"><i class="bi bi-check-circle"></i> Đã đánh giá</button>`
+              : `<button class="btn btn-review btn-xs" onclick="openReviewModal(${pid}, '${escJs(name)}', '${escJs(img)}')"><i class="bi bi-star"></i> Đánh giá</button>`
+            : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="order-card">
+      <div class="order-card-head">
+        <div>
+          <div class="order-code">${escHtml(code)}</div>
+          <div class="order-date"><i class="bi bi-calendar3" style="margin-right:4px;"></i>${createdAt}</div>
+        </div>
+        <div class="order-head-right">
+          ${payBadge(payStatus)}
+          <span class="badge badge-delivered"><i class="bi bi-check-circle"></i> Đã giao</span>
+        </div>
+      </div>
+      <div class="order-card-body">
+        <div class="order-items-preview">
+          ${itemRows}
+        </div>
+      </div>
+      <div class="order-card-foot">
+        <div class="order-total">
+          Tổng cộng:<strong>${formatPrice(total)}</strong>
+        </div>
+        <div class="order-actions">
+          <button class="btn btn-outline btn-sm" onclick="openDetail(${id})">
+            <i class="bi bi-eye"></i> Chi Tiết
+          </button>
+          <button class="btn btn-gold btn-sm" onclick="reorder(${id})"><i class="bi bi-arrow-repeat"></i> Mua Lại</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ===== DETAIL MODAL ===== */
+function openDetail(id) {
+  const o = allOrders.find(x => Number(x.id) === Number(id));
+  if (!o) return;
+
+  const code = getOrderCode(o);
+  const payStatus = getPayStatus(o);
+  const items = getItems(o);
+  const total = getTotal(o);
+  const discount = Number(o.discountAmount ?? o.discount_amount ?? 0);
+  const shipping = o.shippingAddress ?? o.shipping_address ?? '–';
+  const note = o.note ?? '–';
+
+  document.getElementById('modalTitle').textContent = `Đơn Hàng ${code}`;
+
+  const itemsHTML = items.map(item => {
+    const name = item.product?.name ?? item.productName ?? `Sản phẩm #${item.productId ?? ''}`;
+    const img = item.product?.imageUrl ?? item.product?.image_url ?? item.imageUrl ?? '';
+    const qty = item.quantity ?? 0;
+    const price = Number(item.price ?? 0);
+    return `
+      <div class="modal-item-row">
+        <div class="modal-item-img">
+          ${img ? `<img src="${img}" alt="${escHtml(name)}" onerror="this.style.display='none'">` : '💍'}
+        </div>
+        <div class="modal-item-info">
+          <div class="modal-item-name">${escHtml(name)}</div>
+          <div class="modal-item-meta">${formatPrice(price)} × ${qty}</div>
+        </div>
+        <div class="modal-item-price">
+          <div class="modal-item-unit">${qty} sản phẩm</div>
+          <div class="modal-item-total">${formatPrice(price * qty)}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const subtotal = items.reduce((s, i) => s + Number(i.price ?? 0) * Number(i.quantity ?? 0), 0);
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-box-label">Mã đơn hàng</div>
+        <div class="detail-box-value" style="color:var(--gold-dark);font-family:'Cormorant Garamond',serif;font-size:1.05rem;">${escHtml(code)}</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-label">Ngày đặt</div>
+        <div class="detail-box-value">${formatDate(getCreatedAt(o))}</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-label">Trạng thái đơn hàng</div>
+        <div class="detail-box-value"><span class="badge badge-delivered"><i class="bi bi-check-circle"></i> Đã giao</span></div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-label">Thanh toán</div>
+        <div class="detail-box-value">${payBadge(payStatus)}</div>
+      </div>
+      <div class="detail-box full">
+        <div class="detail-box-label">Địa chỉ giao hàng</div>
+        <div class="detail-box-value">${escHtml(shipping)}</div>
+      </div>
+      ${note !== '–' ? `<div class="detail-box full"><div class="detail-box-label">Ghi chú</div><div class="detail-box-value">${escHtml(note)}</div></div>` : ''}
+    </div>
+
+    <div class="modal-items-title">Sản Phẩm Đã Mua</div>
+    ${itemsHTML || '<div style="color:var(--text-muted);font-size:.875rem;padding:12px 0;">Không có thông tin chi tiết sản phẩm.</div>'}
+
+    <div class="modal-summary">
+      <div class="summary-row"><span>Tạm tính</span><span>${formatPrice(subtotal)}</span></div>
+      ${discount > 0 ? `<div class="summary-row"><span>Giảm giá</span><span style="color:var(--pink)">-${formatPrice(discount)}</span></div>` : ''}
+      <div class="summary-row total"><span>Tổng cộng</span><span>${formatPrice(total)}</span></div>
+    </div>`;
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+/* ===== REVIEW MODAL ===== */
+let _reviewProductId = null;
+let _selectedRating = 0;
+
+function openReviewModal(productId, productName, productImg) {
+  _reviewProductId = productId;
+  _selectedRating = 0;
+
+  document.getElementById('reviewProductMini').innerHTML = `
+    <div class="order-item-img">
+      ${productImg ? `<img src="${productImg}" alt="${escHtml(productName)}" onerror="this.style.display='none'">` : '💍'}
+    </div>
+    <div class="order-item-info">
+      <div class="order-item-name">${escHtml(productName)}</div>
+      <div class="order-item-meta">Đánh giá sản phẩm này</div>
+    </div>`;
+
+  document.getElementById('reviewComment').value = '';
+  updateStars(0);
+  document.getElementById('reviewOverlay').classList.add('open');
+}
+function closeReviewModal() {
+  document.getElementById('reviewOverlay').classList.remove('open');
+}
+
+document.getElementById('starPick').querySelectorAll('i').forEach(star => {
+  star.addEventListener('click', () => {
+    _selectedRating = parseInt(star.dataset.v);
+    updateStars(_selectedRating);
+  });
+  star.addEventListener('mouseenter', () => updateStars(parseInt(star.dataset.v)));
+  star.addEventListener('mouseleave', () => updateStars(_selectedRating));
+});
+function updateStars(count) {
+  document.getElementById('starPick').querySelectorAll('i').forEach((s, i) => {
+    s.className = i < count ? 'bi bi-star-fill lit' : 'bi bi-star';
+  });
+}
+
+async function submitReview() {
+  if (!_selectedRating) { showToast('Vui lòng chọn số sao!', 'error'); return; }
+  const comment = document.getElementById('reviewComment').value.trim();
+  if (!comment) { showToast('Vui lòng nhập nội dung đánh giá!', 'error'); return; }
+
+  try {
+    const res = await fetch(
+      `${API}/reviews?productId=${_reviewProductId}&rating=${_selectedRating}&comment=${encodeURIComponent(comment)}`,
+      { method: 'POST' }
+    );
+    if (!res.ok) throw new Error(await res.text());
+
+    reviewedProductIds.add(Number(_reviewProductId));
+    closeReviewModal();
+    renderOrders();
+    showToast('Cảm ơn bạn đã đánh giá sản phẩm!');
+  } catch {
+    showToast('Không thể gửi đánh giá. Vui lòng thử lại!', 'error');
+  }
+}
+
+/* ===== REORDER ===== */
+function reorder(id) {
+  const o = allOrders.find(x => Number(x.id) === Number(id));
+  if (!o) return;
+  const items = getItems(o);
+  if (!items.length) { location.href = 'products.html'; return; }
+
+  let cart = [];
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch {}
+
+  items.forEach(item => {
+    const pId = item.product?.id ?? item.productId;
+    const pName = item.product?.name ?? item.productName ?? 'Sản phẩm';
+    const price = Number(item.price ?? 0);
+    const img = item.product?.imageUrl ?? '';
+    const qty = Number(item.quantity ?? 1);
+    const idx = cart.findIndex(c => c.id === pId);
+    if (idx > -1) cart[idx].quantity += qty;
+    else cart.push({ id: pId, name: pName, price, image: img, quantity: qty });
+  });
+
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  showToast('Đã thêm sản phẩm vào giỏ hàng');
+  setTimeout(() => location.href = 'cart.html', 1000);
+}
+
+/* ===== HELPERS ===== */
+function getOrderCode(o) { return o.orderCode ?? o.order_code ?? `ORDER-${o.id ?? ''}`; }
+function getStatus(o) { return o.status ?? 'PENDING'; }
+function getPayStatus(o) { return o.paymentStatus ?? o.payment_status ?? o.payment?.status ?? 'UNPAID'; }
+function getCreatedAt(o) { return o.createdAt ?? o.created_at ?? ''; }
+function getItems(o) { return o.orderItems ?? o.order_items ?? o.items ?? []; }
+function getTotal(o) { return Number(o.finalAmount ?? o.final_amount ?? o.totalAmount ?? o.total_amount ?? 0); }
+function escHtml(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escJs(v) { return String(v ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+/* ===== INIT ===== */
+renderNavUser();
+updateCartBadge();
+loadOrders();
+</script>
+</body>
+</html>

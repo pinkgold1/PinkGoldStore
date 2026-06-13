@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản Lý Sản Phẩm - PinkGold Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root{
+      --gold:#c9a84c;--gold-light:#e8c97a;--gold-dark:#8b6914;
+      --pink:#d4637a;--cream:#faf6f0;--dark:#1a1208;
+      --muted:#7b7468;--line:#f0e8d8;--bg:#f8f4ed;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);}
+
+    /* ── HEADER ── */
+    .header{background:white;box-shadow:0 2px 10px rgba(0,0,0,.1);position:fixed;top:0;left:0;right:0;z-index:1000;height:70px;display:flex;align-items:center;padding:0 30px;}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--gold-dark);letter-spacing:2px;}
+    .nav-right{margin-left:auto;display:flex;align-items:center;gap:20px;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{position:fixed;left:0;top:70px;bottom:0;width:260px;background:var(--dark);color:#e8d9c0;padding:30px 20px;overflow-y:auto;}
+    .sidebar a{color:#e8d9c0;text-decoration:none;display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:8px;margin-bottom:6px;transition:all .3s;}
+    .sidebar a:hover,.sidebar a.active{background:var(--gold);color:var(--dark);}
+
+    /* ── MAIN ── */
+    .main-content{margin-left:260px;margin-top:70px;padding:30px;}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--dark);margin-bottom:24px;}
+    .card{background:white;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08);padding:24px;margin-bottom:24px;}
+
+    /* ── BUTTONS ── */
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;transition:all .2s;}
+    .btn-gold{background:var(--gold);color:white;}
+    .btn-gold:hover{background:var(--gold-dark);}
+    .btn-outline{background:transparent;border:1.5px solid var(--gold);color:var(--gold-dark);}
+    .btn-outline:hover{background:var(--gold);color:white;}
+
+    /* ── TOOLBAR ── */
+    .toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+    .toolbar input,.toolbar select{padding:10px 16px;border:1.5px solid #e8dfd0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:white;}
+    .toolbar input:focus,.toolbar select:focus{border-color:var(--gold);}
+    .toolbar input{flex:1;min-width:200px;}
+
+    /* ── TABLE ── */
+    .server-error{display:none;background:#fff4f4;border:1px solid #ffd4d4;color:#8a1f1f;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:.88rem;}
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;padding:12px 16px;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:2px solid #f0e8d8;}
+    td{padding:12px 16px;border-bottom:1px solid #f5f0e8;font-size:.88rem;vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#fffbf5;}
+    .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:500;}
+    .badge-active{background:#d4edda;color:#155724;}
+    .badge-inactive{background:#f8d7da;color:#721c24;}
+    .badge-restock{background:#fdf0d5;color:#8b6914;}
+    .badge-order{background:#e8e0d0;color:#2d2010;}
+    .price{font-weight:600;color:var(--gold-dark);}
+    .price-old{text-decoration:line-through;color:#aaa;font-size:.8rem;}
+    .img-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;}
+    .img-placeholder{width:52px;height:52px;border-radius:8px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;color:#c5b99a;}
+    .action-btn{background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background .2s;font-size:1rem;}
+    .action-btn:hover{background:#f5f0e8;}
+    .action-btn.edit{color:var(--gold-dark);}
+    .action-btn.del{color:#dc3545;}
+    .stock-low{color:#dc3545;font-weight:500;}
+    .empty-state{text-align:center;padding:60px 20px;color:#aaa;}
+
+    /* ── PAGINATION ── */
+    .pagination{display:flex;gap:8px;justify-content:center;margin-top:20px;}
+    .pagination button{width:36px;height:36px;border-radius:8px;border:1.5px solid #e8dfd0;background:white;cursor:pointer;font-size:.875rem;transition:all .2s;}
+    .pagination button:hover,.pagination button.active{background:var(--gold);border-color:var(--gold);color:white;}
+
+    /* ── MODAL ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:white;border-radius:16px;padding:32px;width:720px;max-width:95%;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin-bottom:24px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:6px;font-weight:500;}
+    .form-control{width:100%;padding:10px 14px;border:1.5px solid #e8dfd0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);outline:none;transition:border-color .2s;}
+    .form-control:focus{border-color:var(--gold);}
+    .form-hint{font-size:.74rem;color:#aaa;margin-top:4px;}
+    .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;}
+
+    /* ── AVAILABILITY ── */
+    .availability-note{font-size:.74rem;color:#999;margin-top:4px;line-height:1.5;}
+
+    /* ══════════════════════════════════════════
+       UPLOAD — GIẤY KIỂM ĐỊNH (1 ảnh)
+    ══════════════════════════════════════════ */
+    .upload-section{
+      border:1.5px dashed #e8dfd0;border-radius:10px;
+      padding:18px 18px 14px;margin-bottom:18px;background:#fffdf8;
+    }
+    .upload-section-title{
+      font-size:.74rem;letter-spacing:1px;text-transform:uppercase;
+      color:var(--gold-dark);font-weight:600;margin-bottom:12px;
+      display:flex;align-items:center;gap:7px;
+    }
+
+    /* single cert image */
+    .cert-row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+    .cert-thumb{
+      width:96px;height:96px;border-radius:8px;border:1.5px solid #e8dfd0;
+      background:#f5f0e8;display:flex;align-items:center;justify-content:center;
+      overflow:hidden;flex:none;position:relative;
+    }
+    .cert-thumb img{width:100%;height:100%;object-fit:cover;}
+    .cert-thumb i{font-size:1.8rem;color:#c5b99a;}
+    .cert-remove{
+      position:absolute;top:-8px;right:-8px;
+      width:22px;height:22px;border-radius:50%;
+      background:#dc3545;color:white;border:none;cursor:pointer;
+      font-size:.65rem;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.2);
+    }
+    .cert-info{flex:1;min-width:160px;}
+    .cert-filename{
+      font-size:.78rem;color:var(--muted);margin-bottom:8px;
+      word-break:break-all;min-height:18px;
+    }
+    .file-btn{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 16px;border:1.5px solid var(--gold);
+      color:var(--gold-dark);border-radius:8px;cursor:pointer;
+      font-size:.8rem;font-weight:500;background:white;transition:all .2s;
+    }
+    .file-btn:hover{background:var(--gold);color:white;}
+    input[type=file]{display:none;}
+    .upload-status{font-size:.74rem;margin-top:7px;min-height:18px;}
+    .upload-status.uploading{color:var(--gold-dark);}
+    .upload-status.success{color:#155724;}
+    .upload-status.error{color:#dc3545;}
+
+    /* ══════════════════════════════════════════
+       UPLOAD — ẢNH SẢN PHẨM (nhiều ảnh)
+    ══════════════════════════════════════════ */
+    .gallery-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;min-height:96px;}
+    .gallery-item{
+      position:relative;width:86px;height:86px;
+      border-radius:8px;overflow:hidden;
+      border:2px solid #e8dfd0;background:#f5f0e8;flex:none;
+    }
+    .gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+    .gallery-item.primary{border-color:var(--gold);}
+    .gallery-primary-tag{
+      position:absolute;bottom:0;left:0;right:0;
+      background:var(--gold);color:white;
+      font-size:.58rem;text-align:center;padding:2px 0;
+      letter-spacing:.5px;font-weight:700;text-transform:uppercase;
+    }
+    .gallery-item-overlay{
+      position:absolute;inset:0;
+      background:rgba(26,18,8,.6);
+      display:flex;align-items:center;justify-content:center;gap:5px;
+      opacity:0;transition:opacity .2s;
+    }
+    .gallery-item:hover .gallery-item-overlay{opacity:1;}
+    .gallery-item-btn{
+      width:28px;height:28px;border-radius:50%;
+      border:none;background:white;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      font-size:.82rem;color:var(--dark);transition:all .15s;
+    }
+    .gallery-item-btn:hover{transform:scale(1.1);}
+    .gallery-item-btn.del{color:#dc3545;}
+    .gallery-empty{
+      width:100%;display:flex;align-items:center;justify-content:center;
+      color:#c5b99a;font-size:.8rem;gap:6px;padding:20px 0;
+    }
+    .gallery-add{
+      width:86px;height:86px;border-radius:8px;
+      border:1.5px dashed #d4c9b0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:5px;color:#b3a78c;cursor:pointer;font-size:.72rem;
+      background:white;transition:all .2s;flex:none;
+    }
+    .gallery-add:hover{border-color:var(--gold);color:var(--gold-dark);background:var(--cream);}
+    .gallery-add i{font-size:1.4rem;}
+    .gallery-note{font-size:.73rem;color:#aaa;margin-top:6px;}
+    .gallery-hint-new{
+      font-size:.78rem;color:#8b6914;background:#fdf5e4;
+      border:1px solid #f0d78a;border-radius:6px;padding:9px 12px;
+      display:none;margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">PINKGOLD</div>
+  <div class="nav-right">
+    <span style="color:var(--gold-dark);font-weight:500;" id="adminName">Admin</span>
+    <a href="login-admin.html" onclick="logout()" style="color:#666;text-decoration:none;cursor:pointer;">
+      <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+  </div>
+</header>
+
+<aside class="sidebar">
+  <a href="products.html" class="active"><i class="bi bi-gem"></i> Quản Lý Sản Phẩm</a>
+  <a href="categories.html"><i class="bi bi-tags"></i> Quản Lý Danh Mục</a>
+  <a href="orders.html"><i class="bi bi-cart"></i> Quản Lý Đơn Hàng</a>
+  <a href="customers.html"><i class="bi bi-people"></i> Quản Lý Khách Hàng</a>
+  <a href="vouchers.html"><i class="bi bi-ticket-perforated"></i> Mã Giảm Giá</a>
+  <a href="reports.html"><i class="bi bi-graph-up"></i> Báo Cáo Thống Kê</a>
+  <hr style="border-color:#444;margin:25px 0;">
+  <a href="login-admin.html" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</a>
+</aside>
+
+<main class="main-content">
+  <h1 class="page-title">Quản Lý Sản Phẩm</h1>
+
+  <div class="card">
+    <div id="serverError" class="server-error"></div>
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Tìm theo tên sản phẩm..." oninput="filterProducts()">
+      <select id="filterCategory" onchange="filterProducts()">
+        <option value="">Tất cả danh mục</option>
+      </select>
+      <select id="filterStatus" onchange="filterProducts()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="true">Đang bán</option>
+        <option value="false">Tạm ẩn</option>
+      </select>
+      <button class="btn btn-gold" onclick="openModal()">
+        <i class="bi bi-plus-lg"></i> Thêm Sản Phẩm
+      </button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ảnh</th>
+          <th>Tên Sản Phẩm</th>
+          <th>Danh Mục</th>
+          <th>Giá</th>
+          <th>Tồn Kho</th>
+          <th>Chất Liệu</th>
+          <th>Trạng Thái</th>
+          <th>Thao Tác</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        <tr><td colspan="8" class="empty-state">Đang tải...</td></tr>
+      </tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</main>
+
+<!-- ════════════════════════════════════════════════════
+     MODAL THÊM / SỬA SẢN PHẨM
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 class="modal-title" id="modalTitle">Thêm Sản Phẩm Mới</h2>
+    <input type="hidden" id="productId">
+
+    <!-- Tên & Danh mục -->
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Tên Sản Phẩm *</label>
+        <input type="text" class="form-control" id="pName" placeholder="VD: Nhẫn Vàng 18K Đá CZ">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Danh Mục</label>
+        <select class="form-control" id="pCategory"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Chất Liệu</label>
+        <input type="text" class="form-control" id="pMaterial" placeholder="Vàng 18K, Bạc 925...">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Giá Gốc (VNĐ) *</label>
+        <input type="number" class="form-control" id="pPrice" placeholder="2450000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Giá Khuyến Mãi</label>
+        <input type="number" class="form-control" id="pDiscountPrice" placeholder="2190000">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tồn Kho</label>
+        <input type="number" class="form-control" id="pStock" placeholder="50" oninput="toggleAvailabilityFields()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Trọng Lượng (gram)</label>
+        <input type="number" class="form-control" id="pWeight" placeholder="2.45">
+      </div>
+    </div>
+
+    <!-- Tình trạng khi hết hàng -->
+    <div class="form-row" id="availabilityRow" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Tình Trạng Khi Hết Hàng</label>
+        <select class="form-control" id="pAvailability" onchange="toggleRestockDate()">
+          <option value="IN_STOCK">Hết hàng (chưa rõ)</option>
+          <option value="RESTOCKING">Đang nhập hàng (có ngày về)</option>
+          <option value="MADE_TO_ORDER">Đặt riêng — liên hệ</option>
+        </select>
+        <div class="availability-note">Chỉ hiển thị khi tồn kho = 0.</div>
+      </div>
+      <div class="form-group" id="restockDateGroup" style="display:none;">
+        <label class="form-label">Ngày Dự Kiến Có Hàng</label>
+        <input type="date" class="form-control" id="pRestockDate">
+      </div>
+    </div>
+
+    <!-- ═══ UPLOAD ẢNH GIẤY KIỂM ĐỊNH (1 ảnh) ═══ -->
+    <div class="upload-section">
+      <div class="upload-section-title">
+        <i class="bi bi-file-earmark-check"></i>
+        Ảnh Giấy Kiểm Định <span style="font-weight:400;color:#aaa;">(1 ảnh, lưu vào images/)</span>
+      </div>
+      <div class="cert-row">
+        <div class="cert-thumb" id="certThumb">
+          <i class="bi bi-file-earmark-image"></i>
+        </div>
+        <div class="cert-info">
+          <div class="cert-filename" id="certFilename">Chưa có ảnh</div>
+          <label class="file-btn" for="certFileInput">
+            <i class="bi bi-upload"></i> Chọn ảnh
+          </label>
+          <input type="file" id="certFileInput" accept="image/*" onchange="uploadCertImage(event)">
+          <div class="upload-status" id="certStatus"></div>
+        </div>
+      </div>
+      <!-- Lưu URL trả về từ server -->
+      <input type="hidden" id="pImage">
+    </div>
+
+    <!-- ═══ UPLOAD ẢNH SẢN PHẨM (nhiều ảnh) ═══ -->
+    <div class="upload-section">
+      <div class="upload-section-title">
+        <i class="bi bi-images"></i>
+        Ảnh Sản Phẩm <span style="font-weight:400;color:#aaa;">(nhiều ảnh, lưu vào images/)</span>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-empty">
+          <i class="bi bi-images"></i> Chưa có ảnh nào
+        </div>
+      </div>
+
+      <label class="file-btn" for="galleryFileInput">
+        <i class="bi bi-upload"></i> Thêm ảnh sản phẩm
+      </label>
+      <input type="file" id="galleryFileInput" accept="image/*" multiple onchange="uploadGalleryImages(event)">
+      <div class="upload-status" id="galleryStatus"></div>
+
+      <!-- Thông báo khi sản phẩm mới chưa lưu -->
+      <div class="gallery-hint-new" id="galleryHintNew">
+        <i class="bi bi-info-circle"></i>
+        Lưu sản phẩm trước để có thể thêm ảnh sản phẩm.
+        Sau khi lưu, bấm <strong>Sửa</strong> để thêm ảnh.
+      </div>
+
+      <div class="gallery-note">Ảnh đầu tiên sẽ là ảnh đại diện. Hover vào ảnh để đặt ảnh chính hoặc xóa.</div>
+    </div>
+
+    <!-- Mô tả & Trạng thái -->
+    <div class="form-group">
+      <label class="form-label">Mô Tả</label>
+      <textarea class="form-control" id="pDesc" rows="3" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Trạng Thái</label>
+      <select class="form-control" id="pStatus">
+        <option value="true">Đang bán</option>
+        <option value="false">Tạm ẩn</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-gold" onclick="saveProduct()">
+        <i class="bi bi-check-lg"></i> Lưu sản phẩm
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG
+============================================================ */
+const API = localStorage.getItem('API_BASE') || 'http://localhost:8080/api';
+// URL gốc của backend để phục vụ ảnh tĩnh
+// Ảnh lưu ở images/abc.jpg → truy cập qua http://localhost:8080/images/abc.jpg
+const IMG_BASE = 'http://localhost:8080';
+
+let allProducts = [], allCategories = [], currentFilteredProducts = [];
+let currentPage = 1;
+const PAGE_SIZE = 10;
+
+let editingProductId = null;      // null = thêm mới, số = đang sửa
+let currentGalleryImages = [];    // [{id, imageUrl, isPrimary}]
+
+/* ── Admin name ── */
+const admin = JSON.parse(localStorage.getItem('user') || '{}');
+if (admin.fullName || admin.fullname) {
+  document.getElementById('adminName').textContent = admin.fullName || admin.fullname;
+}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+async function fetchJson(path) {
+  const res = await fetch(`${API}${path}`, { headers: { Accept: 'application/json' } });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`${path} → HTTP ${res.status}${t ? ': ' + t.slice(0, 200) : ''}`);
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.content || data.data || []);
+}
+
+function fmt(v) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(v || 0));
+}
+function esc(v) {
+  return String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function escJs(v) {
+  return String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+/* URL đầy đủ để hiển thị ảnh — nếu đã là http thì giữ nguyên, nếu là path tương đối thì thêm IMG_BASE */
+function imgUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${IMG_BASE}/${path.replace(/^\//, '')}`;
+}
+
+/* ============================================================
+   LOAD DATA
+============================================================ */
+async function loadAll() {
+  hideServerError();
+  document.getElementById('productTableBody').innerHTML =
+    `<tr><td colspan="8" class="empty-state">Đang tải...</td></tr>`;
+
+  try {
+    allProducts = await fetchJson('/products');
+  } catch (e) {
+    allProducts = [];
+    showServerError(`Không tải được sản phẩm. Chi tiết: ${e.message}`);
+  }
+
+  try {
+    allCategories = await fetchJson('/categories');
+  } catch (e) {
+    allCategories = [];
+  }
+
+  populateCategoryFilter();
+  populateCategorySelect();
+  currentPage = 1;
+  currentFilteredProducts = allProducts;
+  renderTable(currentFilteredProducts);
+
+  // Sau khi render bảng, load ảnh đại diện từ product_images cho từng sản phẩm
+  loadPrimaryImages(allProducts);
+}
+
+// Load ảnh đại diện (từ product_images) cho danh sách sản phẩm
+// Gọi bất đồng bộ để không chặn render bảng
+async function loadPrimaryImages(products) {
+  for (const p of products) {
+    try {
+      const imgs = await fetchJson(`/product-images/product/${p.id}`);
+      if (!imgs.length) continue;
+      const primary = imgs.find(i => i.isPrimary) || imgs[0];
+      const url = primary.imageUrl || primary.image_url || '';
+      if (!url) continue;
+      p._primaryImage = url;
+      // Cập nhật ô ảnh trong bảng nếu sản phẩm đang hiển thị
+      const imgEl = document.querySelector(`img[data-pid="${p.id}"]`);
+      if (imgEl) {
+        imgEl.src = imgUrl(url);
+      } else {
+        // Nếu placeholder đang hiện, thay bằng img
+        const phEl = document.querySelector(`div[data-pid="${p.id}"]`);
+        if (phEl) {
+          phEl.outerHTML = `<img data-pid="${p.id}" src="${esc(imgUrl(url))}" class="img-thumb"
+            onerror="this.outerHTML='<div class=&quot;img-placeholder&quot; data-pid=&quot;${p.id}&quot;><i class=&quot;bi bi-image&quot;></i></div>'">`;
+        }
+      }
+    } catch { /* bỏ qua nếu lỗi */ }
+  }
+}
+
+function showServerError(msg) {
+  const b = document.getElementById('serverError');
+  b.textContent = msg;
+  b.style.display = 'block';
+}
+function hideServerError() {
+  const b = document.getElementById('serverError');
+  b.textContent = '';
+  b.style.display = 'none';
+}
+
+/* ============================================================
+   FILTER / RENDER TABLE
+============================================================ */
+function getCategoryId(p) {
+  return p.category?.id ?? p.categoryId ?? p.category_id ?? '';
+}
+function getCategoryName(p) {
+  const id = String(getCategoryId(p));
+  const found = allCategories.find(c => String(c.id) === id);
+  return p.category?.name || p.categoryName || found?.name || '-';
+}
+
+function populateCategoryFilter() {
+  const sel = document.getElementById('filterCategory');
+  sel.innerHTML = '<option value="">Tất cả danh mục</option>';
+  allCategories.forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${esc(c.name)}</option>`;
+  });
+}
+function populateCategorySelect() {
+  const sel = document.getElementById('pCategory');
+  sel.innerHTML = '<option value="">-- Chọn danh mục --</option>';
+  allCategories.forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${esc(c.name)}</option>`;
+  });
+}
+
+function filterProducts() {
+  const kw  = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cat = document.getElementById('filterCategory').value;
+  const st  = document.getElementById('filterStatus').value;
+
+  currentFilteredProducts = allProducts.filter(p => {
+    const matchName = String(p.name || '').toLowerCase().includes(kw);
+    const matchCat  = !cat || String(getCategoryId(p)) === cat;
+    const matchSt   = st === '' || String(p.status) === st;
+    return matchName && matchCat && matchSt;
+  });
+
+  currentPage = 1;
+  renderTable(currentFilteredProducts);
+}
+
+function renderTable(data) {
+  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = Math.max(totalPages, 1);
+  const pageData = data.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const tbody = document.getElementById('productTableBody');
+  if (!pageData.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">
+      <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
+      Không có sản phẩm nào
+    </td></tr>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = pageData.map(p => {
+    const price   = Number(p.price || 0);
+    const discP   = p.discountPrice ?? p.discount_price;
+    const status  = p.status !== false;
+    const stock   = Number(p.stock || 0);
+    const avail   = p.availabilityType || p.availability_type || 'IN_STOCK';
+
+    // Ảnh đại diện: CHỈ lấy từ product_images (gallery), KHÔNG dùng ảnh giấy kiểm định
+    const thumbSrc = esc(imgUrl(p._primaryImage || ''));
+
+    let stockCell = `<span class="${stock <= 5 ? 'stock-low' : ''}">${stock} cái</span>`;
+    if (stock <= 0) {
+      if (avail === 'RESTOCKING') {
+        const dt = p.restockDate || p.restock_date || '';
+        stockCell += ` <span class="badge badge-restock">Đang nhập${dt ? ' · ' + dt : ''}</span>`;
+      } else if (avail === 'MADE_TO_ORDER') {
+        stockCell += ` <span class="badge badge-order">Đặt riêng</span>`;
+      }
+    }
+
+    return `
+      <tr>
+        <td>
+          ${thumbSrc
+            ? `<img data-pid="${p.id}" src="${thumbSrc}" class="img-thumb"
+                    onerror="this.outerHTML='<div class=&quot;img-placeholder&quot; data-pid=&quot;${p.id}&quot;><i class=&quot;bi bi-image&quot;></i></div>'">`
+            : `<div class="img-placeholder" data-pid="${p.id}"><i class="bi bi-image"></i></div>`}
+        </td>
+        <td>
+          <div style="font-weight:500;">${esc(p.name || '')}</div>
+          <div style="font-size:.78rem;color:#999;">${esc(p.material || '')}</div>
+        </td>
+        <td style="color:#666;">${esc(getCategoryName(p))}</td>
+        <td>
+          <div class="price">${fmt(discP || price)}</div>
+          ${discP ? `<div class="price-old">${fmt(price)}</div>` : ''}
+        </td>
+        <td>${stockCell}</td>
+        <td style="font-size:.82rem;color:#666;">${esc(p.material || '-')}</td>
+        <td><span class="badge ${status ? 'badge-active' : 'badge-inactive'}">${status ? 'Đang bán' : 'Tạm ẩn'}</span></td>
+        <td>
+          <button class="action-btn edit" onclick="editProduct(${p.id})" title="Sửa"><i class="bi bi-pencil"></i></button>
+          <button class="action-btn del"  onclick="deleteProduct(${p.id}, '${escJs(p.name || '')}')" title="Xóa"><i class="bi bi-trash"></i></button>
+        </td>
+      </tr>`;
+  }).join('');
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  const pg = document.getElementById('pagination');
+  if (totalPages <= 1) { pg.innerHTML = ''; return; }
+  pg.innerHTML = Array.from({ length: totalPages }, (_, i) =>
+    `<button class="${i + 1 === currentPage ? 'active' : ''}" onclick="goPage(${i + 1})">${i + 1}</button>`
+  ).join('');
+}
+function goPage(n) { currentPage = n; renderTable(currentFilteredProducts); }
+
+/* ============================================================
+   AVAILABILITY FIELDS
+============================================================ */
+function toggleAvailabilityFields() {
+  const stock = parseInt(document.getElementById('pStock').value) || 0;
+  document.getElementById('availabilityRow').style.display = stock <= 0 ? 'grid' : 'none';
+  if (stock <= 0) toggleRestockDate();
+}
+function toggleRestockDate() {
+  const v = document.getElementById('pAvailability').value;
+  document.getElementById('restockDateGroup').style.display = v === 'RESTOCKING' ? 'block' : 'none';
+}
+
+/* ============================================================
+   MODAL OPEN / CLOSE
+============================================================ */
+function openModal(p = null) {
+  editingProductId = p ? p.id : null;
+  currentGalleryImages = [];
+
+  document.getElementById('modalTitle').textContent = p ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới';
+  document.getElementById('productId').value         = p ? p.id : '';
+  document.getElementById('pName').value             = p ? (p.name || '')         : '';
+  document.getElementById('pMaterial').value         = p ? (p.material || '')     : '';
+  document.getElementById('pPrice').value            = p ? (p.price || '')        : '';
+  document.getElementById('pDiscountPrice').value    = p ? (p.discountPrice ?? p.discount_price ?? '') : '';
+  document.getElementById('pStock').value            = p ? (p.stock ?? 0)        : '';
+  document.getElementById('pWeight').value           = p ? (p.weight || '')      : '';
+  document.getElementById('pDesc').value             = p ? (p.description || '') : '';
+  document.getElementById('pStatus').value           = p ? String(p.status !== false) : 'true';
+  document.getElementById('pCategory').value         = p ? getCategoryId(p) : '';
+
+  // Availability
+  document.getElementById('pAvailability').value = p ? (p.availabilityType || 'IN_STOCK') : 'IN_STOCK';
+  document.getElementById('pRestockDate').value  = p ? (p.restockDate || p.restock_date || '') : '';
+  toggleAvailabilityFields();
+
+  // Cert image
+  const certUrl = p ? (p.imageUrl || p.image_url || '') : '';
+  document.getElementById('pImage').value = certUrl;
+  renderCertPreview(certUrl);
+  document.getElementById('certStatus').textContent = '';
+  document.getElementById('certStatus').className = 'upload-status';
+
+  // Gallery images
+  document.getElementById('galleryStatus').textContent = '';
+  document.getElementById('galleryStatus').className = 'upload-status';
+  document.getElementById('galleryHintNew').style.display = p ? 'none' : 'block';
+
+  if (p && p.id) {
+    loadGalleryImages(p.id);
+  } else {
+    renderGalleryGrid(); // hiển thị lưới rỗng
+  }
+
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function editProduct(id) {
+  const p = allProducts.find(x => Number(x.id) === Number(id));
+  if (p) openModal(p);
+}
+
+/* ============================================================
+   ẢNH GIẤY KIỂM ĐỊNH — 1 ảnh
+   Upload: POST /api/upload  →  { url: "images/xxx.jpg" }
+   Ảnh lưu ở images/ trên máy backend
+   Hiển thị: http://localhost:8080/images/xxx.jpg
+============================================================ */
+function renderCertPreview(url) {
+  const box = document.getElementById('certThumb');
+  const fnEl = document.getElementById('certFilename');
+  if (url) {
+    const full = imgUrl(url);
+    box.innerHTML = `
+      <img src="${esc(full)}" onerror="this.outerHTML='<i class=&quot;bi bi-file-earmark-image&quot;></i>'">
+      <button class="cert-remove" onclick="removeCertImage()" title="Xóa ảnh">
+        <i class="bi bi-x"></i>
+      </button>`;
+    fnEl.textContent = url.split('/').pop();
+  } else {
+    box.innerHTML = `<i class="bi bi-file-earmark-image"></i>`;
+    fnEl.textContent = 'Chưa có ảnh';
+  }
+}
+
+function removeCertImage() {
+  const url = document.getElementById('pImage').value;
+  if (url) {
+    // Xóa file trên server (không chặn luồng)
+    fetch(`${API}/upload?url=${encodeURIComponent(url)}`, { method: 'DELETE' }).catch(() => {});
+  }
+  document.getElementById('pImage').value = '';
+  renderCertPreview('');
+}
+
+async function uploadCertImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('certStatus');
+  statusEl.textContent = 'Đang tải lên...';
+  statusEl.className = 'upload-status uploading';
+
+  // Xóa ảnh cũ nếu có
+  const oldUrl = document.getElementById('pImage').value;
+  if (oldUrl) {
+    fetch(`${API}/upload?url=${encodeURIComponent(oldUrl)}`, { method: 'DELETE' }).catch(() => {});
+  }
+
+  try {
+    const form = new FormData();
+    form.append('file', file);
+
+    const res = await fetch(`${API}/upload`, { method: 'POST', body: form });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+
+    const data = await res.json();
+    const url = data.url || data.path || data.imageUrl;
+    if (!url) throw new Error('Server không trả về đường dẫn ảnh.');
+
+    document.getElementById('pImage').value = url;
+    renderCertPreview(url);
+    statusEl.textContent = '✓ Tải lên thành công';
+    statusEl.className = 'upload-status success';
+  } catch (e) {
+    statusEl.textContent = `Lỗi: ${e.message}`;
+    statusEl.className = 'upload-status error';
+  } finally {
+    event.target.value = '';
+  }
+}
+
+/* ============================================================
+   ẢNH SẢN PHẨM — nhiều ảnh (bảng product_images)
+   Upload: POST /api/upload  →  { url: "images/xxx.jpg" }
+   Sau đó gọi POST /api/product-images để lưu vào CSDL
+============================================================ */
+async function loadGalleryImages(productId) {
+  document.getElementById('galleryStatus').textContent = 'Đang tải ảnh...';
+  try {
+    const imgs = await fetchJson(`/product-images/product/${productId}`);
+    currentGalleryImages = imgs.map(i => ({
+      id: i.id,
+      imageUrl: i.imageUrl || i.image_url || '',
+      isPrimary: !!i.isPrimary
+    }));
+    document.getElementById('galleryStatus').textContent = '';
+  } catch (e) {
+    currentGalleryImages = [];
+    document.getElementById('galleryStatus').textContent = `Không tải được ảnh: ${e.message}`;
+    document.getElementById('galleryStatus').className = 'upload-status error';
+  }
+  renderGalleryGrid();
+}
+
+function renderGalleryGrid() {
+  const grid = document.getElementById('galleryGrid');
+
+  if (!currentGalleryImages.length && !editingProductId) {
+    grid.innerHTML = `<div class="gallery-empty"><i class="bi bi-images"></i> Chưa có ảnh</div>`;
+    return;
+  }
+
+  const items = currentGalleryImages.map(img => `
+    <div class="gallery-item ${img.isPrimary ? 'primary' : ''}">
+      <img src="${esc(imgUrl(img.imageUrl))}"
+           onerror="this.style.display='none'">
+      ${img.isPrimary ? `<div class="gallery-primary-tag">Ảnh chính</div>` : ''}
+      <div class="gallery-item-overlay">
+        ${!img.isPrimary
+          ? `<button class="gallery-item-btn" onclick="setPrimaryImage(${img.id})" title="Đặt làm ảnh chính">
+               <i class="bi bi-star"></i>
+             </button>`
+          : ''}
+        <button class="gallery-item-btn del" onclick="deleteGalleryImage(${img.id})" title="Xóa ảnh">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>`
+  ).join('');
+
+  const addBtn = `
+    <label class="gallery-add" for="galleryFileInput" title="Thêm ảnh">
+      <i class="bi bi-plus-lg"></i>
+      <span>Thêm ảnh</span>
+    </label>`;
+
+  grid.innerHTML = items + (editingProductId ? addBtn : '');
+}
+
+async function uploadGalleryImages(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+
+  // Nếu sản phẩm chưa được lưu, báo lỗi
+  if (!editingProductId) {
+    document.getElementById('galleryHintNew').style.display = 'block';
+    document.getElementById('galleryStatus').textContent = 'Vui lòng lưu sản phẩm trước.';
+    document.getElementById('galleryStatus').className = 'upload-status error';
+    event.target.value = '';
+    return;
+  }
+
+  const statusEl = document.getElementById('galleryStatus');
+  statusEl.className = 'upload-status uploading';
+
+  let uploaded = 0;
+  for (const file of files) {
+    statusEl.textContent = `Đang tải ảnh ${uploaded + 1}/${files.length}...`;
+
+    try {
+      // 1. Upload file lên server → lấy url
+      const form = new FormData();
+      form.append('file', file);
+      const upRes = await fetch(`${API}/upload`, { method: 'POST', body: form });
+      if (!upRes.ok) throw new Error(`HTTP ${upRes.status}: ${await upRes.text()}`);
+      const upData = await upRes.json();
+      const url = upData.url || upData.path || upData.imageUrl;
+      if (!url) throw new Error('Server không trả về url.');
+
+      // 2. Lưu vào bảng product_images
+      const isPrimary = currentGalleryImages.length === 0; // ảnh đầu tiên = ảnh chính
+      const addRes = await fetch(
+        `${API}/product-images?productId=${editingProductId}&imageUrl=${encodeURIComponent(url)}&isPrimary=${isPrimary}`,
+        { method: 'POST', headers: { Accept: 'application/json' } }
+      );
+      if (!addRes.ok) throw new Error(`HTTP ${addRes.status}: ${await addRes.text()}`);
+      const saved = await addRes.json();
+
+      currentGalleryImages.push({
+        id: saved.id,
+        imageUrl: saved.imageUrl || saved.image_url || url,
+        isPrimary
+      });
+
+      // Cập nhật ảnh đại diện trong bảng danh sách
+      if (isPrimary) {
+        const prod = allProducts.find(p => Number(p.id) === Number(editingProductId));
+        if (prod) prod._primaryImage = url;
+      }
+
+      renderGalleryGrid();
+      uploaded++;
+    } catch (e) {
+      statusEl.textContent = `Lỗi khi tải "${file.name}": ${e.message}`;
+      statusEl.className = 'upload-status error';
+      event.target.value = '';
+      return;
+    }
+  }
+
+  statusEl.textContent = `✓ Đã tải lên ${uploaded} ảnh thành công`;
+  statusEl.className = 'upload-status success';
+  event.target.value = '';
+}
+
+async function setPrimaryImage(imageId) {
+  const img = currentGalleryImages.find(i => i.id === imageId);
+  if (!img) return;
+
+  try {
+    // Bỏ isPrimary của ảnh cũ
+    const old = currentGalleryImages.find(i => i.isPrimary);
+    if (old) {
+      await fetch(`${API}/product-images/${old.id}?imageUrl=${encodeURIComponent(old.imageUrl)}&isPrimary=false`,
+        { method: 'PUT' });
+      old.isPrimary = false;
+    }
+    // Đặt isPrimary mới
+    await fetch(`${API}/product-images/${img.id}?imageUrl=${encodeURIComponent(img.imageUrl)}&isPrimary=true`,
+      { method: 'PUT' });
+    img.isPrimary = true;
+
+    // Cập nhật ảnh đại diện trong bảng
+    const prod = allProducts.find(p => Number(p.id) === Number(editingProductId));
+    if (prod) prod._primaryImage = img.imageUrl;
+
+    renderGalleryGrid();
+  } catch (e) {
+    alert(`Không thể đặt ảnh chính: ${e.message}`);
+  }
+}
+
+async function deleteGalleryImage(imageId) {
+  if (!confirm('Xóa ảnh này?')) return;
+  const img = currentGalleryImages.find(i => i.id === imageId);
+  if (!img) return;
+
+  try {
+    // Xóa record trong CSDL
+    const res = await fetch(`${API}/product-images/${imageId}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+
+    // Xóa file trên ổ cứng
+    fetch(`${API}/upload?url=${encodeURIComponent(img.imageUrl)}`, { method: 'DELETE' }).catch(() => {});
+
+    const wasPrimary = img.isPrimary;
+    currentGalleryImages = currentGalleryImages.filter(i => i.id !== imageId);
+
+    // Nếu xóa ảnh chính và còn ảnh khác → tự đặt ảnh đầu tiên
+    if (wasPrimary && currentGalleryImages.length) {
+      await setPrimaryImage(currentGalleryImages[0].id);
+    } else {
+      renderGalleryGrid();
+    }
+  } catch (e) {
+    alert(`Không thể xóa ảnh: ${e.message}`);
+  }
+}
+
+/* ============================================================
+   SAVE PRODUCT
+============================================================ */
+async function saveProduct() {
+  const id    = document.getElementById('productId').value;
+  const name  = document.getElementById('pName').value.trim();
+  const price = document.getElementById('pPrice').value;
+  if (!name || !price) { alert('Vui lòng nhập tên và giá sản phẩm!'); return; }
+
+  const catId = document.getElementById('pCategory').value;
+  const stock = parseInt(document.getElementById('pStock').value) || 0;
+  const avail = document.getElementById('pAvailability').value;
+
+  const body = {
+    name,
+    description:    document.getElementById('pDesc').value,
+    price:          parseFloat(price),
+    discountPrice:  document.getElementById('pDiscountPrice').value
+                      ? parseFloat(document.getElementById('pDiscountPrice').value) : null,
+    stock,
+    material:       document.getElementById('pMaterial').value,
+    weight:         document.getElementById('pWeight').value
+                      ? parseFloat(document.getElementById('pWeight').value) : null,
+    // ảnh giấy kiểm định (image_url trong bảng products)
+    imageUrl:       document.getElementById('pImage').value || null,
+    status:         document.getElementById('pStatus').value === 'true',
+    category:       catId ? { id: parseInt(catId) } : null,
+    // tình trạng khi hết hàng
+    availabilityType: stock <= 0 ? avail : 'IN_STOCK',
+    restockDate:      (stock <= 0 && avail === 'RESTOCKING')
+                        ? (document.getElementById('pRestockDate').value || null) : null
+  };
+
+  try {
+    const url    = id ? `${API}/products/${id}` : `${API}/products`;
+    const method = id ? 'PUT' : 'POST';
+    const res    = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+
+    const saved = await res.json();
+
+    if (!id) {
+      // Sản phẩm mới → cho phép thêm ảnh ngay bằng cách set editingProductId
+      editingProductId = saved.id;
+      document.getElementById('productId').value = saved.id;
+      document.getElementById('modalTitle').textContent = 'Chỉnh Sửa Sản Phẩm';
+      document.getElementById('galleryHintNew').style.display = 'none';
+      renderGalleryGrid();
+      await loadAll(); // reload bảng
+      alert('Thêm sản phẩm thành công!\nBây giờ bạn có thể thêm ảnh sản phẩm, rồi bấm "Hủy" để đóng.');
+      return;
+    }
+
+    closeModal();
+    await loadAll();
+    alert('Cập nhật sản phẩm thành công!');
+  } catch (e) {
+    alert(`Lỗi khi lưu sản phẩm: ${e.message}`);
+  }
+}
+
+/* ============================================================
+   DELETE PRODUCT
+============================================================ */
+async function deleteProduct(id, name) {
+  if (!confirm(`Xóa sản phẩm "${name}"?`)) return;
+  try {
+    const res = await fetch(`${API}/products/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    await loadAll();
+    alert('Đã xóa sản phẩm!');
+  } catch (e) {
+    alert(`Không thể xóa: ${e.message}`);
+  }
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+function logout() {
+  if (confirm('Bạn có chắc muốn đăng xuất?')) {
+    localStorage.clear();
+    window.location.href = 'login-admin.html';
+  }
+}
+
+/* ── Đóng modal khi click ngoài ── */
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ── INIT ── */
+loadAll();
+</script>
+</body>
+</html>

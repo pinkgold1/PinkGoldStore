@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thanh Toán - PinkGold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root{
+      --gold:#c9a84c;--gold-light:#e8c97a;--gold-dark:#8b6914;
+      --gold-pale:#fdf5e4;--pink:#d4637a;--pink-light:#f0a0b0;
+      --cream:#faf6f0;--cream-2:#f2ebe0;
+      --dark:#1a1208;--dark-mid:#2d2010;
+      --muted:#8a7a60;--line:rgba(201,168,76,.2);
+      --success:#3a7a44;--error:#c0152e;
+      --shadow:0 4px 20px rgba(26,18,8,.08);
+      --shadow-lg:0 8px 40px rgba(26,18,8,.14);
+      --radius:8px;--radius-lg:12px;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);}
+    a{text-decoration:none;color:inherit;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:70px;display:flex;align-items:center;padding:0 40px;gap:32px;background:rgba(250,246,240,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:600;color:var(--gold-dark);letter-spacing:4px;}
+    .nav-steps{display:flex;align-items:center;gap:0;margin:0 auto;}
+    .nav-step{display:flex;align-items:center;gap:8px;padding:0 18px;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);height:70px;border-bottom:2px solid transparent;}
+    .nav-step.active{color:var(--gold-dark);border-bottom-color:var(--gold);}
+    .nav-step.done{color:var(--success);}
+    .nav-step-num{width:24px;height:24px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600;flex:none;}
+    .nav-step.active .nav-step-num{background:var(--gold);border-color:var(--gold);color:white;}
+    .nav-step.done .nav-step-num{background:var(--success);border-color:var(--success);color:white;}
+    .nav-step-div{width:32px;height:1px;background:var(--line);}
+    .nav-right{display:flex;align-items:center;gap:8px;}
+    .nav-icon{width:38px;height:38px;border-radius:50%;background:none;border:none;cursor:pointer;color:var(--dark);font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;text-decoration:none;}
+    .nav-icon:hover{background:var(--gold-pale);color:var(--gold-dark);}
+
+    .main{padding-top:70px;}
+    .breadcrumb{max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--muted);}
+    .breadcrumb a{color:var(--gold-dark);}
+    .breadcrumb i{font-size:.58rem;}
+    .page-header{max-width:1200px;margin:0 auto;padding:0 40px 24px;}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:400;color:var(--dark);}
+    .page-title span{color:var(--gold-dark);font-style:italic;}
+
+    .checkout-layout{max-width:1200px;margin:0 auto;padding:0 40px 80px;display:grid;grid-template-columns:1fr 400px;gap:36px;align-items:start;}
+
+    .form-card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:28px;margin-bottom:20px;}
+    .form-card:last-child{margin-bottom:0;}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--dark);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+    .card-title i{color:var(--gold-dark);font-size:1rem;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-group{margin-bottom:16px;}
+    .form-group.full{grid-column:1/-1;}
+    .form-label{display:block;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:7px;}
+    .form-label .req{color:var(--pink);}
+    .form-control{width:100%;padding:11px 14px;border:1.5px solid #e8dfd0;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);outline:none;transition:border-color .2s,box-shadow .2s;background:white;}
+    .form-control:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+    .form-control.has-error{border-color:var(--error);}
+    textarea.form-control{resize:vertical;min-height:80px;}
+    .field-error{font-size:.72rem;color:var(--error);margin-top:4px;display:none;}
+    .field-error.show{display:block;}
+
+    /* PAYMENT OPTIONS */
+    .pay-options{display:flex;flex-direction:column;gap:10px;}
+    .pay-opt{display:flex;align-items:center;gap:14px;padding:15px 18px;border:1.5px solid #e8dfd0;border-radius:var(--radius);cursor:pointer;transition:all .2s;}
+    .pay-opt:hover,.pay-opt.selected{border-color:var(--gold);background:var(--gold-pale);}
+    .pay-opt input{display:none;}
+    .pay-radio{width:20px;height:20px;border:2px solid #d4c9b0;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+    .pay-opt.selected .pay-radio{border-color:var(--gold-dark);}
+    .pay-opt.selected .pay-radio::after{content:'';width:10px;height:10px;background:var(--gold-dark);border-radius:50%;}
+    .pay-icon{width:48px;height:34px;border-radius:6px;border:1px solid var(--line);background:white;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gold-dark);letter-spacing:.5px;flex:none;}
+    .pay-icon.vnpay{background:linear-gradient(135deg,#005baa,#00a651);color:white;border:none;font-size:.65rem;}
+    .pay-info strong{display:block;font-size:.88rem;margin-bottom:2px;}
+    .pay-info small{font-size:.73rem;color:var(--muted);}
+
+    /* VOUCHER SECTION */
+    .voucher-row{display:flex;gap:10px;align-items:flex-start;}
+    .voucher-input{flex:1;padding:11px 14px;border:1.5px solid #e8dfd0;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);outline:none;transition:border-color .2s;background:white;text-transform:uppercase;letter-spacing:1px;}
+    .voucher-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+    .voucher-input.applied{border-color:var(--success);background:#f0fff4;}
+    .btn-voucher{padding:11px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;white-space:nowrap;background:var(--dark);color:var(--gold-light);}
+    .btn-voucher:hover{background:var(--dark-mid);}
+    .btn-voucher:disabled{opacity:.5;cursor:not-allowed;}
+    .voucher-result{margin-top:10px;font-size:.82rem;padding:10px 14px;border-radius:var(--radius);display:none;}
+    .voucher-result.success{background:#f0fff4;color:var(--success);border:1px solid #b7f0c8;display:flex;align-items:center;gap:8px;}
+    .voucher-result.error{background:#fff0f3;color:var(--error);border:1px solid #ffd4d4;display:flex;align-items:center;gap:8px;}
+    .voucher-remove{background:none;border:none;cursor:pointer;color:var(--error);font-size:.8rem;margin-left:auto;padding:0 4px;transition:opacity .2s;}
+    .voucher-remove:hover{opacity:.7;}
+
+    /* ORDER SUMMARY */
+    .summary-card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:26px;position:sticky;top:88px;}
+    .summary-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--dark);padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+    .order-items{max-height:260px;overflow-y:auto;padding-right:6px;margin-bottom:18px;}
+    .order-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
+    .order-item:last-child{border-bottom:none;}
+    .oi-img{width:54px;height:54px;border-radius:var(--radius);background:var(--cream-2);flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;}
+    .oi-img img{width:100%;height:100%;object-fit:cover;}
+    .oi-img i{font-size:1.2rem;color:rgba(201,168,76,.35);}
+    .oi-qty{position:absolute;top:-5px;right:-5px;background:var(--dark);color:var(--gold-light);width:18px;height:18px;border-radius:50%;font-size:.58rem;display:flex;align-items:center;justify-content:center;font-weight:600;}
+    .oi-body{flex:1;min-width:0;}
+    .oi-name{font-size:.82rem;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .oi-unit{font-size:.72rem;color:var(--muted);}
+    .oi-total{font-size:.88rem;font-weight:600;color:var(--gold-dark);white-space:nowrap;}
+    .summary-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:.875rem;}
+    .summary-row span:first-child{color:var(--muted);}
+    .summary-row.discount span:last-child{color:var(--success);font-weight:500;}
+    .summary-divider{border:none;border-top:1px solid var(--line);margin:14px 0;}
+    .summary-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;}
+    .summary-total span{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+    .summary-total strong{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--gold-dark);}
+
+    .btn-order{width:100%;height:54px;background:var(--gold);color:var(--dark);border:none;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;}
+    .btn-order:hover{background:var(--gold-dark);color:white;transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,.35);}
+    .btn-order:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+    .btn-order.loading{pointer-events:none;opacity:.8;}
+    .btn-order .spinner{display:none;width:18px;height:18px;border:2px solid rgba(0,0,0,.2);border-top-color:var(--dark);border-radius:50%;animation:spin .6s linear infinite;}
+    .btn-order.loading .btn-text{display:none;}
+    .btn-order.loading .spinner{display:block;}
+    .secure-note{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:.72rem;color:var(--muted);}
+    .secure-note i{color:var(--success);}
+
+    .server-error{background:#fff4f4;border:1px solid #ffd4d4;color:#8a1f1f;border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:.85rem;display:none;}
+    .server-error.show{display:block;}
+
+    /* SUCCESS MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:white;border-radius:var(--radius-lg);padding:48px 40px;max-width:460px;width:100%;text-align:center;animation:fadeUp .4s ease;}
+    .modal-icon{width:76px;height:76px;border-radius:50%;background:rgba(58,122,68,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+    .modal-icon i{font-size:2.2rem;color:var(--success);}
+    .modal h2{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--dark);margin-bottom:10px;}
+    .modal p{color:var(--muted);font-size:.875rem;line-height:1.7;margin-bottom:6px;}
+    .modal-code{font-size:1.1rem;font-weight:600;color:var(--gold-dark);letter-spacing:2px;margin:14px 0 20px;padding:12px 20px;background:var(--gold-pale);border-radius:var(--radius);display:inline-block;}
+    .modal-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .btn-modal-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--dark);color:var(--gold-light);border:none;border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;transition:background .2s;}
+    .btn-modal-primary:hover{background:var(--dark-mid);}
+    .btn-modal-sec{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:transparent;border:1.5px solid var(--line);color:var(--dark);border-radius:var(--radius);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;text-decoration:none;}
+    .btn-modal-sec:hover{border-color:var(--gold);color:var(--gold-dark);}
+
+    @media(max-width:900px){
+      nav{padding:0 20px;}
+      .nav-steps{display:none;}
+      .breadcrumb,.page-header{padding-left:20px;padding-right:20px;}
+      .checkout-layout{grid-template-columns:1fr;padding:0 20px 60px;}
+      .summary-card{position:static;order:-1;}
+      .form-row{grid-template-columns:1fr;}
+      .form-group.full{grid-column:1;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">PINKGOLD</a>
+  <div class="nav-steps">
+    <div class="nav-step done">
+      <div class="nav-step-num"><i class="bi bi-check"></i></div>
+      <span>Giỏ hàng</span>
+    </div>
+    <div class="nav-step-div"></div>
+    <div class="nav-step active">
+      <div class="nav-step-num">2</div>
+      <span>Thanh toán</span>
+    </div>
+    <div class="nav-step-div"></div>
+    <div class="nav-step">
+      <div class="nav-step-num">3</div>
+      <span>Hoàn tất</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="cart.html" class="nav-icon" title="Giỏ hàng"><i class="bi bi-bag"></i></a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="breadcrumb">
+    <a href="index.html">Trang chủ</a>
+    <i class="bi bi-chevron-right"></i>
+    <a href="cart.html">Giỏ hàng</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>Thanh toán</span>
+  </div>
+
+  <div class="page-header">
+    <h1 class="page-title">Xác nhận <span>đơn hàng</span></h1>
+  </div>
+
+  <div class="checkout-layout">
+
+    <!-- LEFT: FORMS -->
+    <div>
+
+      <!-- Shipping -->
+      <div class="form-card">
+        <h3 class="card-title"><i class="bi bi-geo-alt"></i> Thông tin giao hàng</h3>
+        <div id="serverError" class="server-error"></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Họ và tên <span class="req">*</span></label>
+            <input type="text" class="form-control" id="fullName" placeholder="Nguyễn Thị Hồng Nhung">
+            <div class="field-error" id="err-fullName">Vui lòng nhập họ tên (ít nhất 2 ký tự)</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại <span class="req">*</span></label>
+            <input type="tel" class="form-control" id="phone" placeholder="0912 345 678">
+            <div class="field-error" id="err-phone">Vui lòng nhập số điện thoại hợp lệ (9–11 số)</div>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="email@example.com">
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Địa chỉ giao hàng <span class="req">*</span></label>
+          <input type="text" class="form-control" id="address" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành">
+          <div class="field-error" id="err-address">Vui lòng nhập địa chỉ giao hàng</div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Ghi chú</label>
+          <textarea class="form-control" id="note" placeholder="Ghi chú cho người giao hàng (không bắt buộc)..."></textarea>
+        </div>
+      </div>
+
+      <!-- Voucher -->
+      <div class="form-card">
+        <h3 class="card-title"><i class="bi bi-ticket-perforated"></i> Mã giảm giá</h3>
+        <div class="voucher-row">
+          <input type="text" class="voucher-input" id="voucherInput"
+                 placeholder="Nhập mã giảm giá (VD: PINKGOLD10)"
+                 oninput="this.value = this.value.toUpperCase()">
+          <button class="btn-voucher" id="voucherBtn" onclick="applyVoucher()">Áp dụng</button>
+        </div>
+        <div class="voucher-result" id="voucherResult"></div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="form-card">
+        <h3 class="card-title"><i class="bi bi-credit-card"></i> Phương thức thanh toán</h3>
+        <div class="pay-options" id="payOptions">
+          <label class="pay-opt selected" onclick="selectPay(this)">
+            <input type="radio" name="payment" value="COD" checked>
+            <div class="pay-radio"></div>
+            <div class="pay-icon">COD</div>
+            <div class="pay-info">
+              <strong>Thanh toán khi nhận hàng (COD)</strong>
+              <small>Trả tiền mặt trực tiếp khi nhận hàng tại nhà</small>
+            </div>
+          </label>
+          <label class="pay-opt" onclick="selectPay(this)">
+            <input type="radio" name="payment" value="VNPAY">
+            <div class="pay-radio"></div>
+            <div class="pay-icon vnpay">VNPay</div>
+            <div class="pay-info">
+              <strong>Thanh toán qua VNPay</strong>
+              <small>Thẻ ATM, Visa, MasterCard, Ví điện tử, QR Code</small>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="summary-card">
+      <h3 class="summary-title">Đơn hàng của bạn</h3>
+
+      <div class="order-items" id="orderItemsList">
+        <div style="text-align:center;padding:20px;color:var(--muted);">
+          <div style="width:24px;height:24px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 8px;"></div>
+          Đang tải...
+        </div>
+      </div>
+
+      <div class="summary-row"><span>Tạm tính</span><span id="co-sub">–</span></div>
+      <div class="summary-row"><span>Vận chuyển</span><span id="co-ship">–</span></div>
+      <div class="summary-row discount" id="co-discount-row" style="display:none;">
+        <span>Giảm giá (voucher)</span>
+        <span id="co-discount">–</span>
+      </div>
+      <hr class="summary-divider">
+      <div class="summary-total">
+        <span>Tổng cộng</span>
+        <strong id="co-total">–</strong>
+      </div>
+
+      <button class="btn-order" id="placeOrderBtn" onclick="placeOrder()">
+        <span class="btn-text"><i class="bi bi-lock"></i> Đặt hàng ngay</span>
+        <div class="spinner"></div>
+      </button>
+
+      <div class="secure-note">
+        <i class="bi bi-shield-lock-fill"></i> Giao dịch được bảo mật 100%
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL (COD) -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon"><i class="bi bi-check-lg"></i></div>
+    <h2>Đặt hàng thành công!</h2>
+    <p>Cảm ơn bạn đã tin tưởng PinkGold.<br>Chúng tôi sẽ liên hệ xác nhận trong vòng 24 giờ.</p>
+    <p>Mã đơn hàng của bạn:</p>
+    <div class="modal-code" id="orderCodeDisplay"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="location.href='orders.html'">
+        <i class="bi bi-receipt"></i> Đơn hàng của tôi
+      </button>
+      <a href="products.html" class="btn-modal-sec">Tiếp tục mua sắm</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const API      = 'http://localhost:8080/api';
+const CART_KEY = 'pinkgold_cart';
+
+/* ── CART ── */
+function getCart() {
+  try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; }
+}
+function clearCart() {
+  localStorage.removeItem(CART_KEY);
+  localStorage.removeItem('pinkgold_checkout');
+}
+function fmt(v) {
+  return new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND' }).format(Number(v||0));
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+  );
+}
+
+/* ── VOUCHER STATE ── */
+let _appliedVoucher = null; // { code, discountPercent, discountAmount, minOrderAmount }
+
+/* ── RENDER SUMMARY ── */
+function renderSummary() {
+  const cart     = getCart();
+  const checkout = JSON.parse(localStorage.getItem('pinkgold_checkout') || '{}');
+
+  if (!cart.length) { window.location.href = 'cart.html'; return; }
+
+  document.getElementById('orderItemsList').innerHTML = cart.map(item => `
+    <div class="order-item">
+      <div class="oi-img" style="position:relative">
+        ${item.image
+          ? `<img src="${esc(item.image)}" alt="${esc(item.name||'')}" onerror="this.outerHTML='<i class=\\'bi bi-gem\\'></i>'">`
+          : '<i class="bi bi-gem"></i>'}
+        <span class="oi-qty">${item.quantity}</span>
+      </div>
+      <div class="oi-body">
+        <div class="oi-name">${esc(item.name||'Sản phẩm')}</div>
+        <div class="oi-unit">${fmt(item.price)} / cái</div>
+      </div>
+      <div class="oi-total">${fmt(item.price * item.quantity)}</div>
+    </div>
+  `).join('');
+
+  recalcTotals();
+}
+
+function recalcTotals() {
+  const cart    = getCart();
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const shipping = subtotal >= 2000000 ? 0 : 30000;
+
+  let discount = 0;
+  if (_appliedVoucher) {
+    const v = _appliedVoucher;
+    if (subtotal >= (v.minOrderAmount || 0)) {
+      if (v.discountPercent) discount = Math.round(subtotal * v.discountPercent / 100);
+      else if (v.discountAmount) discount = v.discountAmount;
+    }
+  }
+
+  const total = subtotal - discount + shipping;
+
+  document.getElementById('co-sub').textContent  = fmt(subtotal);
+  document.getElementById('co-ship').textContent = shipping === 0 ? 'Miễn phí' : fmt(shipping);
+  document.getElementById('co-total').textContent = fmt(total);
+
+  const discRow = document.getElementById('co-discount-row');
+  if (discount > 0) {
+    discRow.style.display = 'flex';
+    document.getElementById('co-discount').textContent = '-' + fmt(discount);
+  } else {
+    discRow.style.display = 'none';
+  }
+
+  window._summary = { subtotal, shipping, discount, total };
+}
+
+/* ── VOUCHER ── */
+async function applyVoucher() {
+  const code = document.getElementById('voucherInput').value.trim().toUpperCase();
+  const resultEl = document.getElementById('voucherResult');
+  const btn = document.getElementById('voucherBtn');
+
+  if (!code) {
+    showVoucherMsg('Vui lòng nhập mã giảm giá!', 'error');
+    return;
+  }
+
+  // Nếu đang có voucher đang áp dụng → xóa
+  if (_appliedVoucher && _appliedVoucher.code === code) {
+    removeVoucher();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const res = await fetch(`${API}/vouchers/check/${code}`);
+    const text = await res.text();
+
+    if (!res.ok) {
+      showVoucherMsg(text || 'Mã giảm giá không hợp lệ!', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Áp dụng';
+      return;
+    }
+
+    const voucher = JSON.parse(text);
+    const cart    = getCart();
+    const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+    const min = voucher.minOrderAmount || 0;
+
+    if (subtotal < min) {
+      showVoucherMsg(`Đơn hàng tối thiểu ${fmt(min)} để dùng mã này!`, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Áp dụng';
+      return;
+    }
+
+    // Áp dụng thành công
+    _appliedVoucher = {
+      code: voucher.code,
+      discountPercent: voucher.discountPercent || 0,
+      discountAmount: voucher.discountAmount || 0,
+      minOrderAmount: voucher.minOrderAmount || 0,
+    };
+
+    const discText = voucher.discountPercent
+      ? `Giảm ${voucher.discountPercent}%`
+      : `Giảm ${fmt(voucher.discountAmount)}`;
+
+    showVoucherMsg(`✓ Áp dụng thành công! ${discText}`, 'success', true);
+    document.getElementById('voucherInput').classList.add('applied');
+    btn.textContent = 'Xóa';
+    btn.disabled = false;
+    recalcTotals();
+
+  } catch {
+    showVoucherMsg('Lỗi kết nối. Vui lòng thử lại!', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Áp dụng';
+  }
+}
+
+function removeVoucher() {
+  _appliedVoucher = null;
+  document.getElementById('voucherInput').value = '';
+  document.getElementById('voucherInput').classList.remove('applied');
+  document.getElementById('voucherBtn').textContent = 'Áp dụng';
+  document.getElementById('voucherResult').style.display = 'none';
+  recalcTotals();
+}
+
+function showVoucherMsg(msg, type, showRemove = false) {
+  const el = document.getElementById('voucherResult');
+  el.className = `voucher-result ${type}`;
+  el.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+    <span>${msg}</span>
+    ${showRemove ? `<button class="voucher-remove" onclick="removeVoucher()" title="Xóa mã">✕</button>` : ''}`;
+  el.style.display = 'flex';
+}
+
+/* ── PAYMENT OPTION ── */
+function selectPay(el) {
+  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input[type=radio]').checked = true;
+}
+
+/* ── VALIDATION ── */
+function validate() {
+  const rules = [
+    { id:'fullName', errId:'err-fullName', fn: v => v.trim().length >= 2 },
+    { id:'phone',    errId:'err-phone',    fn: v => /^[0-9]{9,11}$/.test(v.replace(/\s/g,'')) },
+    { id:'address',  errId:'err-address',  fn: v => v.trim().length >= 8 },
+  ];
+  let ok = true;
+  rules.forEach(r => {
+    const input = document.getElementById(r.id);
+    const errEl = document.getElementById(r.errId);
+    const valid = r.fn(input.value);
+    input.classList.toggle('has-error', !valid);
+    errEl.classList.toggle('show', !valid);
+    if (!valid) ok = false;
+  });
+  return ok;
+}
+
+/* ── PLACE ORDER ── */
+async function placeOrder() {
+  hideServerError();
+  if (!validate()) {
+    document.getElementById('fullName').scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+
+  const btn = document.getElementById('placeOrderBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const cart      = getCart();
+  const payMethod = document.querySelector('input[name=payment]:checked')?.value || 'COD';
+  const user      = JSON.parse(localStorage.getItem('user') || '{}');
+  const s         = window._summary || {};
+
+  const body = {
+    userId:          user.id || 2,
+    shippingAddress: document.getElementById('address').value.trim(),
+    note:            document.getElementById('note').value.trim(),
+    paymentMethod:   payMethod,
+    totalAmount:     s.subtotal || 0,
+    discountAmount:  s.discount  || 0,
+    finalAmount:     s.total     || 0,
+    voucherCode:     _appliedVoucher?.code || null,
+    items: cart.map(item => ({
+      productId: item.id,
+      quantity:  item.quantity,
+      price:     item.price
+    }))
+  };
+
+  try {
+    const res  = await fetch(`${API}/orders/create`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showServerError(data.message || data || 'Không thể tạo đơn hàng. Vui lòng thử lại!');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      return;
+    }
+
+    const orderCode = data.orderCode || 'ORDER' + Date.now();
+    clearCart();
+
+    if (payMethod === 'COD') {
+      // COD → modal thành công
+      showSuccessModal(orderCode);
+    } else {
+      // VNPay → chuyển sang trang thanh toán VNPay riêng
+      const vnpayUrl = data.vnpayUrl || '#';
+      // Lưu thông tin để trang VNPay dùng
+      localStorage.setItem('pinkgold_vnpay', JSON.stringify({
+        orderCode,
+        vnpayUrl,
+        amount: s.total || 0
+      }));
+      window.location.href = 'vnpay-payment.html';
+    }
+
+  } catch (err) {
+    console.error(err);
+    showServerError('Không thể kết nối đến server. Kiểm tra backend đang chạy tại port 8080.');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+/* ── MODALS ── */
+function showSuccessModal(orderCode) {
+  document.getElementById('orderCodeDisplay').textContent = orderCode;
+  document.getElementById('successModal').classList.add('show');
+  const btn = document.getElementById('placeOrderBtn');
+  btn.classList.remove('loading');
+  btn.disabled = false;
+}
+
+/* ── SERVER ERROR ── */
+function showServerError(msg) {
+  const box = document.getElementById('serverError');
+  box.textContent = msg;
+  box.classList.add('show');
+  box.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function hideServerError() {
+  document.getElementById('serverError').classList.remove('show');
+}
+
+/* ── PREFILL ── */
+function prefillUserInfo() {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.fullName || user.fullname) document.getElementById('fullName').value = user.fullName || user.fullname || '';
+  if (user.email)   document.getElementById('email').value   = user.email;
+  if (user.phone)   document.getElementById('phone').value   = user.phone;
+  if (user.address) document.getElementById('address').value = user.address;
+}
+
+/* ── ENTER KEY on voucher ── */
+document.getElementById('voucherInput')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') applyVoucher();
+});
+
+/* ── INIT ── */
+renderSummary();
+prefillUserInfo();
+</script>
+</body>
+</html>

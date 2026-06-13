@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chi Tiết Sản Phẩm - PinkGold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8b6914;
+      --gold-pale: #fdf5e4; --pink: #d4637a; --pink-light: #f0a0b0;
+      --cream: #faf6f0; --cream-2: #f2ebe0;
+      --dark: #1a1208; --dark-mid: #2d2010;
+      --muted: #8a7a60; --line: rgba(201,168,76,.2);
+      --shadow: 0 4px 20px rgba(26,18,8,.08);
+      --shadow-lg: 0 8px 40px rgba(26,18,8,.14);
+      --radius: 8px; --radius-lg: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 70px; display: flex; align-items: center; padding: 0 40px; gap: 32px;
+      background: rgba(250,246,240,.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 600; color: var(--gold-dark); letter-spacing: 4px; }
+    .nav-links { display: flex; gap: 4px; margin: 0 auto; list-style: none; }
+    .nav-links a { display: block; padding: 8px 14px; border-radius: 6px; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); transition: all .2s; }
+    .nav-links a:hover { color: var(--gold-dark); background: var(--gold-pale); }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-icon { position: relative; width: 40px; height: 40px; border-radius: 50%; background: none; border: none; cursor: pointer; color: var(--dark); font-size: 1.05rem; display: flex; align-items: center; justify-content: center; transition: all .2s; text-decoration: none; }
+    .nav-icon:hover { background: var(--gold-pale); color: var(--gold-dark); }
+    .cart-badge { position: absolute; top: 2px; right: 2px; background: var(--pink); color: white; width: 17px; height: 17px; border-radius: 50%; font-size: .58rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cream); }
+
+    .main { padding-top: 70px; }
+
+    .breadcrumb { max-width: 1200px; margin: 0 auto; padding: 18px 40px; display: flex; align-items: center; gap: 8px; font-size: .74rem; color: var(--muted); }
+    .breadcrumb a { color: var(--gold-dark); transition: color .2s; }
+    .breadcrumb a:hover { color: var(--gold); text-decoration: underline; }
+    .breadcrumb i { font-size: .58rem; }
+
+    /* ===== PRODUCT LAYOUT ===== */
+    .product-section { max-width: 1200px; margin: 0 auto; padding: 10px 40px 72px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: start; }
+
+    /* ===== GALLERY ===== */
+    .gallery-main { position: relative; aspect-ratio: 1; background: var(--cream-2); border-radius: var(--radius-lg); overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .gallery-main:hover img { transform: scale(1.04); }
+    .no-img { font-size: 6rem; color: rgba(201,168,76,.2); }
+    .zoom-btn { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; background: rgba(255,255,255,.9); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .2s; box-shadow: var(--shadow); z-index: 2; }
+    .zoom-btn:hover { color: var(--gold-dark); }
+    .gallery-thumbs { display: flex; gap: 9px; flex-wrap: wrap; }
+    .gallery-thumb { width: 72px; height: 72px; border-radius: var(--radius); border: 2px solid transparent; cursor: pointer; overflow: hidden; background: var(--cream-2); flex: none; display: flex; align-items: center; justify-content: center; transition: border-color .2s; }
+    .gallery-thumb.active, .gallery-thumb:hover { border-color: var(--gold); }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-thumb i { font-size: 1.1rem; color: rgba(201,168,76,.35); }
+
+    /* ===== PRODUCT INFO ===== */
+    .product-info { animation: fadeUp .6s ease .1s both; }
+    .product-cat-tag { display: inline-block; font-size: .6rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-dark); background: rgba(201,168,76,.1); padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; }
+    .product-title { font-family: 'Cormorant Garamond', serif; font-size: 2.3rem; font-weight: 400; line-height: 1.2; color: var(--dark); margin-bottom: 16px; }
+    .product-rating-row { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+    .stars { display: flex; gap: 3px; }
+    .stars i { color: var(--gold); font-size: .82rem; }
+    .rating-text { font-size: .8rem; color: var(--muted); }
+    .rating-sep { color: var(--line); }
+
+    .price-block { display: flex; align-items: baseline; gap: 14px; margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+    .price-main { font-family: 'Cormorant Garamond', serif; font-size: 2.1rem; font-weight: 400; color: var(--gold-dark); }
+    .price-orig { font-size: 1.05rem; color: #bbb; text-decoration: line-through; }
+    .price-save { font-size: .7rem; background: var(--pink); color: white; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
+
+    .detail-list { display: flex; flex-direction: column; gap: 11px; margin-bottom: 28px; }
+    .detail-row { display: flex; align-items: flex-start; }
+    .detail-label { font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); min-width: 130px; padding-top: 2px; }
+    .detail-value { font-size: .88rem; color: var(--dark); }
+    .detail-value a { color: var(--gold-dark); font-weight: 600; }
+    .detail-value a:hover { text-decoration: underline; }
+    .in-stock { color: #3a7a44; font-weight: 500; }
+    .low-stock { color: var(--pink); font-weight: 500; }
+    .restocking-stock { color: #8b6914; font-weight: 500; }
+    .mto-stock { color: var(--gold-dark); font-weight: 500; }
+
+    .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .qty-label { font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .qty-control { display: flex; align-items: center; border: 1.5px solid #e8dfd0; border-radius: var(--radius); overflow: hidden; }
+    .qty-btn { width: 42px; height: 46px; background: none; border: none; cursor: pointer; font-size: 1.05rem; color: var(--dark); transition: background .2s; display: flex; align-items: center; justify-content: center; }
+    .qty-btn:hover { background: var(--cream-2); }
+    .qty-input { width: 52px; height: 46px; text-align: center; border: none; border-left: 1.5px solid #e8dfd0; border-right: 1.5px solid #e8dfd0; font-family: 'DM Sans', sans-serif; font-size: .95rem; color: var(--dark); outline: none; background: white; }
+
+    .action-row { display: flex; gap: 10px; margin-bottom: 26px; }
+    .btn-cart { flex: 1; height: 52px; background: var(--dark); color: var(--gold-light); border: none; border-radius: var(--radius); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .75rem; letter-spacing: 2px; text-transform: uppercase; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-cart:hover:not(:disabled) { background: var(--dark-mid); transform: translateY(-1px); }
+    .btn-cart:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-buy { flex: 1; height: 52px; background: var(--gold); color: var(--dark); border: none; border-radius: var(--radius); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .75rem; letter-spacing: 2px; text-transform: uppercase; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+    .btn-buy:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,.35); }
+    .btn-buy.disabled-btn { opacity: .45; cursor: not-allowed; pointer-events: none; transform: none; box-shadow: none; }
+    .btn-wish { width: 52px; height: 52px; background: transparent; border: 1.5px solid #e8dfd0; border-radius: var(--radius); cursor: pointer; color: var(--muted); font-size: 1.05rem; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+    .btn-wish:hover, .btn-wish.active { border-color: var(--pink); color: var(--pink); background: rgba(212,99,122,.05); }
+
+    /* ── AVAILABILITY BANNER ── */
+    .avail-banner { display: none; border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 24px; line-height: 1.7; font-size: .875rem; }
+    .avail-banner.show { display: block; }
+    .avail-banner-head { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 8px; font-size: .9rem; }
+    .avail-banner-head i { font-size: 1.15rem; flex: none; }
+    .avail-banner p { margin: 0; }
+    .avail-banner .hotline-btn { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; padding: 9px 18px; border-radius: 7px; font-weight: 600; font-size: .82rem; text-decoration: none; transition: all .2s; letter-spacing: .5px; }
+
+    /* RESTOCKING — warm amber */
+    .avail-banner.restocking { background: #fffbf0; border: 1.5px solid #f0d87a; color: #6b4e0a; }
+    .avail-banner.restocking .avail-banner-head { color: #5a3d00; }
+    .avail-banner.restocking .hotline-btn { background: var(--gold-dark); color: white; }
+    .avail-banner.restocking .hotline-btn:hover { background: var(--dark); }
+
+    /* OUT-UNKNOWN — neutral warm */
+    .avail-banner.out-unknown { background: #f8f4ed; border: 1.5px solid #e0d0b0; color: var(--dark-mid); }
+    .avail-banner.out-unknown .hotline-btn { background: var(--dark); color: var(--gold-light); }
+    .avail-banner.out-unknown .hotline-btn:hover { background: var(--dark-mid); }
+
+    /* MADE-TO-ORDER — dark elegant */
+    .avail-banner.made-to-order { background: #1a1208; border: 1.5px solid rgba(201,168,76,.35); color: #e8d9c0; }
+    .avail-banner.made-to-order .avail-banner-head { color: var(--gold-light); }
+    .avail-banner.made-to-order p { color: rgba(232,217,192,.8); }
+    .avail-banner.made-to-order .hotline-btn { background: var(--gold); color: var(--dark); font-weight: 700; }
+    .avail-banner.made-to-order .hotline-btn:hover { background: var(--gold-light); }
+
+    .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .perk { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--cream-2); border-radius: var(--radius); }
+    .perk i { color: var(--gold-dark); font-size: .95rem; flex: none; }
+    .perk span { font-size: .78rem; color: var(--dark); }
+
+    /* ===== TABS ===== */
+    .tabs-section { max-width: 1200px; margin: 0 auto; padding: 0 40px 80px; }
+    .tabs-nav { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 32px; gap: 4px; }
+    .tab-btn { padding: 12px 22px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); transition: all .2s; margin-bottom: -1px; }
+    .tab-btn.active { color: var(--gold-dark); border-bottom-color: var(--gold); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp .3s ease; }
+    .desc-text { font-size: .9rem; line-height: 1.9; color: var(--dark); }
+    .specs-table { width: 100%; border-collapse: collapse; }
+    .specs-table tr { border-bottom: 1px solid var(--line); }
+    .specs-table td { padding: 13px 16px; font-size: .87rem; }
+    .specs-table td:first-child { color: var(--muted); width: 200px; font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* CERTIFICATE TAB */
+    .cert-box { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+    .cert-img-wrap { width: 280px; flex: none; border-radius: var(--radius-lg); overflow: hidden; background: var(--cream-2); cursor: pointer; border: 1.5px solid var(--line); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; transition: transform .25s, box-shadow .25s; }
+    .cert-img-wrap:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .cert-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cert-img-wrap .cert-placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; color: rgba(201,168,76,.35); font-size: .8rem; }
+    .cert-img-wrap .cert-placeholder i { font-size: 3.5rem; }
+    .cert-info { flex: 1; min-width: 220px; }
+    .cert-info h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; margin-bottom: 12px; color: var(--dark); }
+    .cert-info p { font-size: .87rem; color: var(--muted); line-height: 1.85; margin-bottom: 10px; }
+    .cert-badge { display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; color: #3a7a44; background: #f0fff4; border: 1px solid #b7f0c8; padding: 6px 14px; border-radius: 20px; margin-top: 4px; }
+    .cert-empty { text-align: center; padding: 48px 20px; color: var(--muted); font-size: .88rem; line-height: 1.8; }
+    .cert-empty i { font-size: 2.6rem; display: block; margin-bottom: 14px; color: rgba(201,168,76,.3); }
+    .cert-empty a { color: var(--gold-dark); font-weight: 600; text-decoration: underline; }
+
+    /* ===== REVIEWS ===== */
+    .reviews-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .avg-score { display: flex; align-items: baseline; gap: 10px; }
+    .avg-score strong { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 300; color: var(--gold-dark); }
+    .avg-score span { font-size: .8rem; color: var(--muted); }
+    .review-list { display: flex; flex-direction: column; gap: 16px; }
+    .review-item { padding: 20px; background: white; border: 1px solid var(--line); border-radius: var(--radius-lg); position: relative; }
+    .review-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .review-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-light), var(--pink-light)); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 600; color: var(--dark); flex: none; }
+    .review-name { font-size: .85rem; font-weight: 500; }
+    .review-date { font-size: .7rem; color: var(--muted); margin-left: auto; }
+    .review-stars { display: flex; gap: 3px; margin-bottom: 8px; }
+    .review-stars i { color: var(--gold); font-size: .75rem; }
+    .review-text { font-size: .85rem; line-height: 1.7; color: var(--dark); }
+    .review-own-badge { position: absolute; top: 14px; right: 14px; font-size: .62rem; letter-spacing: 1px; text-transform: uppercase; background: var(--gold-pale); color: var(--gold-dark); padding: 3px 10px; border-radius: 20px; font-weight: 600; border: 1px solid rgba(201,168,76,.3); }
+
+    /* EDIT REVIEW FORM */
+    .review-edit-area { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); display: none; }
+    .review-edit-area.open { display: block; animation: fadeUp .25s ease; }
+    .review-edit-stars { display: flex; gap: 6px; margin-bottom: 12px; }
+    .review-edit-stars i { font-size: 1.4rem; color: #ddd; cursor: pointer; transition: color .15s; }
+    .review-edit-stars i.lit { color: var(--gold); }
+    .review-edit-textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #e8dfd0; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none; margin-bottom: 10px; resize: vertical; min-height: 80px; transition: border-color .2s; }
+    .review-edit-textarea:focus { border-color: var(--gold); }
+    .review-edit-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-edit-save { padding: 9px 22px; background: var(--dark); color: var(--gold-light); border: none; border-radius: var(--radius); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; transition: background .2s; }
+    .btn-edit-save:hover { background: var(--dark-mid); }
+    .btn-edit-cancel { padding: 9px 18px; background: transparent; border: 1.5px solid #e8dfd0; color: var(--muted); border-radius: var(--radius); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; transition: all .2s; }
+    .btn-edit-cancel:hover { border-color: var(--gold); color: var(--gold-dark); }
+    .btn-edit-review { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: transparent; border: 1.5px solid var(--gold); color: var(--gold-dark); border-radius: 6px; cursor: pointer; font-size: .72rem; font-weight: 600; transition: all .2s; margin-top: 10px; }
+    .btn-edit-review:hover { background: var(--gold); color: white; }
+
+    .review-empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+    .review-empty i { font-size: 2.2rem; display: block; margin-bottom: 12px; color: rgba(201,168,76,.3); }
+
+    /* ===== RELATED ===== */
+    .related-section { background: white; padding: 70px 0; }
+    .related-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    .section-eyebrow { font-size: .62rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; display: block; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 400; color: var(--dark); margin-bottom: 36px; }
+    .section-title em { font-style: italic; color: var(--gold-dark); }
+    .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .rel-card { cursor: pointer; transition: transform .25s; border-radius: var(--radius-lg); overflow: hidden; }
+    .rel-card:hover { transform: translateY(-4px); }
+    .rel-img { height: 220px; background: var(--cream-2); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .rel-img i { font-size: 2.5rem; color: rgba(201,168,76,.3); }
+    .rel-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .rel-card:hover .rel-img img { transform: scale(1.06); }
+    .rel-body { padding: 14px 4px 4px; }
+    .rel-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--dark); margin-bottom: 4px; }
+    .rel-price { font-size: .88rem; color: var(--gold-dark); font-weight: 500; }
+
+    .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: var(--radius); font-size: .85rem; font-weight: 500; animation: fadeUp .3s ease; box-shadow: var(--shadow-lg); max-width: 340px; }
+    .toast-success { background: var(--dark); color: var(--gold-light); border-left: 3px solid var(--gold); }
+    .toast-error { background: #2d0810; color: var(--pink-light); border-left: 3px solid var(--pink); }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .product-section { grid-template-columns: 1fr; gap: 32px; padding: 10px 20px 48px; }
+      .breadcrumb { padding: 16px 20px; }
+      .tabs-section { padding: 0 20px 60px; }
+      .related-inner { padding: 0 20px; }
+      .related-grid { grid-template-columns: repeat(2, 1fr); }
+      .perks { grid-template-columns: 1fr; }
+      .cert-box { flex-direction: column; }
+      .cert-img-wrap { width: 100%; max-width: 320px; }
+    }
+    @media (max-width: 480px) {
+      .product-title { font-size: 1.9rem; }
+      .action-row { flex-wrap: wrap; }
+      .btn-cart, .btn-buy { flex: 1 1 45%; }
+      .btn-wish { flex: 0 0 52px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">PINKGOLD</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Trang Chủ</a></li>
+    <li><a href="products.html">Sản Phẩm</a></li>
+    <li><a href="products.html?cat=6">Trang Sức Cưới</a></li>
+  </ul>
+  <div class="nav-right">
+    <div id="navUserArea"></div>
+    <a href="cart.html" class="nav-icon" title="Giỏ hàng">
+      <i class="bi bi-bag"></i>
+      <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+    </a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="breadcrumb">
+    <a href="index.html">Trang chủ</a>
+    <i class="bi bi-chevron-right"></i>
+    <a href="products.html">Sản phẩm</a>
+    <i class="bi bi-chevron-right"></i>
+    <span id="bcProduct">Chi tiết sản phẩm</span>
+  </div>
+
+  <div class="product-section">
+    <div class="gallery">
+      <div class="gallery-main" id="mainImg">
+        <i class="bi bi-gem no-img" id="mainImgIcon"></i>
+        <img id="mainImgEl" src="" alt="" style="display:none">
+        <button class="zoom-btn" onclick="openZoom()" title="Phóng to"><i class="bi bi-zoom-in"></i></button>
+      </div>
+      <div class="gallery-thumbs" id="thumbs"></div>
+    </div>
+
+    <div class="product-info">
+      <span class="product-cat-tag" id="pCat">Trang sức</span>
+      <h1 class="product-title" id="pName">Đang tải...</h1>
+
+      <div class="product-rating-row">
+        <div class="stars" id="ratingStars">
+          <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-half"></i>
+        </div>
+        <span class="rating-text" id="avgRating">–</span>
+        <span class="rating-sep">|</span>
+        <span class="rating-text" id="reviewCount">0 đánh giá</span>
+      </div>
+
+      <div class="price-block">
+        <span class="price-main" id="pPrice">–</span>
+        <span class="price-orig" id="pPriceOrig" style="display:none"></span>
+        <span class="price-save" id="pSave" style="display:none"></span>
+      </div>
+
+      <div class="avail-banner" id="availBanner"></div>
+
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Chất liệu</span>
+          <span class="detail-value" id="dMaterial">–</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Trọng lượng</span>
+          <span class="detail-value" id="dWeight">–</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Tình trạng</span>
+          <span class="detail-value" id="dStock">–</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Mã sản phẩm</span>
+          <span class="detail-value" id="dCode">–</span>
+        </div>
+      </div>
+
+      <div class="qty-row" id="qtyRow">
+        <span class="qty-label">Số lượng</span>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)"><i class="bi bi-dash"></i></button>
+          <input type="number" class="qty-input" id="qtyInput" value="1" min="1" max="99">
+          <button class="qty-btn" onclick="changeQty(1)"><i class="bi bi-plus"></i></button>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-cart" id="btnCart" onclick="addToCart()">
+          <i class="bi bi-bag-plus"></i> Thêm vào giỏ
+        </button>
+        <a href="checkout.html" class="btn-buy" id="btnBuy">
+          <i class="bi bi-lightning-charge"></i> Mua ngay
+        </a>
+        <button class="btn-wish" id="wishBtn" onclick="toggleWish()">
+          <i class="bi bi-heart"></i>
+        </button>
+      </div>
+
+      <div class="perks">
+        <div class="perk"><i class="bi bi-patch-check"></i><span>Vàng chuẩn kiểm định</span></div>
+        <div class="perk"><i class="bi bi-truck"></i><span>Giao hàng miễn phí</span></div>
+        <div class="perk"><i class="bi bi-shield-check"></i><span>Bảo hành 2 năm</span></div>
+        <div class="perk"><i class="bi bi-arrow-repeat"></i><span>Đổi trả 30 ngày</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs-section">
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('desc', this)">Mô tả</button>
+      <button class="tab-btn" onclick="switchTab('specs', this)">Thông số</button>
+      <button class="tab-btn" onclick="switchTab('cert', this)">Giấy kiểm định</button>
+      <button class="tab-btn" onclick="switchTab('reviews', this)">Đánh giá (<span id="reviewTabCount">0</span>)</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-desc">
+      <p class="desc-text" id="pDesc">Đang tải thông tin sản phẩm...</p>
+    </div>
+
+    <div class="tab-panel" id="tab-specs">
+      <table class="specs-table">
+        <tr><td>Tên sản phẩm</td><td id="s-name">–</td></tr>
+        <tr><td>Chất liệu</td><td id="s-material">–</td></tr>
+        <tr><td>Trọng lượng</td><td id="s-weight">–</td></tr>
+        <tr><td>Danh mục</td><td id="s-cat">–</td></tr>
+        <tr><td>Tình trạng</td><td id="s-stock">–</td></tr>
+        <tr><td>Giá gốc</td><td id="s-price">–</td></tr>
+      </table>
+    </div>
+
+    <div class="tab-panel" id="tab-cert">
+      <div class="cert-box" id="certBox">
+        <div class="cert-empty">
+          <i class="bi bi-hourglass-split"></i>
+          Đang tải...
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-reviews">
+      <div class="reviews-header">
+        <div class="avg-score">
+          <strong id="avgRatingBig">–</strong>
+          <div>
+            <div class="stars" style="margin-bottom:4px">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-half"></i>
+            </div>
+            <span id="reviewCountBig">0 đánh giá</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-list" id="reviewList">
+        <div class="review-empty">
+          <i class="bi bi-chat-square-text"></i>
+          Chưa có đánh giá nào cho sản phẩm này.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="related-section">
+  <div class="related-inner">
+    <span class="section-eyebrow">Gợi ý</span>
+    <div class="section-title">Sản phẩm <em>tương tự</em></div>
+    <div class="related-grid" id="relatedGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">
+        <div style="width:32px;height:32px;border:3px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="zoomOverlay" style="display:none;position:fixed;inset:0;background:rgba(26,18,8,.88);z-index:5000;align-items:center;justify-content:center;cursor:zoom-out;" onclick="closeZoom()">
+  <img id="zoomImg" src="" alt="" style="max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain;">
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ============================================================
+   CONFIG
+============================================================ */
+const API      = 'http://localhost:8080/api';
+const IMG_BASE = 'http://localhost:8080';   // ← thêm prefix cho ảnh relative
+const CART_KEY = 'pinkgold_cart';
+const HOTLINE  = '0394508685';
+
+/* ============================================================
+   HELPER: chuẩn hoá URL ảnh (relative → absolute)
+   Ảnh lưu trên server dạng "images/abc.jpg" hoặc "images/abc.jpg"
+   Cần prefix IMG_BASE để trình duyệt tải được
+============================================================ */
+function imgUrl(raw) {
+  if (!raw) return '';
+  raw = String(raw).trim();
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('//')) return raw;
+  // bỏ dấu / đầu nếu có để ghép đúng
+  return IMG_BASE + '/' + raw.replace(/^\/+/, '');
+}
+
+/* ============================================================
+   CART
+============================================================ */
+function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
+function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+function cartTotal() { return getCart().reduce((s, i) => s + (i.quantity || 0), 0); }
+function updateCartBadge() {
+  const n = cartTotal();
+  const b = document.getElementById('cartBadge');
+  if (!b) return;
+  b.textContent = n;
+  b.style.display = n > 0 ? 'flex' : 'none';
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2800);
+  setTimeout(() => t.remove(), 3200);
+}
+
+/* ============================================================
+   UTILS
+============================================================ */
+function fmt(v) { return new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND' }).format(Number(v||0)); }
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let product       = null;
+let productImages = [];
+let allReviews    = [];
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+function renderNavUser() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const area = document.getElementById('navUserArea');
+  if (!area) return;
+  if (user) {
+    area.innerHTML = `
+      <div style="position:relative">
+        <button onclick="toggleUserMenu()"
+          style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;background:none;border:1.5px solid var(--line);font-size:.8rem;color:var(--dark);cursor:pointer;font-family:inherit;transition:all .2s"
+          onmouseenter="this.style.borderColor='var(--gold)'" onmouseleave="this.style.borderColor='var(--line)'">
+          <i class="bi bi-person-circle"></i>${esc(user.fullName || user.username || 'Tài khoản')}
+        </button>
+        <div id="userMenu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:white;border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);min-width:170px;overflow:hidden;z-index:200">
+          <a href="profile.html" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:.875rem;color:var(--dark);text-decoration:none" onmouseenter="this.style.background='var(--gold-pale)'" onmouseleave="this.style.background=''"><i class="bi bi-person"></i>Tài Khoản</a>
+          <a href="orders.html"  style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:.875rem;color:var(--dark);text-decoration:none" onmouseenter="this.style.background='var(--gold-pale)'" onmouseleave="this.style.background=''"><i class="bi bi-bag"></i>Đơn Hàng</a>
+          <div style="border-top:1px solid var(--line)"></div>
+          <a href="#" onclick="logout()" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:.875rem;color:var(--pink);text-decoration:none" onmouseenter="this.style.background='var(--gold-pale)'" onmouseleave="this.style.background=''"><i class="bi bi-box-arrow-right"></i>Đăng Xuất</a>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML = `<a href="login.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--gold);color:var(--dark);border-radius:6px;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;font-weight:500;text-decoration:none"><i class="bi bi-person"></i>Đăng Nhập</a>`;
+  }
+}
+function toggleUserMenu() { const m=document.getElementById('userMenu'); if(m) m.style.display=m.style.display==='none'?'block':'none'; }
+document.addEventListener('click', e => { const m=document.getElementById('userMenu'); if(m && !m.parentElement?.contains(e.target)) m.style.display='none'; });
+function logout() { localStorage.removeItem('user'); localStorage.removeItem('token'); window.location.reload(); }
+
+/* ============================================================
+   LOAD PRODUCT
+============================================================ */
+async function loadProduct() {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) { renderMock(); return; }
+  try {
+    const res = await fetch(`${API}/products/${id}`);
+    if (!res.ok) throw new Error();
+    product = await res.json();
+    productImages = await loadProductImages(id);
+    renderProduct(product);
+    renderGallery(productImages);
+    renderCertificate(product);
+    await loadReviews(id);
+    loadRelated(product.category?.id ?? product.categoryId ?? null);
+  } catch { renderMock(); }
+}
+
+async function loadProductImages(pid) {
+  try {
+    const res = await fetch(`${API}/product-images/product/${pid}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (data.content || []);
+    list.sort((a, b) => (b.isPrimary === true ? 1 : 0) - (a.isPrimary === true ? 1 : 0));
+    return list;
+  } catch { return []; }
+}
+
+function renderMock() {
+  product = {
+    id: 1, name: 'Nhẫn Vàng 18K Đá CZ Tròn', material: 'Vàng 18K',
+    price: 2450000, discountPrice: 2190000, stock: 45, weight: 2.45,
+    description: 'Nhẫn vàng 18K đính đá CZ cao cấp, thiết kế tinh tế sang trọng.',
+    category: { id: 1, name: 'Nhẫn' },
+    availability_type: 'IN_STOCK', image_url: ''
+  };
+  productImages = [];
+  renderProduct(product);
+  renderGallery(productImages);
+  renderCertificate(product);
+  loadRelatedMock();
+}
+
+/* ============================================================
+   RENDER PRODUCT
+============================================================ */
+function renderProduct(p) {
+  document.title = `${p.name} – PinkGold`;
+  document.getElementById('bcProduct').textContent = p.name;
+  document.getElementById('pName').textContent     = p.name;
+  document.getElementById('pCat').textContent      = p.category?.name ?? 'Trang sức';
+  document.getElementById('pDesc').textContent     = p.description || 'Sản phẩm chất lượng cao từ PinkGold.';
+
+  const disc  = Number(p.discountPrice ?? p.discount_price ?? 0);
+  const price = Number(p.price || 0);
+  const showDisc = disc > 0 && disc < price;
+  document.getElementById('pPrice').textContent = fmt(showDisc ? disc : price);
+  if (showDisc) {
+    document.getElementById('pPriceOrig').textContent = fmt(price);
+    document.getElementById('pPriceOrig').style.display = 'inline';
+    document.getElementById('pSave').textContent = `-${Math.round((1 - disc/price)*100)}%`;
+    document.getElementById('pSave').style.display = 'inline';
+  }
+
+  document.getElementById('dMaterial').textContent  = p.material || '–';
+  document.getElementById('dWeight').textContent    = p.weight ? `${p.weight}g` : '–';
+  document.getElementById('dCode').textContent      = `PG${String(p.id).padStart(4,'0')}`;
+  document.getElementById('s-name').textContent     = p.name;
+  document.getElementById('s-material').textContent = p.material || '–';
+  document.getElementById('s-weight').textContent   = p.weight ? `${p.weight}g` : '–';
+  document.getElementById('s-cat').textContent      = p.category?.name || '–';
+  document.getElementById('s-price').textContent    = fmt(price);
+
+  applyAvailability(p);
+}
+
+/* ============================================================
+   AVAILABILITY
+   ── Đọc cả camelCase (availabilityType) lẫn snake_case (availability_type)
+   ── Đọc cả restockDate lẫn restock_date
+============================================================ */
+function getAvailType(p) {
+  return p.availabilityType || p.availability_type || 'IN_STOCK';
+}
+function getRestockDate(p) {
+  return p.restockDate || p.restock_date || null;
+}
+
+function applyAvailability(p) {
+  const stock    = Number(p.stock || 0);
+  const avail    = getAvailType(p);
+  const stockEl  = document.getElementById('dStock');
+  const sStockEl = document.getElementById('s-stock');
+  const banner   = document.getElementById('availBanner');
+  const qtyRow   = document.getElementById('qtyRow');
+  const btnCart  = document.getElementById('btnCart');
+  const btnBuy   = document.getElementById('btnBuy');
+
+  // --- reset ---
+  banner.className  = 'avail-banner';
+  banner.innerHTML  = '';
+  btnBuy.className  = 'btn-buy';
+  btnBuy.style.cssText = '';
+  btnCart.disabled  = false;
+  btnCart.onclick   = addToCart;
+
+  /* ════ CÒN HÀNG ════ */
+  if (stock > 0) {
+    if (stock > 10) {
+      stockEl.textContent = `Còn hàng (${stock})`;
+      stockEl.className   = 'detail-value in-stock';
+      sStockEl.textContent = `Còn ${stock} sản phẩm`;
+    } else {
+      stockEl.textContent = `Sắp hết hàng (còn ${stock})`;
+      stockEl.className   = 'detail-value low-stock';
+      sStockEl.textContent = `Sắp hết — còn ${stock}`;
+    }
+    document.getElementById('qtyInput').max = stock;
+    qtyRow.style.display = '';
+    btnCart.innerHTML = `<i class="bi bi-bag-plus"></i> Thêm vào giỏ`;
+    btnBuy.href = 'checkout.html';
+    btnBuy.innerHTML = `<i class="bi bi-lightning-charge"></i> Mua ngay`;
+    btnBuy.onclick = null;
+    return;
+  }
+
+  /* ════ HẾT HÀNG — ẩn qty ════ */
+  qtyRow.style.display = 'none';
+  btnCart.disabled = true;
+  btnCart.innerHTML = `<i class="bi bi-bag-x"></i> Hết hàng`;
+  btnCart.onclick = null;
+
+  /* ── Trường hợp 1: RESTOCKING — đang nhập, có ngày dự kiến ── */
+  if (avail === 'RESTOCKING') {
+    const rawDate  = getRestockDate(p);
+    const dateText = rawDate
+      ? new Date(rawDate).toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' })
+      : null;
+
+    stockEl.className = 'detail-value restocking-stock';
+    sStockEl.textContent = dateText ? `Dự kiến về ${dateText}` : 'Đang nhập hàng';
+
+    if (dateText) {
+      stockEl.textContent = `Hết hàng — dự kiến về ${dateText}`;
+      banner.innerHTML = `
+        <div class="avail-banner-head">
+          <i class="bi bi-truck"></i>
+          Sản phẩm đang được nhập hàng
+        </div>
+        <p>Dự kiến có hàng trở lại vào <strong>${esc(dateText)}</strong>.
+        Quý khách có thể liên hệ để đặt trước, chúng tôi sẽ ưu tiên giao ngay khi hàng về.</p>
+        <a class="hotline-btn" href="tel:${HOTLINE}">
+          <i class="bi bi-telephone-fill"></i> Đặt trước — Hotline ${HOTLINE}
+        </a>`;
+    } else {
+      stockEl.textContent = 'Hết hàng — đang nhập';
+      banner.innerHTML = `
+        <div class="avail-banner-head">
+          <i class="bi bi-truck"></i>
+          Sản phẩm đang được nhập hàng
+        </div>
+        <p>Hàng đang trên đường về. Vui lòng liên hệ hotline để được cập nhật thời gian có hàng chính xác nhất.</p>
+        <a class="hotline-btn" href="tel:${HOTLINE}">
+          <i class="bi bi-telephone-fill"></i> Liên hệ ${HOTLINE}
+        </a>`;
+    }
+    banner.classList.add('show', 'restocking');
+
+    btnBuy.removeAttribute('href');
+    btnBuy.innerHTML = `<i class="bi bi-telephone"></i> Đặt trước qua hotline`;
+    btnBuy.onclick = (e) => { e.preventDefault(); window.location.href = `tel:${HOTLINE}`; };
+
+  /* ── Trường hợp 2: MADE_TO_ORDER — hàng đặt riêng ── */
+  } else if (avail === 'MADE_TO_ORDER') {
+    stockEl.className = 'detail-value mto-stock';
+    stockEl.innerHTML = `Hàng đặt riêng &mdash; <a href="tel:${HOTLINE}">Liên hệ ${HOTLINE}</a>`;
+    sStockEl.textContent = 'Chế tác theo đơn';
+
+    banner.classList.add('show', 'made-to-order');
+    banner.innerHTML = `
+      <div class="avail-banner-head">
+        <i class="bi bi-gem"></i>
+        Sản phẩm được chế tác riêng theo yêu cầu khách hàng
+      </div>
+      <p>Quý khách vui lòng liên hệ trao đổi thông tin về kích thước, chất liệu, thiết kế
+      và thời gian hoàn thiện. Thợ thủ công PinkGold sẽ tạo nên tác phẩm mang đậm dấu ấn của bạn.</p>
+      <a class="hotline-btn" href="tel:${HOTLINE}">
+        <i class="bi bi-telephone-fill"></i> Liên hệ ${HOTLINE}
+      </a>`;
+
+    btnBuy.removeAttribute('href');
+    btnBuy.innerHTML = `<i class="bi bi-telephone"></i> Liên hệ đặt hàng`;
+    btnBuy.onclick = (e) => { e.preventDefault(); window.location.href = `tel:${HOTLINE}`; };
+
+  /* ── Trường hợp 3: Hết hàng — chưa rõ thời gian ── */
+  } else {
+    stockEl.textContent = 'Tạm hết hàng';
+    stockEl.className   = 'detail-value low-stock';
+    sStockEl.textContent = 'Tạm hết hàng';
+
+    banner.classList.add('show', 'out-unknown');
+    banner.innerHTML = `
+      <div class="avail-banner-head">
+        <i class="bi bi-exclamation-circle"></i>
+        Sản phẩm hiện đang tạm hết hàng
+      </div>
+      <p>Vui lòng liên hệ để được tư vấn thời gian nhập hàng mới.</p>
+      <a class="hotline-btn" href="tel:${HOTLINE}">
+        <i class="bi bi-telephone-fill"></i> Hotline ${HOTLINE}
+      </a>`;
+
+    btnBuy.removeAttribute('href');
+    btnBuy.classList.add('disabled-btn');
+    btnBuy.innerHTML = `<i class="bi bi-clock"></i> Tạm hết hàng`;
+    btnBuy.onclick = (e) => e.preventDefault();
+  }
+}
+
+/* ============================================================
+   GALLERY
+============================================================ */
+function renderGallery(images) {
+  const mainEl   = document.getElementById('mainImgEl');
+  const mainIcon = document.getElementById('mainImgIcon');
+  const thumbsEl = document.getElementById('thumbs');
+
+  if (!images || !images.length) {
+    mainEl.style.display   = 'none';
+    mainIcon.style.display = 'block';
+    thumbsEl.innerHTML     = '';
+    return;
+  }
+
+  const firstSrc = imgUrl(images[0].imageUrl || images[0].image_url || '');
+  setMainImage(firstSrc, product?.name || '');
+
+  thumbsEl.innerHTML = images.map((img, i) => {
+    const src = imgUrl(img.imageUrl || img.image_url || '');
+    return `
+      <div class="gallery-thumb ${i===0?'active':''}" onclick="selectThumb(this,'${esc(src)}')">
+        <img src="${esc(src)}" alt="" onerror="this.parentElement.innerHTML='<i class=&quot;bi bi-gem&quot;></i>'">
+      </div>`;
+  }).join('');
+}
+
+function setMainImage(src, alt) {
+  const mainEl   = document.getElementById('mainImgEl');
+  const mainIcon = document.getElementById('mainImgIcon');
+  if (!src) { mainEl.style.display='none'; mainIcon.style.display='block'; return; }
+  mainEl.src  = src;
+  mainEl.alt  = alt || '';
+  mainEl.style.display   = 'block';
+  mainIcon.style.display = 'none';
+  mainEl.onerror = () => { mainEl.style.display='none'; mainIcon.style.display='block'; };
+}
+
+function selectThumb(el, src) {
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  setMainImage(src, product?.name || '');
+}
+
+function openZoom() {
+  const src = document.getElementById('mainImgEl').src;
+  if (src && src !== window.location.href) { document.getElementById('zoomImg').src=src; document.getElementById('zoomOverlay').style.display='flex'; }
+}
+function closeZoom() { document.getElementById('zoomOverlay').style.display='none'; }
+function openZoomSrc(src) { if(!src) return; document.getElementById('zoomImg').src=src; document.getElementById('zoomOverlay').style.display='flex'; }
+
+/* ============================================================
+   CERTIFICATE TAB
+   Ảnh giấy kiểm định lấy từ products.image_url (hoặc imageUrl)
+   Cần qua imgUrl() để thêm prefix http://localhost:8080
+============================================================ */
+function renderCertificate(p) {
+  const box = document.getElementById('certBox');
+
+  // Đọc cả camelCase lẫn snake_case
+  const rawUrl  = p.imageUrl || p.image_url || '';
+  const certUrl = imgUrl(rawUrl);   // ← FIX: thêm prefix IMG_BASE
+
+  if (!certUrl) {
+    box.innerHTML = `
+      <div class="cert-empty">
+        <i class="bi bi-file-earmark-text"></i>
+        Sản phẩm này chưa có ảnh giấy kiểm định.<br>
+        Vui lòng liên hệ <a href="tel:${HOTLINE}">${HOTLINE}</a> để được cung cấp thông tin kiểm định.
+      </div>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="cert-img-wrap" onclick="openZoomSrc('${esc(certUrl)}')" title="Nhấn để xem toàn màn hình">
+      <img src="${esc(certUrl)}"
+           alt="Giấy kiểm định ${esc(p.name)}"
+           onerror="this.parentElement.innerHTML='<div class=&quot;cert-placeholder&quot;><i class=&quot;bi bi-file-earmark-text&quot;></i><span>Không tải được ảnh</span></div>'">
+    </div>
+    <div class="cert-info">
+      <h4>Giấy chứng nhận kiểm định</h4>
+      <p>
+        Mỗi sản phẩm PinkGold đều đi kèm giấy kiểm định chất lượng, xác nhận về
+        chất liệu${p.material ? ` <strong>${esc(p.material)}</strong>` : ''},
+        ${p.weight ? `trọng lượng <strong>${esc(String(p.weight))}g</strong> và ` : ''}độ
+        tinh khiết theo tiêu chuẩn của trung tâm kiểm định uy tín.
+      </p>
+      <p>Nhấn vào ảnh để xem chi tiết hoặc phóng to.</p>
+      <div class="cert-badge">
+        <i class="bi bi-shield-check"></i>
+        Giấy kiểm định được giao kèm sản phẩm khi nhận hàng
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   REVIEWS — chỉ xem; chủ đánh giá mới được sửa
+============================================================ */
+async function loadReviews(pid) {
+  try {
+    const res = await fetch(`${API}/reviews/product/${pid}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    allReviews = Array.isArray(data) ? data : [];
+    renderReviews();
+  } catch {}
+}
+
+function renderReviews() {
+  const cu   = JSON.parse(localStorage.getItem('user') || 'null');
+  const cuId = cu ? Number(cu.id) : null;
+
+  // --- stats ---
+  if (allReviews.length) {
+    const avg = (allReviews.reduce((s,r)=>s+Number(r.rating||5),0)/allReviews.length).toFixed(1);
+    ['avgRating','avgRatingBig'].forEach(id => document.getElementById(id).textContent = avg);
+    document.getElementById('reviewCount').textContent      = `${allReviews.length} đánh giá`;
+    document.getElementById('reviewCountBig').textContent   = `${allReviews.length} đánh giá`;
+    document.getElementById('reviewTabCount').textContent   = allReviews.length;
+  } else {
+    ['avgRating','avgRatingBig'].forEach(id => document.getElementById(id).textContent = '–');
+    document.getElementById('reviewCount').textContent    = '0 đánh giá';
+    document.getElementById('reviewCountBig').textContent = '0 đánh giá';
+    document.getElementById('reviewTabCount').textContent = 0;
+  }
+
+  const list = document.getElementById('reviewList');
+  if (!allReviews.length) {
+    list.innerHTML = `<div class="review-empty"><i class="bi bi-chat-square-text"></i>Chưa có đánh giá nào cho sản phẩm này.</div>`;
+    return;
+  }
+
+  list.innerHTML = allReviews.map(r => {
+    const rUid   = r.user ? Number(r.user.id ?? r.userId ?? 0) : 0;
+    const isOwn  = cuId !== null && rUid === cuId;
+    const name   = r.user?.fullName || r.user?.username || 'Khách hàng';
+    const init   = name.trim().split(/\s+/).slice(-2).map(w=>w[0].toUpperCase()).join('');
+    const date   = r.createdAt ? new Date(r.createdAt).toLocaleDateString('vi-VN') : '';
+    const rating = Number(r.rating) || 5;
+    const stars  = Array.from({length:5},(_,i)=>`<i class="bi bi-star${i<rating?'-fill':''}"></i>`).join('');
+
+    const editForm = isOwn ? `
+      <div class="review-edit-area" id="editArea-${r.id}">
+        <div class="review-edit-stars" id="editStars-${r.id}" data-rating="${rating}">
+          ${Array.from({length:5},(_,i)=>`
+            <i class="bi bi-star${i<rating?'-fill lit':''}" data-v="${i+1}"
+               onclick="setEditRating(${r.id},${i+1})"
+               onmouseenter="hoverEditStars(${r.id},${i+1})"
+               onmouseleave="hoverEditStars(${r.id},0,${rating})"></i>`).join('')}
+        </div>
+        <textarea class="review-edit-textarea" id="editText-${r.id}">${esc(r.comment||'')}</textarea>
+        <div class="review-edit-actions">
+          <button class="btn-edit-cancel" onclick="cancelEditReview(${r.id})">Hủy</button>
+          <button class="btn-edit-save"   onclick="saveEditReview(${r.id})">Lưu thay đổi</button>
+        </div>
+      </div>` : '';
+
+    return `
+      <div class="review-item" id="reviewItem-${r.id}">
+        ${isOwn ? `<span class="review-own-badge">Đánh giá của bạn</span>` : ''}
+        <div class="review-top">
+          <div class="review-avatar">${esc(init)}</div>
+          <div class="review-name">${esc(name)}</div>
+          <div class="review-date">${esc(date)}</div>
+        </div>
+        <div class="review-stars">${stars}</div>
+        <p class="review-text" id="reviewText-${r.id}">${esc(r.comment||'')}</p>
+        ${isOwn ? `<button class="btn-edit-review" onclick="openEditReview(${r.id})"><i class="bi bi-pencil"></i> Sửa đánh giá</button>` : ''}
+        ${editForm}
+      </div>`;
+  }).join('');
+}
+
+function openEditReview(id) {
+  document.querySelectorAll('.review-edit-area.open').forEach(el=>{ if(el.id!==`editArea-${id}`) el.classList.remove('open'); });
+  document.getElementById(`editArea-${id}`)?.classList.toggle('open');
+}
+function cancelEditReview(id) { document.getElementById(`editArea-${id}`)?.classList.remove('open'); }
+
+function setEditRating(rid, val) {
+  const el = document.getElementById(`editStars-${rid}`);
+  if (!el) return;
+  el.dataset.rating = val;
+  el.querySelectorAll('i').forEach((s,i) => { s.className = i<val ? 'bi bi-star-fill lit' : 'bi bi-star'; });
+}
+function hoverEditStars(rid, hval, rval) {
+  const el = document.getElementById(`editStars-${rid}`);
+  if (!el) return;
+  const n = hval > 0 ? hval : (rval || Number(el.dataset.rating) || 5);
+  el.querySelectorAll('i').forEach((s,i) => { s.className = i<n ? 'bi bi-star-fill lit' : 'bi bi-star'; });
+}
+
+async function saveEditReview(rid) {
+  const starsEl = document.getElementById(`editStars-${rid}`);
+  const textEl  = document.getElementById(`editText-${rid}`);
+  const rating  = Number(starsEl?.dataset.rating || starsEl?.querySelectorAll('i.lit').length || 0);
+  const comment = textEl?.value.trim() || '';
+
+  if (!rating)  { showToast('Vui lòng chọn số sao!', 'error'); return; }
+  if (!comment) { showToast('Vui lòng nhập nội dung đánh giá!', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API}/reviews/${rid}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating, comment })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const idx = allReviews.findIndex(r=>r.id===rid);
+    if (idx>-1) { allReviews[idx].rating=rating; allReviews[idx].comment=comment; }
+    cancelEditReview(rid);
+    renderReviews();
+    showToast('Đã cập nhật đánh giá!');
+  } catch(e) { showToast(`Lỗi: ${e.message}`, 'error'); }
+}
+
+/* ============================================================
+   RELATED
+============================================================ */
+async function loadRelated(catId) {
+  if (!catId) { loadRelatedMock(); return; }
+  try {
+    const res = await fetch(`${API}/products/category/${catId}`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const list = (Array.isArray(data)?data:(data.content||[])).filter(p=>p.id!==product?.id).slice(0,4);
+    list.length ? renderRelated(list) : loadRelatedMock();
+  } catch { loadRelatedMock(); }
+}
+function loadRelatedMock() {
+  renderRelated([
+    { id:2, name:'Nhẫn Kim Cương 4.5ly', price:18500000, discountPrice:17200000, stock:8 },
+    { id:3, name:'Dây Chuyền Vàng Trái Tim', price:3250000, discountPrice:2890000, stock:32 },
+    { id:7, name:'Bông Tai Vàng Hoa Hồng', price:1650000, discountPrice:1490000, stock:40 },
+    { id:5, name:'Lắc Tay Vàng Charm Bear', price:2850000, discountPrice:2590000, stock:0, availability_type:'RESTOCKING' },
+  ]);
+}
+async function renderRelated(products) {
+  const withImg = await Promise.all(products.map(async p => {
+    let img = '';
+    try { const imgs=await loadProductImages(p.id); if(imgs.length){ const pr=imgs.find(x=>x.isPrimary)||imgs[0]; img=imgUrl(pr.imageUrl||pr.image_url||''); } } catch {}
+    return { ...p, _img: img };
+  }));
+  document.getElementById('relatedGrid').innerHTML = withImg.map(p => {
+    const price = Number(p.discountPrice||p.discount_price||p.price||0);
+    return `
+      <div class="rel-card" onclick="location.href='product-detail.html?id=${p.id}'">
+        <div class="rel-img">
+          ${p._img ? `<img src="${esc(p._img)}" alt="${esc(p.name)}" loading="lazy" onerror="this.outerHTML='<i class=&quot;bi bi-gem&quot; style=&quot;font-size:2.5rem;color:rgba(201,168,76,.3)&quot;></i>'">`
+                   : '<i class="bi bi-gem" style="font-size:2.5rem;color:rgba(201,168,76,.3)"></i>'}
+        </div>
+        <div class="rel-body">
+          <div class="rel-name">${esc(p.name)}</div>
+          <div class="rel-price">${fmt(price)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   QTY & CART
+============================================================ */
+function changeQty(delta) {
+  const inp = document.getElementById('qtyInput');
+  inp.value = Math.max(1, Math.min(parseInt(inp.max||99), parseInt(inp.value||1)+delta));
+}
+
+async function addToCart() {
+  if (!product) { showToast('Sản phẩm chưa tải xong','error'); return; }
+  if (Number(product.stock||0)<=0) { showToast('Sản phẩm hiện đã hết hàng!','error'); return; }
+
+  const qty   = parseInt(document.getElementById('qtyInput').value)||1;
+  const price = Number(product.discountPrice||product.discount_price||product.price||0);
+  let imgSrc  = '';
+  if (productImages.length) {
+    const pr = productImages.find(x=>x.isPrimary)||productImages[0];
+    imgSrc = imgUrl(pr.imageUrl||pr.image_url||'');
+  }
+
+  const cart = getCart();
+  const idx  = cart.findIndex(i=>i.id===product.id);
+  if (idx>-1) cart[idx].quantity+=qty;
+  else cart.push({ id:product.id, name:product.name, price, image:imgSrc, quantity:qty });
+  saveCart(cart);
+  updateCartBadge();
+
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  if (user?.id) {
+    try { await fetch(`${API}/cart/add?userId=${user.id}&productId=${product.id}&quantity=${qty}`,{method:'POST'}); } catch {}
+  }
+  showToast(`Đã thêm ${qty} "${product.name}" vào giỏ hàng`);
+}
+
+function toggleWish() {
+  const btn = document.getElementById('wishBtn');
+  btn.classList.toggle('active');
+  btn.querySelector('i').className = btn.classList.contains('active') ? 'bi bi-heart-fill' : 'bi bi-heart';
+  showToast(btn.classList.contains('active') ? 'Đã thêm vào yêu thích' : 'Đã xóa khỏi yêu thích');
+}
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderNavUser();
+updateCartBadge();
+loadProduct();
+</script>
+</body>
+</html>

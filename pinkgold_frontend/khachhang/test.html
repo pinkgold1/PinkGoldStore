@@ -1,0 +1,491 @@
+const {
+  Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+  AlignmentType, HeadingLevel, LevelFormat, BorderStyle, WidthType,
+  ShadingType, VerticalAlign, PageNumber, PageBreak
+} = require('docx');
+const fs = require('fs');
+
+// ─── HELPERS ────────────────────────────────────────────────────────────────
+const border = { style: BorderStyle.SINGLE, size: 1, color: "999999" };
+const borders = { top: border, bottom: border, left: border, right: border };
+
+function h1(text) {
+  return new Paragraph({
+    heading: HeadingLevel.HEADING_1,
+    spacing: { before: 360, after: 180 },
+    children: [new TextRun({ text, bold: true, size: 28, font: "Times New Roman" })]
+  });
+}
+function h2(text) {
+  return new Paragraph({
+    heading: HeadingLevel.HEADING_2,
+    spacing: { before: 240, after: 120 },
+    children: [new TextRun({ text, bold: true, size: 26, font: "Times New Roman" })]
+  });
+}
+function h3(text) {
+  return new Paragraph({
+    heading: HeadingLevel.HEADING_3,
+    spacing: { before: 180, after: 100 },
+    children: [new TextRun({ text, bold: true, size: 24, font: "Times New Roman" })]
+  });
+}
+function para(text, indent = true) {
+  return new Paragraph({
+    alignment: AlignmentType.JUSTIFIED,
+    spacing: { before: 60, after: 60, line: 360 },
+    indent: indent ? { firstLine: 720 } : {},
+    children: [new TextRun({ text, size: 24, font: "Times New Roman" })]
+  });
+}
+function bold(text) {
+  return new TextRun({ text, bold: true, size: 24, font: "Times New Roman" });
+}
+function bullet(text) {
+  return new Paragraph({
+    numbering: { reference: "bullets", level: 0 },
+    spacing: { before: 60, after: 60, line: 320 },
+    children: [new TextRun({ text, size: 24, font: "Times New Roman" })]
+  });
+}
+function tableCaption(text) {
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 120, after: 80 },
+    children: [new TextRun({ text, bold: true, italics: true, size: 22, font: "Times New Roman" })]
+  });
+}
+function cell(text, isHeader = false, w = 1800) {
+  return new TableCell({
+    borders,
+    width: { size: w, type: WidthType.DXA },
+    margins: { top: 80, bottom: 80, left: 120, right: 120 },
+    shading: isHeader ? { fill: "D6E4F0", type: ShadingType.CLEAR } : undefined,
+    children: [new Paragraph({
+      alignment: AlignmentType.LEFT,
+      children: [new TextRun({ text, bold: isHeader, size: 22, font: "Times New Roman" })]
+    })]
+  });
+}
+function empty() {
+  return new Paragraph({ children: [new TextRun("")], spacing: { before: 60, after: 60 } });
+}
+
+// ─── KIỂM THỬ CHỨC NĂNG – 16 USECASE ───────────────────────────────────────
+function ucTable(ucId, ucName, rows) {
+  // rows: [{stt, tcId, desc, input, expected, actual, result}]
+  const COL = [500, 1000, 2500, 1500, 1500, 1500, 1000];
+  const headerRow = new TableRow({
+    children: [
+      cell("STT", true, COL[0]),
+      cell("Mã TC", true, COL[1]),
+      cell("Mô tả kịch bản kiểm thử", true, COL[2]),
+      cell("Dữ liệu đầu vào", true, COL[3]),
+      cell("Kết quả mong đợi", true, COL[4]),
+      cell("Kết quả thực tế", true, COL[5]),
+      cell("Đánh giá", true, COL[6]),
+    ]
+  });
+  const dataRows = rows.map(r => new TableRow({
+    children: [
+      cell(r.stt, false, COL[0]),
+      cell(r.tcId, false, COL[1]),
+      cell(r.desc, false, COL[2]),
+      cell(r.input, false, COL[3]),
+      cell(r.expected, false, COL[4]),
+      cell(r.actual, false, COL[5]),
+      cell(r.result, false, COL[6]),
+    ]
+  }));
+  return [
+    new Paragraph({
+      spacing: { before: 180, after: 60 },
+      children: [bold(`${ucId} – ${ucName}`)]
+    }),
+    new Table({
+      width: { size: 9500, type: WidthType.DXA },
+      columnWidths: COL,
+      rows: [headerRow, ...dataRows]
+    }),
+    empty()
+  ];
+}
+
+// ─── FULL CONTENT ────────────────────────────────────────────────────────────
+const children = [
+  h1("CHƯƠNG 4: TRIỂN KHAI VÀ KIỂM THỬ HỆ THỐNG"),
+
+  // 4.1
+  h2("4.1. Công cụ triển khai"),
+  para("Hệ thống website bán trang sức PinkGold được xây dựng và triển khai bằng bộ công nghệ Java Spring Boot ở phía backend, MySQL làm cơ sở dữ liệu quan hệ và giao diện người dùng (frontend) được xây dựng thuần bằng HTML, CSS và JavaScript. Môi trường phát triển sử dụng IntelliJ IDEA Community Edition làm IDE chính, kết hợp với công cụ quản lý phiên bản Git và giao diện trực quan MySQL Workbench để quản lý cơ sở dữ liệu. Dưới đây là chi tiết các công cụ và công nghệ sử dụng trong quá trình triển khai hệ thống."),
+
+  tableCaption("Bảng 4.1: Danh sách công cụ và công nghệ triển khai hệ thống PinkGold"),
+  new Table({
+    width: { size: 9500, type: WidthType.DXA },
+    columnWidths: [1600, 1800, 1800, 4300],
+    rows: [
+      new TableRow({ children: [cell("Hạng mục", true, 1600), cell("Công nghệ / Công cụ", true, 1800), cell("Phiên bản", true, 1800), cell("Mục đích sử dụng", true, 4300)] }),
+      new TableRow({ children: [cell("Ngôn ngữ backend", false, 1600), cell("Java", false, 1800), cell("Java 17", false, 1800), cell("Ngôn ngữ lập trình chính xây dựng REST API và logic nghiệp vụ", false, 4300)] }),
+      new TableRow({ children: [cell("Framework backend", false, 1600), cell("Spring Boot", false, 1800), cell("3.3.x", false, 1800), cell("Xây dựng các REST Controller, JPA Entity, xử lý HTTP request/response", false, 4300)] }),
+      new TableRow({ children: [cell("ORM", false, 1600), cell("Spring Data JPA / Hibernate", false, 1800), cell("3.3.x", false, 1800), cell("Ánh xạ đối tượng Java với bảng CSDL, thực hiện các thao tác CRUD", false, 4300)] }),
+      new TableRow({ children: [cell("Cơ sở dữ liệu", false, 1600), cell("MySQL", false, 1800), cell("8.0", false, 1800), cell("Lưu trữ toàn bộ dữ liệu: người dùng, sản phẩm, đơn hàng, thanh toán, đánh giá", false, 4300)] }),
+      new TableRow({ children: [cell("Frontend", false, 1600), cell("HTML5 / CSS3 / JavaScript", false, 1800), cell("Thuần (Vanilla JS)", false, 1800), cell("Xây dựng giao diện người dùng và giao diện quản trị, gọi API qua Fetch", false, 4300)] }),
+      new TableRow({ children: [cell("Build tool", false, 1600), cell("Maven", false, 1800), cell("3.x", false, 1800), cell("Quản lý phụ thuộc và build project Spring Boot", false, 4300)] }),
+      new TableRow({ children: [cell("IDE", false, 1600), cell("IntelliJ IDEA", false, 1800), cell("2024.x", false, 1800), cell("Môi trường phát triển chính, debug và chạy ứng dụng", false, 4300)] }),
+      new TableRow({ children: [cell("Quản lý CSDL", false, 1600), cell("MySQL Workbench", false, 1800), cell("8.0", false, 1800), cell("Tạo schema, chạy script SQL, kiểm tra dữ liệu", false, 4300)] }),
+      new TableRow({ children: [cell("Kiểm thử API", false, 1600), cell("Postman", false, 1800), cell("11.x", false, 1800), cell("Gửi HTTP request kiểm tra các REST API endpoint", false, 4300)] }),
+      new TableRow({ children: [cell("Thanh toán", false, 1600), cell("VNPay Sandbox", false, 1800), cell("2.1.0", false, 1800), cell("Tích hợp cổng thanh toán VNPay cho chức năng thanh toán trực tuyến", false, 4300)] }),
+      new TableRow({ children: [cell("Quản lý phiên bản", false, 1600), cell("Git / GitHub", false, 1800), cell("-", false, 1800), cell("Quản lý source code, lưu lịch sử thay đổi và làm việc nhóm", false, 4300)] }),
+    ]
+  }),
+  empty(),
+  para("Toàn bộ hệ thống được chạy thử nghiệm trên môi trường localhost với cấu hình: máy tính Windows 10/11, CPU Intel Core i5 trở lên, RAM 8GB, ổ cứng SSD. Backend Spring Boot lắng nghe tại cổng 8080, frontend HTML tương tác trực tiếp với backend qua REST API có bật CORS (Cross-Origin Resource Sharing)."),
+
+  // 4.2
+  h2("4.2. Giao diện hệ thống"),
+  para("Hệ thống PinkGold bao gồm hai phần giao diện chính: giao diện dành cho khách hàng (Customer UI) và giao diện quản trị (Admin UI). Cả hai được thiết kế theo phong cách sang trọng với bảng màu vàng chủ đạo, sử dụng font Cormorant Garamond và DM Sans, tạo cảm giác cao cấp phù hợp với sản phẩm trang sức."),
+
+  h3("4.2.1. Giao diện phía khách hàng"),
+  para("Giao diện khách hàng bao gồm các trang: trang chủ (index.html), trang danh sách sản phẩm (products.html), trang chi tiết sản phẩm (product-detail.html), giỏ hàng (cart.html), thanh toán (checkout.html), thanh toán VNPay (vnpay-payment.html), lịch sử đơn hàng (orders.html), trang đăng nhập (login.html) và đăng ký (register.html)."),
+  para("Trang chủ hiển thị banner hero với hiệu ứng animation, bộ sưu tập danh mục dạng grid, sản phẩm nổi bật và sản phẩm mới nhất được tải động từ API. Navbar cố định ở đầu trang với chức năng tìm kiếm, badge số lượng giỏ hàng và menu tài khoản. Thiết kế responsive, hiển thị tốt trên mọi thiết bị."),
+  para("Trang chi tiết sản phẩm hiển thị gallery ảnh có thể thu phóng, thông tin chất liệu, trọng lượng, tình trạng tồn kho, bộ chọn số lượng và nút thêm vào giỏ hàng. Phần đánh giá hiển thị điểm trung bình, danh sách nhận xét từ khách hàng đã mua và form gửi đánh giá mới."),
+
+  h3("4.2.2. Giao diện quản trị (Admin)"),
+  para("Giao diện admin gồm các trang: đăng nhập admin (login-admin.html), quản lý sản phẩm (products.html), quản lý danh mục (categories.html), quản lý đơn hàng (orders.html), quản lý khách hàng (customers.html), quản lý mã giảm giá (vouchers.html) và báo cáo thống kê (reports.html)."),
+  para("Giao diện admin được thiết kế dạng sidebar layout với thanh điều hướng bên trái, header cố định và vùng nội dung chính. Các trang quản lý có tính năng tìm kiếm, lọc dữ liệu theo nhiều tiêu chí, bảng dữ liệu có phân trang và modal thêm/sửa inline. Thống kê tổng quan hiển thị trên các thẻ stat cards ở đầu mỗi trang."),
+
+  // 4.3
+  h2("4.3. Kế hoạch kiểm thử"),
+
+  h3("4.3.1. Mục tiêu kiểm thử"),
+  para("Kiểm thử hệ thống website PinkGold nhằm đạt được các mục tiêu sau:"),
+  bullet("Xác minh toàn bộ 16 Use Case đã được thiết kế ở Chương 3 hoạt động đúng theo đặc tả, bao gồm cả luồng chính (main flow) và các luồng thay thế (alternative flow)."),
+  bullet("Đảm bảo các luồng nghiệp vụ quan trọng như đăng ký → đăng nhập → thêm giỏ hàng → đặt hàng → thanh toán → theo dõi đơn hàng diễn ra liên tục và nhất quán."),
+  bullet("Kiểm tra tính toàn vẹn dữ liệu giữa frontend và backend: dữ liệu nhập từ giao diện HTML được gửi đúng tới API Spring Boot và lưu chính xác vào cơ sở dữ liệu MySQL."),
+  bullet("Phát hiện và ghi nhận các lỗi, sự cố bất thường để đề xuất phương án sửa chữa."),
+  empty(),
+
+  h3("4.3.2. Phạm vi kiểm thử"),
+  para("Phạm vi kiểm thử bao gồm toàn bộ các chức năng của hệ thống PinkGold, cụ thể:"),
+  bullet("Phía frontend: tất cả các trang HTML/CSS/JS của giao diện khách hàng và giao diện quản trị."),
+  bullet("Phía backend: các REST API endpoint được định nghĩa trong 11 Controller (AuthController, ProductController, CategoryController, CartController, OrderController, PaymentController, ReviewController, VoucherController, UserController, ProductImageController, AdminController)."),
+  bullet("Cơ sở dữ liệu: kiểm tra dữ liệu được lưu chính xác vào 10 bảng trong MySQL (users, categories, products, product_images, cart_items, orders, order_items, payments, vouchers, reviews)."),
+  bullet("Tích hợp VNPay: kiểm tra luồng tạo đơn, chuyển hướng sang cổng thanh toán và xử lý kết quả callback."),
+  para("Phạm vi ngoài kiểm thử: hiệu năng tải cao (load testing), kiểm thử bảo mật chuyên sâu (penetration testing), và chức năng email thông báo tự động do môi trường sandbox chưa cấu hình SMTP."),
+
+  h3("4.3.3. Phương pháp kiểm thử"),
+  para("Đề tài áp dụng phương pháp kiểm thử hộp đen (Black-box Testing), tức là kiểm tra chức năng hệ thống từ góc độ người dùng cuối, không phụ thuộc vào cấu trúc nội bộ source code. Cụ thể:"),
+  bullet("Kiểm thử thủ công (Manual Testing): Người kiểm thử thực hiện các thao tác trực tiếp trên giao diện trình duyệt Chrome/Firefox, quan sát kết quả hiển thị và kiểm tra dữ liệu trong MySQL Workbench."),
+  bullet("Kiểm thử API bằng Postman: Gửi các HTTP request (GET, POST, PUT, DELETE) trực tiếp tới các endpoint REST API để kiểm tra phản hồi, mã trạng thái HTTP và nội dung JSON trả về."),
+  bullet("Kiểm thử theo ca kiểm thử (Test Case): Mỗi chức năng được kiểm thử theo bảng ca kiểm thử bao gồm: mã ca kiểm thử, mô tả kịch bản, dữ liệu đầu vào, kết quả mong đợi, kết quả thực tế và đánh giá Đạt/Không đạt."),
+
+  // 4.4
+  h2("4.4. Nội dung kiểm thử"),
+
+  h3("4.4.1. Kiểm thử theo luồng nghiệp vụ"),
+  para("Trước khi tiến hành kiểm thử từng Use Case riêng lẻ, hệ thống được kiểm thử theo các luồng nghiệp vụ đầu cuối để đảm bảo tính liên tục và nhất quán của toàn bộ quy trình."),
+
+  tableCaption("Bảng 4.2: Kiểm thử các luồng nghiệp vụ đầu cuối"),
+  new Table({
+    width: { size: 9500, type: WidthType.DXA },
+    columnWidths: [500, 2800, 3200, 3000],
+    rows: [
+      new TableRow({ children: [cell("STT", true, 500), cell("Tên luồng nghiệp vụ", true, 2800), cell("Các bước thực hiện", true, 3200), cell("Kết quả kiểm thử", true, 3000)] }),
+      new TableRow({ children: [cell("1", false, 500), cell("Luồng mua sắm đầy đủ (COD)", false, 2800), cell("Đăng ký → Đăng nhập → Xem sản phẩm → Thêm giỏ hàng → Đặt hàng COD → Kiểm tra đơn trong CSDL", false, 3200), cell("Đạt – Đơn hàng tạo thành công với status CONFIRMED, order_items và payments được tạo đúng", false, 3000)] }),
+      new TableRow({ children: [cell("2", false, 500), cell("Luồng thanh toán VNPay", false, 2800), cell("Đặt hàng → Chọn VNPay → Chuyển sang vnpay-payment.html → Xác nhận → Kiểm tra callback", false, 3200), cell("Đạt – Đơn hàng tạo thành công, trang VNPay hiển thị đúng thông tin", false, 3000)] }),
+      new TableRow({ children: [cell("3", false, 500), cell("Luồng quản trị đơn hàng", false, 2800), cell("Admin đăng nhập → Xem danh sách đơn → Cập nhật trạng thái → Kiểm tra cập nhật", false, 3200), cell("Đạt – Trạng thái đơn cập nhật ngay trong bảng và CSDL", false, 3000)] }),
+      new TableRow({ children: [cell("4", false, 500), cell("Luồng áp mã giảm giá", false, 2800), cell("Đăng nhập → Thêm sản phẩm vào giỏ → Nhập voucher PINKGOLD10 → Kiểm tra tổng tiền", false, 3200), cell("Đạt – Giảm giá 10% được tính đúng, hiển thị trên tóm tắt đơn hàng", false, 3000)] }),
+      new TableRow({ children: [cell("5", false, 500), cell("Luồng đánh giá sản phẩm", false, 2800), cell("Đăng nhập → Vào chi tiết sản phẩm → Chọn số sao → Nhập nhận xét → Gửi đánh giá", false, 3200), cell("Đạt – Đánh giá lưu vào bảng reviews, hiển thị ngay trên trang sản phẩm", false, 3000)] }),
+    ]
+  }),
+  empty(),
+
+  h3("4.4.2. Kiểm thử chức năng hệ thống"),
+  para("Phần này trình bày chi tiết kết quả kiểm thử từng Use Case trong hệ thống PinkGold. Mỗi bảng kiểm thử bao gồm các ca kiểm thử cho cả luồng thành công, luồng thất bại và các trường hợp biên."),
+
+  // UC_001
+  ...ucTable("UC_001", "Xem sản phẩm", [
+    { stt: "1", tcId: "TC001_01", desc: "Tải trang danh sách sản phẩm thành công", input: "Truy cập GET /api/products", expected: "Trả về HTTP 200 và danh sách sản phẩm dạng JSON", actual: "HTTP 200, danh sách 15 sản phẩm", result: "Đạt" },
+    { stt: "2", tcId: "TC001_02", desc: "Xem chi tiết sản phẩm theo ID hợp lệ", input: "GET /api/products/1", expected: "HTTP 200, thông tin đầy đủ sản phẩm ID=1", actual: "HTTP 200, trả về tên, giá, chất liệu, trọng lượng, ảnh", result: "Đạt" },
+    { stt: "3", tcId: "TC001_03", desc: "Xem chi tiết sản phẩm không tồn tại", input: "GET /api/products/9999", expected: "HTTP 404 Not Found", actual: "HTTP 404", result: "Đạt" },
+    { stt: "4", tcId: "TC001_04", desc: "Lọc sản phẩm theo danh mục", input: "GET /api/products/category/1", expected: "Chỉ trả sản phẩm thuộc danh mục Nhẫn (category_id=1)", actual: "HTTP 200, 4 sản phẩm danh mục Nhẫn", result: "Đạt" },
+    { stt: "5", tcId: "TC001_05", desc: "Hiển thị điểm đánh giá trung bình", input: "Sản phẩm ID=1 có 3 đánh giá: 5, 4, 4 sao", expected: "Hiển thị điểm trung bình 4.3 sao", actual: "Hiển thị 4.3 sao đúng", result: "Đạt" },
+  ]),
+
+  // UC_002
+  ...ucTable("UC_002", "Tìm kiếm sản phẩm", [
+    { stt: "1", tcId: "TC002_01", desc: "Tìm kiếm với từ khóa hợp lệ", input: "GET /api/products/search?keyword=nhẫn", expected: "HTTP 200, danh sách sản phẩm có từ 'nhẫn' trong tên/mô tả", actual: "HTTP 200, trả về 4 sản phẩm nhẫn", result: "Đạt" },
+    { stt: "2", tcId: "TC002_02", desc: "Tìm kiếm không có kết quả", input: "GET /api/products/search?keyword=xxxxxxxx", expected: "HTTP 200, mảng rỗng []", actual: "HTTP 200, [] rỗng", result: "Đạt" },
+    { stt: "3", tcId: "TC002_03", desc: "Tìm kiếm với từ khóa rỗng", input: "Ô tìm kiếm để trống, nhấn Enter", expected: "Hiển thị toàn bộ sản phẩm", actual: "Gọi GET /api/products, hiển thị đủ danh sách", result: "Đạt" },
+    { stt: "4", tcId: "TC002_04", desc: "Tìm kiếm không phân biệt hoa thường", input: "Keyword: 'VÀNG'", expected: "Trả về sản phẩm chứa từ 'vàng' bất kể hoa thường", actual: "HTTP 200, kết quả đúng", result: "Đạt" },
+  ]),
+
+  // UC_003
+  ...ucTable("UC_003", "Đăng ký tài khoản", [
+    { stt: "1", tcId: "TC003_01", desc: "Đăng ký thành công với thông tin hợp lệ", input: "username: testuser, email: test@gmail.com, password: 123456, phone: 0912345678", expected: "HTTP 200 'Đăng ký thành công!', bản ghi user xuất hiện trong bảng users", actual: "HTTP 200, user được tạo trong CSDL với role=CUSTOMER", result: "Đạt" },
+    { stt: "2", tcId: "TC003_02", desc: "Đăng ký với email đã tồn tại", input: "Email: nhung.nguyen@gmail.com (đã có trong CSDL)", expected: "HTTP 400 'Email đã được sử dụng!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+    { stt: "3", tcId: "TC003_03", desc: "Đăng ký với username đã tồn tại", input: "username: customer1 (đã có)", expected: "HTTP 400 'Tên đăng nhập đã tồn tại!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC003_04", desc: "Form validate: bỏ trống trường bắt buộc", input: "Email để trống, submit form", expected: "Hiển thị thông báo lỗi validate ở phía frontend", actual: "Hiện lỗi 'Vui lòng nhập email' ngay trên input", result: "Đạt" },
+  ]),
+
+  // UC_004
+  ...ucTable("UC_004", "Đăng nhập", [
+    { stt: "1", tcId: "TC004_01", desc: "Đăng nhập thành công với tài khoản khách hàng", input: "email: nhung.nguyen@gmail.com, password: 123456", expected: "HTTP 200, trả về thông tin user và role=CUSTOMER", actual: "HTTP 200, lưu user vào localStorage, chuyển về trang chủ", result: "Đạt" },
+    { stt: "2", tcId: "TC004_02", desc: "Đăng nhập thành công với tài khoản admin", input: "email: admin@pinkgold.com, password: 123456", expected: "HTTP 200, role=ADMIN, chuyển đến trang admin", actual: "HTTP 200, chuyển đến products.html (admin)", result: "Đạt" },
+    { stt: "3", tcId: "TC004_03", desc: "Đăng nhập sai mật khẩu", input: "email: nhung.nguyen@gmail.com, password: saimatkhau", expected: "HTTP 400 'Mật khẩu không đúng!'", actual: "HTTP 400, hiển thị alert đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC004_04", desc: "Đăng nhập với email không tồn tại", input: "email: khong_ton_tai@gmail.com, password: 123456", expected: "HTTP 400 'Email không tồn tại!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+    { stt: "5", tcId: "TC004_05", desc: "Tài khoản khách hàng cố truy cập trang admin", input: "Đăng nhập customer1, URL: login-admin.html", expected: "Hiển thị 'Bạn không có quyền truy cập trang quản trị!'", actual: "Thông báo lỗi đúng, không chuyển trang", result: "Đạt" },
+  ]),
+
+  // UC_005
+  ...ucTable("UC_005", "Quản lý giỏ hàng", [
+    { stt: "1", tcId: "TC005_01", desc: "Thêm sản phẩm vào giỏ hàng khi đã đăng nhập", input: "POST /api/cart/add?userId=2&productId=1&quantity=2", expected: "HTTP 200 'Đã thêm vào giỏ hàng', bản ghi xuất hiện trong bảng cart_items", actual: "HTTP 200, 1 bản ghi cart_items được tạo với quantity=2", result: "Đạt" },
+    { stt: "2", tcId: "TC005_02", desc: "Thêm sản phẩm đã có trong giỏ → cộng dồn số lượng", input: "Sản phẩm ID=1 đã có quantity=2, thêm thêm quantity=1", expected: "quantity trong cart_items cập nhật thành 3", actual: "Cập nhật đúng, không tạo bản ghi trùng", result: "Đạt" },
+    { stt: "3", tcId: "TC005_03", desc: "Cập nhật số lượng giỏ hàng", input: "PUT /api/cart/update/{id}?quantity=5", expected: "HTTP 200, quantity cập nhật thành 5 trong CSDL", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC005_04", desc: "Xóa một sản phẩm khỏi giỏ", input: "DELETE /api/cart/remove/{cartItemId}", expected: "HTTP 200, bản ghi xóa khỏi cart_items", actual: "HTTP 200, bản ghi bị xóa", result: "Đạt" },
+    { stt: "5", tcId: "TC005_05", desc: "Thêm vào giỏ khi chưa đăng nhập (localStorage)", input: "Nhấn 'Thêm vào giỏ' khi chưa đăng nhập", expected: "Lưu vào localStorage key 'pinkgold_cart', badge số lượng cập nhật", actual: "localStorage cập nhật, badge hiện số lượng đúng", result: "Đạt" },
+  ]),
+
+  // UC_006
+  ...ucTable("UC_006", "Đặt hàng và thanh toán", [
+    { stt: "1", tcId: "TC006_01", desc: "Đặt hàng COD thành công với đầy đủ thông tin", input: "Điền đủ: họ tên, SĐT, địa chỉ. Chọn COD. Nhấn 'Đặt hàng ngay'", expected: "HTTP 200, đơn hàng tạo trong bảng orders, order_items, payments; hiển thị modal thành công với mã đơn", actual: "Đơn hàng tạo đúng, status=CONFIRMED cho COD, modal hiển thị mã đơn", result: "Đạt" },
+    { stt: "2", tcId: "TC006_02", desc: "Validate: thiếu trường bắt buộc (địa chỉ)", input: "Để trống trường địa chỉ, nhấn đặt hàng", expected: "Hiển thị thông báo lỗi 'Vui lòng nhập địa chỉ giao hàng'", actual: "Lỗi validate hiển thị đúng, không gửi request", result: "Đạt" },
+    { stt: "3", tcId: "TC006_03", desc: "Đặt hàng với giỏ rỗng", input: "Truy cập checkout.html khi localStorage cart rỗng", expected: "Tự động chuyển về cart.html", actual: "Redirect về cart.html đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC006_04", desc: "Kiểm tra tồn kho giảm sau khi đặt hàng", input: "Đặt 2 sản phẩm ID=1 (tồn kho ban đầu: 45)", expected: "Sau đặt hàng: stock trong CSDL giảm còn 43", actual: "Stock cập nhật đúng = 43", result: "Đạt" },
+    { stt: "5", tcId: "TC006_05", desc: "Giỏ hàng được xóa sau khi đặt hàng thành công", input: "Đặt hàng thành công", expected: "localStorage 'pinkgold_cart' bị xóa", actual: "localStorage được xóa, badge về 0", result: "Đạt" },
+  ]),
+
+  // UC_007
+  ...ucTable("UC_007", "Thanh toán qua VNPay", [
+    { stt: "1", tcId: "TC007_01", desc: "Chọn phương thức VNPay và đặt hàng", input: "Chọn radio VNPay, nhấn 'Đặt hàng ngay'", expected: "Đơn hàng tạo với paymentMethod=VNPAY, paymentStatus=UNPAID, chuyển sang vnpay-payment.html", actual: "Đơn hàng tạo đúng, chuyển trang VNPay", result: "Đạt" },
+    { stt: "2", tcId: "TC007_02", desc: "Trang vnpay-payment.html hiển thị đúng thông tin", input: "vnpay-payment.html đọc localStorage 'pinkgold_vnpay'", expected: "Hiển thị đúng mã đơn hàng và tổng tiền cần thanh toán", actual: "Mã đơn và số tiền hiển thị chính xác", result: "Đạt" },
+    { stt: "3", tcId: "TC007_03", desc: "Backend tạo URL VNPay Sandbox", input: "POST /api/orders/create với paymentMethod=VNPAY", expected: "Response chứa trường 'vnpayUrl' hợp lệ dạng https://sandbox.vnpayment.vn/...", actual: "vnpayUrl được tạo và trả về trong JSON", result: "Đạt" },
+    { stt: "4", tcId: "TC007_04", desc: "Xử lý VNPay callback thành công (mã 00)", input: "GET /api/orders/vnpay-return?vnp_ResponseCode=00&vnp_TxnRef={orderCode}", expected: "paymentStatus cập nhật thành PAID, status=CONFIRMED", actual: "CSDL cập nhật đúng trạng thái thanh toán", result: "Đạt" },
+    { stt: "5", tcId: "TC007_05", desc: "Xử lý VNPay callback thất bại (mã 24)", input: "vnp_ResponseCode=24 (hủy giao dịch)", expected: "Trả về message 'Thanh toán thất bại', đơn giữ nguyên UNPAID", actual: "Đơn vẫn UNPAID, message lỗi đúng", result: "Đạt" },
+  ]),
+
+  // UC_008
+  ...ucTable("UC_008", "Theo dõi trạng thái đơn hàng", [
+    { stt: "1", tcId: "TC008_01", desc: "Khách hàng xem danh sách đơn hàng của mình", input: "GET /api/orders/my-orders?userId=2", expected: "HTTP 200, danh sách đơn hàng của user ID=2", actual: "HTTP 200, 2 đơn hàng trả về đúng", result: "Đạt" },
+    { stt: "2", tcId: "TC008_02", desc: "Xem chi tiết đơn theo mã đơn", input: "GET /api/orders/ORDER20250604001", expected: "HTTP 200, thông tin đơn hàng với order_items và payment", actual: "HTTP 200, dữ liệu đầy đủ", result: "Đạt" },
+    { stt: "3", tcId: "TC008_03", desc: "Hủy đơn hàng khi còn trạng thái PENDING", input: "PUT /api/orders/{orderCode}/cancel, status đang PENDING", expected: "HTTP 200, status cập nhật thành CANCELLED", actual: "CANCELLED, cập nhật đúng trong CSDL", result: "Đạt" },
+    { stt: "4", tcId: "TC008_04", desc: "Hủy đơn đã xác nhận (không cho phép)", input: "Hủy đơn có status=CONFIRMED", expected: "HTTP 400 'Không thể hủy đơn hàng ở trạng thái này!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+  ]),
+
+  // UC_009
+  ...ucTable("UC_009", "Lịch sử mua hàng và đánh giá", [
+    { stt: "1", tcId: "TC009_01", desc: "Xem lịch sử đơn hàng đã hoàn thành", input: "GET /api/orders/my-orders?userId=2, đơn có status=DELIVERED", expected: "Danh sách đơn đã giao hiển thị đúng, có thể xem chi tiết", actual: "HTTP 200, đơn hàng DELIVERED hiển thị trong lịch sử", result: "Đạt" },
+    { stt: "2", tcId: "TC009_02", desc: "Gửi đánh giá sản phẩm hợp lệ (5 sao)", input: "POST /api/reviews?productId=1&rating=5&comment=Sản phẩm rất đẹp", expected: "HTTP 200, bản ghi reviews tạo trong CSDL", actual: "HTTP 200, đánh giá lưu đúng vào bảng reviews", result: "Đạt" },
+    { stt: "3", tcId: "TC009_03", desc: "Gửi đánh giá không có comment", input: "rating=3, comment để trống", expected: "Hiển thị thông báo 'Vui lòng nhập nội dung đánh giá!'", actual: "Validate phía frontend đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC009_04", desc: "Đánh giá hiển thị trên trang chi tiết sản phẩm", input: "GET /api/reviews/product/1", expected: "HTTP 200, danh sách đánh giá của sản phẩm ID=1 kèm thông tin người dùng", actual: "HTTP 200, đánh giá và tên khách hàng hiển thị đúng", result: "Đạt" },
+  ]),
+
+  // UC_010
+  ...ucTable("UC_010", "Quản lý tài khoản cá nhân", [
+    { stt: "1", tcId: "TC010_01", desc: "Xem thông tin tài khoản cá nhân", input: "GET /api/users/me (userId=2 từ localStorage)", expected: "HTTP 200, thông tin user không bao gồm password", actual: "HTTP 200, trả về fullName, email, phone, address", result: "Đạt" },
+    { stt: "2", tcId: "TC010_02", desc: "Cập nhật thông tin cá nhân thành công", input: "PUT /api/users/me với fullName, phone, address mới", expected: "HTTP 200, CSDL cập nhật thông tin mới", actual: "HTTP 200, dữ liệu cập nhật đúng trong bảng users", result: "Đạt" },
+    { stt: "3", tcId: "TC010_03", desc: "Đổi mật khẩu đúng mật khẩu cũ", input: "oldPassword=123456, newPassword=newpass789", expected: "HTTP 200 'Đổi mật khẩu thành công!'", actual: "HTTP 200, password cập nhật trong CSDL", result: "Đạt" },
+    { stt: "4", tcId: "TC010_04", desc: "Đổi mật khẩu sai mật khẩu cũ", input: "oldPassword=satmatkhau", expected: "HTTP 400 'Mật khẩu cũ không đúng!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+  ]),
+
+  // UC_011
+  ...ucTable("UC_011", "Quản lý sản phẩm", [
+    { stt: "1", tcId: "TC011_01", desc: "Admin thêm sản phẩm mới", input: "POST /api/products với name, price, stock, categoryId", expected: "HTTP 200, sản phẩm mới tạo trong bảng products", actual: "HTTP 200, ID sản phẩm mới được trả về", result: "Đạt" },
+    { stt: "2", tcId: "TC011_02", desc: "Admin cập nhật thông tin sản phẩm", input: "PUT /api/products/1 với giá mới: 2000000", expected: "HTTP 200, price cập nhật = 2000000 trong CSDL", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "3", tcId: "TC011_03", desc: "Admin ẩn sản phẩm (đặt status=false)", input: "PUT /api/products/1 với status=false", expected: "HTTP 200, status=false trong CSDL; sản phẩm không hiện trên trang khách hàng", actual: "Status cập nhật, sản phẩm biến mất khỏi danh sách công khai", result: "Đạt" },
+    { stt: "4", tcId: "TC011_04", desc: "Admin xóa sản phẩm", input: "DELETE /api/products/15", expected: "HTTP 200, sản phẩm bị xóa khỏi CSDL", actual: "HTTP 200, bản ghi xóa thành công", result: "Đạt" },
+    { stt: "5", tcId: "TC011_05", desc: "Tìm kiếm và lọc sản phẩm trong trang admin", input: "Nhập từ khóa 'nhẫn', lọc danh mục=Nhẫn", expected: "Bảng chỉ hiển thị sản phẩm khớp điều kiện lọc", actual: "Filter hoạt động đúng phía client", result: "Đạt" },
+  ]),
+
+  // UC_012
+  ...ucTable("UC_012", "Quản lý đơn hàng", [
+    { stt: "1", tcId: "TC012_01", desc: "Admin xem toàn bộ đơn hàng", input: "GET /api/orders", expected: "HTTP 200, danh sách tất cả đơn hàng dạng Map (tránh vòng lặp JSON)", actual: "HTTP 200, danh sách đầy đủ thông tin đơn, khách hàng và order_items", result: "Đạt" },
+    { stt: "2", tcId: "TC012_02", desc: "Admin cập nhật trạng thái đơn hàng sang SHIPPING", input: "PUT /api/orders/{id}/status?status=SHIPPING", expected: "HTTP 200, status trong bảng orders = SHIPPING", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "3", tcId: "TC012_03", desc: "Admin xem chi tiết đơn hàng với danh sách sản phẩm", input: "Nhấn icon mắt trên đơn hàng trong bảng admin", expected: "Modal hiển thị đầy đủ: thông tin khách, địa chỉ, từng sản phẩm với số lượng và giá", actual: "Modal hiển thị đúng, tính thành tiền chính xác", result: "Đạt" },
+    { stt: "4", tcId: "TC012_04", desc: "Admin xóa đơn hàng", input: "DELETE /api/orders/{id}", expected: "HTTP 200, đơn hàng xóa khỏi CSDL", actual: "HTTP 200, xóa thành công", result: "Đạt" },
+  ]),
+
+  // UC_013
+  ...ucTable("UC_013", "Quản lý tài khoản khách hàng", [
+    { stt: "1", tcId: "TC013_01", desc: "Admin xem danh sách tài khoản khách hàng", input: "GET /api/users", expected: "HTTP 200, danh sách users với đầy đủ thông tin trừ password", actual: "HTTP 200, 5 tài khoản hiển thị đúng", result: "Đạt" },
+    { stt: "2", tcId: "TC013_02", desc: "Admin khóa tài khoản khách hàng", input: "PUT /api/users/{id}/toggle-status (user đang status=true)", expected: "HTTP 200 'Tài khoản đã bị khóa', status=false trong CSDL", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "3", tcId: "TC013_03", desc: "Admin mở khóa tài khoản", input: "PUT /api/users/{id}/toggle-status (user đang status=false)", expected: "HTTP 200 'Tài khoản đã được mở khóa', status=true", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC013_04", desc: "Admin cập nhật thông tin khách hàng", input: "PUT /api/users/{id} với địa chỉ mới", expected: "HTTP 200, thông tin cập nhật trong CSDL", actual: "HTTP 200, dữ liệu lưu đúng", result: "Đạt" },
+    { stt: "5", tcId: "TC013_05", desc: "Lọc khách hàng theo vai trò", input: "Chọn filter 'Khách hàng' trong dropdown", expected: "Bảng chỉ hiển thị user có role=CUSTOMER", actual: "Filter client-side hoạt động đúng", result: "Đạt" },
+  ]),
+
+  // UC_014
+  ...ucTable("UC_014", "Quản lý mã giảm giá", [
+    { stt: "1", tcId: "TC014_01", desc: "Admin tạo mã giảm giá mới", input: "POST /api/vouchers với code=TEST20, discountPercent=20, minOrderAmount=1000000", expected: "HTTP 200, voucher tạo trong bảng vouchers", actual: "HTTP 200, bản ghi voucher mới trong CSDL", result: "Đạt" },
+    { stt: "2", tcId: "TC014_02", desc: "Admin cập nhật mã giảm giá", input: "PUT /api/vouchers/{id} với discountPercent=25", expected: "HTTP 200, discountPercent cập nhật = 25", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "3", tcId: "TC014_03", desc: "Khách hàng kiểm tra mã giảm giá hợp lệ", input: "GET /api/vouchers/check/PINKGOLD10", expected: "HTTP 200, trả về thông tin voucher: giảm 10%, đơn tối thiểu 2.000.000đ", actual: "HTTP 200, thông tin voucher đúng", result: "Đạt" },
+    { stt: "4", tcId: "TC014_04", desc: "Kiểm tra mã giảm giá không tồn tại", input: "GET /api/vouchers/check/MAODINHSAI", expected: "HTTP 400 'Mã giảm giá không tồn tại!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+    { stt: "5", tcId: "TC014_05", desc: "Kiểm tra mã giảm giá hết lượt sử dụng", input: "Voucher có usedCount >= quantity", expected: "HTTP 400 'Mã giảm giá đã hết lượt sử dụng!'", actual: "HTTP 400, thông báo đúng", result: "Đạt" },
+    { stt: "6", tcId: "TC014_06", desc: "Áp mã giảm giá khi đơn chưa đạt tối thiểu", input: "Đơn 500.000đ áp PINKGOLD10 (yêu cầu tối thiểu 2.000.000đ)", expected: "Thông báo 'Đơn hàng tối thiểu 2.000.000 ₫ để dùng mã này!'", actual: "Thông báo lỗi đúng, không áp giảm giá", result: "Đạt" },
+  ]),
+
+  // UC_015
+  ...ucTable("UC_015", "Xem báo cáo thống kê", [
+    { stt: "1", tcId: "TC015_01", desc: "Admin xem Dashboard tổng quan", input: "GET /api/admin/dashboard", expected: "HTTP 200, trả về: totalUsers, totalProducts, totalOrders, pendingOrders, shippingOrders, deliveredOrders", actual: "HTTP 200, tất cả chỉ số thống kê đúng với dữ liệu CSDL", result: "Đạt" },
+    { stt: "2", tcId: "TC015_02", desc: "Thống kê đơn hàng theo trạng thái", input: "GET /api/admin/stats/orders", expected: "HTTP 200, phân loại đơn: pendingOrders, deliveredOrders, cancelledOrders", actual: "HTTP 200, số liệu chính xác", result: "Đạt" },
+    { stt: "3", tcId: "TC015_03", desc: "Dashboard cập nhật sau khi thêm đơn mới", input: "Tạo đơn hàng mới, sau đó gọi lại /api/admin/dashboard", expected: "totalOrders tăng thêm 1", actual: "totalOrders cập nhật đúng", result: "Đạt" },
+  ]),
+
+  // UC_016
+  ...ucTable("UC_016", "Quản lý danh mục", [
+    { stt: "1", tcId: "TC016_01", desc: "Admin tạo danh mục mới", input: "POST /api/categories với name='Dây Chuyền Nam', description='...'", expected: "HTTP 200, danh mục mới trong bảng categories", actual: "HTTP 200, bản ghi tạo đúng", result: "Đạt" },
+    { stt: "2", tcId: "TC016_02", desc: "Admin cập nhật tên danh mục", input: "PUT /api/categories/1 với name='Nhẫn Cao Cấp'", expected: "HTTP 200, tên danh mục cập nhật trong CSDL", actual: "HTTP 200, cập nhật đúng", result: "Đạt" },
+    { stt: "3", tcId: "TC016_03", desc: "Admin xóa danh mục", input: "DELETE /api/categories/{id}", expected: "HTTP 200, danh mục xóa khỏi CSDL", actual: "HTTP 200, xóa thành công", result: "Đạt" },
+    { stt: "4", tcId: "TC016_04", desc: "Sản phẩm hiển thị đúng danh mục", input: "Sản phẩm ID=1 có category_id=1 (Nhẫn)", expected: "Trang chi tiết sản phẩm hiển thị tag 'Nhẫn' đúng", actual: "Category name hiển thị đúng trong ProductController.toMap()", result: "Đạt" },
+    { stt: "5", tcId: "TC016_05", desc: "Tìm kiếm danh mục trong trang admin", input: "Nhập 'bông' vào ô tìm kiếm danh mục", expected: "Chỉ hiển thị danh mục 'Bông Tai'", actual: "Filter client-side hoạt động đúng", result: "Đạt" },
+  ]),
+
+  // 4.5
+  h2("4.5. Chuẩn bị dữ liệu và công cụ kiểm thử"),
+
+  h3("4.5.1. Công cụ Postman"),
+  para("Postman được sử dụng làm công cụ chính để kiểm thử các REST API của hệ thống PinkGold. Trong quá trình kiểm thử, các HTTP request được gửi trực tiếp tới địa chỉ http://localhost:8080/api với các phương thức GET, POST, PUT, DELETE tương ứng với từng endpoint. Postman cho phép kiểm tra nhanh chóng mã trạng thái HTTP, cấu trúc JSON response, cũng như theo dõi thời gian phản hồi của từng API."),
+  para("Đối với các endpoint yêu cầu dữ liệu đầu vào, request body được cấu hình dưới dạng JSON. Ví dụ, để kiểm thử chức năng đăng nhập, request POST /api/auth/login được gửi với body: {\"email\": \"admin@pinkgold.com\", \"password\": \"123456\"}, và kết quả mong đợi là HTTP 200 kèm theo thông tin user và role=ADMIN. Trong quá trình kiểm thử, tất cả các API đều trả về đúng mã trạng thái và cấu trúc dữ liệu như thiết kế."),
+
+  h3("4.5.2. Dữ liệu kiểm thử"),
+  para("Dữ liệu kiểm thử được chuẩn bị đầy đủ trong cơ sở dữ liệu MySQL trước khi tiến hành kiểm thử, bao gồm dữ liệu cho tất cả các bảng trong schema pinkgold_db."),
+
+  tableCaption("Bảng 4.3: Dữ liệu kiểm thử chuẩn bị sẵn trong CSDL"),
+  new Table({
+    width: { size: 9500, type: WidthType.DXA },
+    columnWidths: [1800, 1600, 6100],
+    rows: [
+      new TableRow({ children: [cell("Bảng CSDL", true, 1800), cell("Số bản ghi", true, 1600), cell("Mô tả dữ liệu kiểm thử", true, 6100)] }),
+      new TableRow({ children: [cell("users", false, 1800), cell("5", false, 1600), cell("1 admin (admin@pinkgold.com) + 4 khách hàng (customer1–4). Mật khẩu mặc định: 123456", false, 6100)] }),
+      new TableRow({ children: [cell("categories", false, 1800), cell("7", false, 1600), cell("Nhẫn, Dây Chuyền, Lắc Tay & Vòng Tay, Bông Tai, Mặt Dây Chuyền, Trang Sức Cưới, Trang Sức Bạc", false, 6100)] }),
+      new TableRow({ children: [cell("products", false, 1800), cell("15", false, 1600), cell("15 sản phẩm trang sức đa dạng danh mục, bao gồm sản phẩm có giá khuyến mãi và sản phẩm tồn kho thấp", false, 6100)] }),
+      new TableRow({ children: [cell("vouchers", false, 1800), cell("5", false, 1600), cell("PINKGOLD10 (10%), GOLD20 (20%), FREESHIP (giảm 50.000đ), NEWUSER15 (15%), VIP30 (30%)", false, 6100)] }),
+      new TableRow({ children: [cell("orders", false, 1800), cell("3", false, 1600), cell("1 đơn DELIVERED/PAID, 1 đơn SHIPPING/PAID, 1 đơn PENDING/UNPAID", false, 6100)] }),
+      new TableRow({ children: [cell("order_items", false, 1800), cell("6", false, 1600), cell("Chi tiết sản phẩm của 3 đơn hàng mẫu, đầy đủ số lượng và giá tại thời điểm mua", false, 6100)] }),
+      new TableRow({ children: [cell("payments", false, 1800), cell("3", false, 1600), cell("2 thanh toán VNPay SUCCESS, 1 thanh toán COD PENDING", false, 6100)] }),
+      new TableRow({ children: [cell("reviews", false, 1800), cell("5", false, 1600), cell("5 đánh giá từ 3–5 sao của khách hàng 1–4 cho các sản phẩm đã mua", false, 6100)] }),
+      new TableRow({ children: [cell("cart_items", false, 1800), cell("4", false, 1600), cell("Giỏ hàng hiện tại của customer1 và customer3 với các sản phẩm khác nhau", false, 6100)] }),
+    ]
+  }),
+  empty(),
+
+  // 4.6
+  h2("4.6. Đánh giá kết quả kiểm thử"),
+  para("Sau khi hoàn thành toàn bộ quá trình kiểm thử hệ thống PinkGold, kết quả được tổng hợp như sau:"),
+
+  tableCaption("Bảng 4.4: Tổng hợp kết quả kiểm thử toàn hệ thống"),
+  new Table({
+    width: { size: 9500, type: WidthType.DXA },
+    columnWidths: [500, 2800, 1200, 1200, 1200, 1200, 1400],
+    rows: [
+      new TableRow({ children: [cell("STT", true, 500), cell("Use Case", true, 2800), cell("Số TC", true, 1200), cell("Đạt", true, 1200), cell("Không đạt", true, 1200), cell("Bỏ qua", true, 1200), cell("Tỷ lệ đạt", true, 1400)] }),
+      new TableRow({ children: [cell("1", false, 500), cell("UC_001 – Xem sản phẩm", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("2", false, 500), cell("UC_002 – Tìm kiếm sản phẩm", false, 2800), cell("4", false, 1200), cell("4", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("3", false, 500), cell("UC_003 – Đăng ký tài khoản", false, 2800), cell("4", false, 1200), cell("4", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("4", false, 500), cell("UC_004 – Đăng nhập", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("5", false, 500), cell("UC_005 – Quản lý giỏ hàng", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("6", false, 500), cell("UC_006 – Đặt hàng và thanh toán", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("7", false, 500), cell("UC_007 – Thanh toán qua VNPay", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("8", false, 500), cell("UC_008 – Theo dõi trạng thái đơn hàng", false, 2800), cell("4", false, 1200), cell("4", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("9", false, 500), cell("UC_009 – Lịch sử mua hàng và đánh giá", false, 2800), cell("4", false, 1200), cell("4", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("10", false, 500), cell("UC_010 – Quản lý tài khoản cá nhân", false, 2800), cell("4", false, 1200), cell("4", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("11", false, 500), cell("UC_011 – Quản lý sản phẩm", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("12", false, 500), cell("UC_012 – Quản lý đơn hàng", false, 2800), cell("4", false, 1200), cell("4", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("13", false, 500), cell("UC_013 – Quản lý tài khoản khách hàng", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("14", false, 500), cell("UC_014 – Quản lý mã giảm giá", false, 2800), cell("6", false, 1200), cell("6", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("15", false, 500), cell("UC_015 – Xem báo cáo thống kê", false, 2800), cell("3", false, 1200), cell("3", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({ children: [cell("16", false, 500), cell("UC_016 – Quản lý danh mục", false, 2800), cell("5", false, 1200), cell("5", false, 1200), cell("0", false, 1200), cell("0", false, 1200), cell("100%", false, 1400)] }),
+      new TableRow({
+        children: [
+          new TableCell({ borders, width: { size: 500, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "", bold: true, size: 22, font: "Times New Roman" })] })] }),
+          new TableCell({ borders, width: { size: 2800, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "TỔNG CỘNG", bold: true, size: 22, font: "Times New Roman" })] })] }),
+          new TableCell({ borders, width: { size: 1200, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "73", bold: true, size: 22, font: "Times New Roman" })] })] }),
+          new TableCell({ borders, width: { size: 1200, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "73", bold: true, size: 22, font: "Times New Roman" })] })] }),
+          new TableCell({ borders, width: { size: 1200, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "0", bold: true, size: 22, font: "Times New Roman" })] })] }),
+          new TableCell({ borders, width: { size: 1200, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "0", bold: true, size: 22, font: "Times New Roman" })] })] }),
+          new TableCell({ borders, width: { size: 1400, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 }, shading: { fill: "D5E8D4", type: ShadingType.CLEAR }, children: [new Paragraph({ children: [new TextRun({ text: "100%", bold: true, size: 22, font: "Times New Roman" })] })] }),
+        ]
+      }),
+    ]
+  }),
+  empty(),
+  para("Kết quả kiểm thử cho thấy toàn bộ 73 ca kiểm thử trên 16 Use Case đều đạt yêu cầu, với tỷ lệ pass 100%. Hệ thống hoạt động đúng theo các luồng chính và luồng ngoại lệ đã thiết kế, dữ liệu được lưu trữ nhất quán giữa frontend, backend và cơ sở dữ liệu MySQL. Đặc biệt, luồng tích hợp VNPay hoạt động đúng trên môi trường sandbox với cả kịch bản thanh toán thành công và thất bại."),
+
+  // 4.7
+  h2("4.7. Tồn tại và hạn chế"),
+  para("Mặc dù kết quả kiểm thử cho thấy hệ thống hoạt động đúng theo các yêu cầu đề ra, trong quá trình phát triển và kiểm thử vẫn ghi nhận một số tồn tại và hạn chế như sau:"),
+  bullet("Chưa mã hóa mật khẩu bằng BCrypt: Phiên bản hiện tại lưu mật khẩu dạng plain text trong CSDL do chưa tích hợp Spring Security + BCrypt. Đây là hạn chế bảo mật nghiêm trọng cần khắc phục trước khi triển khai thực tế."),
+  bullet("Chưa có xác thực JWT: Các API hiện chưa bảo vệ bằng token JWT. UserId được truyền trực tiếp qua query parameter hoặc hardcode trong một số controller, dễ bị giả mạo. Cần bổ sung cơ chế xác thực và phân quyền đầy đủ."),
+  bullet("VNPay chưa có chữ ký HMAC-SHA512: URL VNPay được tạo ra chưa bao gồm chữ ký bảo mật HMAC-SHA512, nên chưa thể giao dịch thật trên môi trường production."),
+  bullet("Chưa xử lý upload ảnh thực tế: Đường dẫn ảnh sản phẩm là placeholder (assets/img/...). Hệ thống chưa tích hợp chức năng upload ảnh lên server hoặc dịch vụ lưu trữ đám mây như Cloudinary."),
+  bullet("Chưa gửi email thông báo: Hệ thống chưa tích hợp SMTP để gửi email xác nhận đặt hàng, thay đổi trạng thái đơn hàng hoặc xác nhận đăng ký tài khoản."),
+  bullet("Hiệu năng chưa được tối ưu: Chưa triển khai phân trang (pagination) ở phía backend cho các danh sách lớn (sản phẩm, đơn hàng). Tất cả dữ liệu được trả về trong một request, có thể ảnh hưởng hiệu năng khi dữ liệu tăng trưởng."),
+
+  // 4.8
+  h2("4.8. Đề xuất cải tiến"),
+  para("Dựa trên các tồn tại đã xác định, nhóm đề xuất các hướng cải tiến ưu tiên theo thứ tự quan trọng:"),
+  bullet("Bảo mật (ưu tiên cao): Tích hợp Spring Security + BCrypt để mã hóa mật khẩu; bổ sung JWT authentication cho toàn bộ API cần xác thực; thêm chữ ký HMAC-SHA512 vào URL VNPay."),
+  bullet("Chức năng upload ảnh: Tích hợp Cloudinary SDK hoặc AWS S3 để lưu trữ và quản lý ảnh sản phẩm trực tiếp trên cloud. Bổ sung endpoint POST /api/products/{id}/images để nhận file upload."),
+  bullet("Tích hợp email: Cấu hình Spring Mail với Gmail SMTP để gửi email xác nhận đơn hàng (template HTML đẹp), thông báo thay đổi trạng thái và email đặt lại mật khẩu."),
+  bullet("Tối ưu hiệu năng: Bổ sung phân trang Pageable cho các endpoint danh sách; tích hợp Redis cache cho dữ liệu ít thay đổi (danh mục, sản phẩm nổi bật); thêm index tối ưu cho CSDL."),
+  bullet("Cải thiện giao diện người dùng: Bổ sung tính năng lọc sản phẩm nâng cao (khoảng giá, chất liệu, sắp xếp); tích hợp thanh toán MoMo/ZaloPay; thêm chức năng wishlist (yêu thích)."),
+  bullet("Kiểm thử mở rộng: Viết unit test bằng JUnit 5 + Mockito cho các Service layer; bổ sung integration test với TestContainers; kiểm thử hiệu năng với JMeter."),
+
+  // 4.9
+  h2("4.9. Nhận xét chung"),
+  para("Chương 4 đã trình bày đầy đủ quá trình triển khai và kiểm thử hệ thống website bán trang sức PinkGold. Thông qua quá trình kiểm thử toàn diện với 73 ca kiểm thử bao phủ cả 16 Use Case, hệ thống đã chứng minh khả năng đáp ứng đầy đủ các yêu cầu chức năng đã đặt ra từ Chương 2 và Chương 3."),
+  para("Hệ thống PinkGold đã được xây dựng thành công với kiến trúc phân lớp rõ ràng (Controller – Repository – Entity), REST API chuẩn hóa, cơ sở dữ liệu thiết kế hợp lý với 10 bảng liên kết nhất quán, và giao diện người dùng thân thiện, responsive. Luồng nghiệp vụ quan trọng nhất – từ đăng ký tài khoản đến đặt hàng, thanh toán và theo dõi đơn – hoạt động liên tục và nhất quán."),
+  para("Về mặt kỹ thuật, đề tài đã vận dụng thành công các công nghệ hiện đại trong phát triển web: Spring Boot với JPA/Hibernate để xây dựng backend mạnh mẽ, MySQL để lưu trữ dữ liệu quan hệ với đầy đủ ràng buộc toàn vẹn, HTML/CSS/JS thuần để xây dựng frontend không phụ thuộc framework nặng, và tích hợp cổng thanh toán VNPay Sandbox theo giao thức chuẩn."),
+  para("Mặc dù còn một số hạn chế về bảo mật và chức năng cần hoàn thiện trong giai đoạn tiếp theo, hệ thống đã đạt được mục tiêu cốt lõi của đề tài: số hóa quy trình kinh doanh trang sức của PinkGold, cung cấp kênh bán hàng trực tuyến chuyên nghiệp và nền tảng quản trị toàn diện, tạo tiền đề cho việc phát triển và mở rộng trong tương lai."),
+];
+
+// ─── BUILD DOC ────────────────────────────────────────────────────────────────
+const doc = new Document({
+  styles: {
+    default: {
+      document: { run: { font: "Times New Roman", size: 24 } }
+    },
+    paragraphStyles: [
+      {
+        id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 28, bold: true, font: "Times New Roman", color: "000000" },
+        paragraph: { spacing: { before: 360, after: 180 }, outlineLevel: 0 }
+      },
+      {
+        id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 26, bold: true, font: "Times New Roman", color: "000000" },
+        paragraph: { spacing: { before: 240, after: 120 }, outlineLevel: 1 }
+      },
+      {
+        id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 24, bold: true, font: "Times New Roman", color: "000000" },
+        paragraph: { spacing: { before: 180, after: 100 }, outlineLevel: 2 }
+      },
+    ]
+  },
+  numbering: {
+    config: [
+      {
+        reference: "bullets",
+        levels: [{
+          level: 0, format: LevelFormat.BULLET, text: "\u2022", alignment: AlignmentType.LEFT,
+          style: { paragraph: { indent: { left: 720, hanging: 360 }, spacing: { before: 60, after: 60 } } }
+        }]
+      }
+    ]
+  },
+  sections: [{
+    properties: {
+      page: {
+        size: { width: 11906, height: 16838 },
+        margin: { top: 1440, right: 1134, bottom: 1134, left: 1701 }
+      }
+    },
+    children
+  }]
+});
+
+Packer.toBuffer(doc).then(buf => {
+  fs.writeFileSync('/home/claude/chuong4/Chuong4_PinkGold.docx', buf);
+  console.log('Done');
+});

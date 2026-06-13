@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản Lý Đơn Hàng - PinkGold Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root{--gold:#c9a84c;--gold-dark:#8b6914;--dark:#1a1208;--muted:#7b7468;--line:#f0e8d8;--bg:#f8f4ed;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);}
+    .header{background:white;box-shadow:0 2px 10px rgba(0,0,0,.1);position:fixed;top:0;left:0;right:0;z-index:1000;height:70px;display:flex;align-items:center;padding:0 30px;}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--gold-dark);letter-spacing:2px;}
+    .nav-right{margin-left:auto;display:flex;align-items:center;gap:20px;}
+    .sidebar{position:fixed;left:0;top:70px;bottom:0;width:260px;background:var(--dark);color:#e8d9c0;padding:30px 20px;overflow-y:auto;}
+    .sidebar a{color:#e8d9c0;text-decoration:none;display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:8px;margin-bottom:6px;transition:all .2s;}
+    .sidebar a:hover,.sidebar a.active{background:var(--gold);color:var(--dark);}
+    .main-content{margin-left:260px;margin-top:70px;padding:30px;}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--dark);margin-bottom:24px;}
+    .card{background:white;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08);padding:24px;margin-bottom:24px;}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
+    .stat{background:#fffaf2;border:1px solid #f0e3c4;border-radius:10px;padding:14px 16px;}
+    .stat span{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;}
+    .stat strong{font-size:1.35rem;color:var(--gold-dark);}
+    .toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+    .toolbar input,.toolbar select{padding:10px 14px;border:1.5px solid #e8dfd0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:white;}
+    .toolbar input{flex:1;min-width:240px;}
+    .toolbar input:focus,.toolbar select:focus{border-color:var(--gold);}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;transition:all .2s;text-decoration:none;}
+    .btn-gold{background:var(--gold);color:white;}
+    .btn-gold:hover{background:var(--gold-dark);}
+    .btn-outline{background:white;border:1.5px solid var(--gold);color:var(--gold-dark);}
+    .btn-outline:hover{background:var(--gold);color:white;}
+    .server-error{display:none;background:#fff4f4;border:1px solid #ffd4d4;color:#8a1f1f;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:.88rem;line-height:1.45;}
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;padding:12px 14px;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:2px solid var(--line);}
+    td{padding:13px 14px;border-bottom:1px solid #f5f0e8;font-size:.88rem;vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#fffbf5;}
+    .mono{font-family:Consolas,monospace;font-weight:600;color:var(--gold-dark);}
+    .muted{color:#888;font-size:.8rem;}
+    .price{font-weight:600;color:var(--gold-dark);}
+    .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.73rem;font-weight:600;white-space:nowrap;}
+    .st-pending{background:#fff3cd;color:#856404;}
+    .st-confirmed{background:#d1ecf1;color:#0c5460;}
+    .st-shipping{background:#dbeafe;color:#1d4ed8;}
+    .st-delivered{background:#d4edda;color:#155724;}
+    .st-cancelled{background:#f8d7da;color:#721c24;}
+    .pay-unpaid{background:#f8d7da;color:#721c24;}
+    .pay-paid{background:#d4edda;color:#155724;}
+    .pay-refunded{background:#e2e3e5;color:#383d41;}
+    .status-select{padding:7px 10px;border:1.5px solid #e8dfd0;border-radius:7px;background:white;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--dark);outline:none;}
+    .status-select:focus{border-color:var(--gold);}
+    .action-btn{background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background .2s;font-size:1rem;color:var(--gold-dark);}
+    .action-btn:hover{background:#f5f0e8;}
+    .action-btn.del{color:#dc3545;}
+    .empty-state{text-align:center;padding:60px 20px;color:#aaa;}
+
+    /* Ô chú thích "Cần hoàn tiền" — bấm để xác nhận đã hoàn */
+    .refund-note{
+      display:inline-flex;align-items:center;gap:6px;
+      margin-top:6px;padding:4px 10px;border-radius:20px;
+      font-size:.7rem;font-weight:600;cursor:pointer;
+      background:#fff3cd;color:#856404;border:1px solid #ffe69c;
+      transition:all .2s;white-space:nowrap;
+    }
+    .refund-note:hover{background:#ffe69c;}
+    .refund-note i{font-size:.78rem;}
+
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:white;border-radius:14px;padding:28px;width:780px;max-width:96%;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin-bottom:18px;}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+    .detail-box{background:#fffaf2;border:1px solid #f0e3c4;border-radius:8px;padding:12px;}
+    .detail-box span{display:block;color:#888;font-size:.76rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+    .detail-box strong{font-size:.95rem;}
+    .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:22px;}
+    @media(max-width:900px){
+      .sidebar{position:static;width:auto;height:auto;margin-top:70px;}
+      .main-content{margin-left:0;margin-top:0;padding:18px;}
+      .stats{grid-template-columns:repeat(2,1fr);}
+      .detail-grid{grid-template-columns:1fr;}
+      table{min-width:980px;}
+      #tableWrap{overflow-x:auto;}
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">PINKGOLD</div>
+    <div class="nav-right">
+      <span style="color:var(--gold-dark);font-weight:500;" id="adminName">Admin</span>
+      <a href="login-admin.html" onclick="logout()" style="color:#666;text-decoration:none;cursor:pointer;"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <a href="products.html"><i class="bi bi-gem"></i> Quản Lý Sản Phẩm</a>
+    <a href="categories.html"><i class="bi bi-tags"></i> Quản Lý Danh Mục</a>
+    <a href="orders.html" class="active"><i class="bi bi-cart"></i> Quản Lý Đơn Hàng</a>
+    <a href="customers.html"><i class="bi bi-people"></i> Quản Lý Khách Hàng</a>
+    <a href="vouchers.html"><i class="bi bi-ticket-perforated"></i> Mã Giảm Giá</a>
+    <a href="reports.html"><i class="bi bi-graph-up"></i> Báo Cáo Thống Kê</a>
+    <hr style="border-color:#444;margin:25px 0;">
+    <a href="login-admin.html" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</a>
+  </aside>
+
+  <main class="main-content">
+    <h1 class="page-title">Quản Lý Đơn Hàng</h1>
+
+    <div class="stats">
+      <div class="stat"><span>Tổng đơn</span><strong id="totalOrders">0</strong></div>
+      <div class="stat"><span>Chờ xác nhận</span><strong id="pendingOrders">0</strong></div>
+      <div class="stat"><span>Đang giao</span><strong id="shippingOrders">0</strong></div>
+      <div class="stat"><span>Doanh thu đã giao</span><strong id="deliveredRevenue">0 ₫</strong></div>
+    </div>
+
+    <div class="card">
+      <div id="serverError" class="server-error"></div>
+
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Tìm theo mã đơn, khách hàng, email, số điện thoại..." oninput="filterOrders()">
+        <select id="filterStatus" onchange="filterOrders()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="PENDING">Chờ xác nhận</option>
+          <option value="CONFIRMED">Đã xác nhận</option>
+          <option value="SHIPPING">Đang giao</option>
+          <option value="DELIVERED">Đã giao</option>
+          <option value="CANCELLED">Đã hủy</option>
+        </select>
+        <select id="filterPayment" onchange="filterOrders()">
+          <option value="">Tất cả thanh toán</option>
+          <option value="UNPAID">Chưa thanh toán</option>
+          <option value="PAID">Đã thanh toán</option>
+          <option value="REFUNDED">Đã hoàn tiền</option>
+        </select>
+        <button class="btn btn-outline" onclick="loadOrders()"><i class="bi bi-arrow-clockwise"></i> Tải lại</button>
+      </div>
+
+      <div id="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Khách hàng</th>
+              <th>Ngày đặt</th>
+              <th>Số SP</th>
+              <th>Tổng tiền</th>
+              <th>Thanh toán</th>
+              <th>Trạng thái</th>
+              <th>Cập nhật</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody">
+            <tr><td colspan="9" class="empty-state">Đang tải dữ liệu...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="detailOverlay">
+    <div class="modal">
+      <h2 class="modal-title" id="detailTitle">Chi Tiết Đơn Hàng</h2>
+      <div class="detail-grid" id="detailInfo"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody id="detailItems"></tbody>
+      </table>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeDetail()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = localStorage.getItem('API_BASE') || 'http://localhost:8080/api';
+    const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPING', 'DELIVERED', 'CANCELLED'];
+    let allOrders = [];
+    let currentOrders = [];
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.fullName || user.fullname) {
+      document.getElementById('adminName').textContent = user.fullName || user.fullname;
+    }
+
+    async function fetchJson(path) {
+      const url = `${API}${path}`;
+      let res;
+
+      try {
+        res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      } catch (e) {
+        throw new Error(`Không gọi được ${url}. Kiểm tra backend đã chạy, đúng port 8080, CORS và Spring Security.`);
+      }
+
+      const text = await res.text();
+      if (!res.ok) {
+        throw new Error(`${url} trả HTTP ${res.status}${text ? ': ' + text.slice(0, 300) : ''}`);
+      }
+
+      try {
+        const data = text ? JSON.parse(text) : [];
+        return Array.isArray(data) ? data : (data.content || data.data || []);
+      } catch (e) {
+        throw new Error(`${url} không trả JSON hợp lệ. Đoạn đầu response: ${text.slice(0, 300)}`);
+      }
+    }
+
+    async function loadOrders() {
+      hideServerError();
+      document.getElementById('orderTableBody').innerHTML =
+        `<tr><td colspan="9" class="empty-state">Đang tải dữ liệu...</td></tr>`;
+
+      try {
+        allOrders = await fetchJson('/orders');
+        currentOrders = allOrders;
+        renderStats(allOrders);
+        renderTable(currentOrders);
+      } catch (e) {
+        allOrders = [];
+        currentOrders = [];
+        renderStats(allOrders);
+        showServerError(e.message);
+        renderTable(currentOrders);
+      }
+    }
+
+    function renderStats(orders) {
+      document.getElementById('totalOrders').textContent = orders.length;
+      document.getElementById('pendingOrders').textContent = orders.filter(o => getStatus(o) === 'PENDING').length;
+      document.getElementById('shippingOrders').textContent = orders.filter(o => getStatus(o) === 'SHIPPING').length;
+      const revenue = orders
+        .filter(o => getStatus(o) === 'DELIVERED')
+        .reduce((sum, o) => sum + getAmount(o), 0);
+      document.getElementById('deliveredRevenue').textContent = formatPrice(revenue);
+    }
+
+    function filterOrders() {
+      const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+      const status = document.getElementById('filterStatus').value;
+      const payment = document.getElementById('filterPayment').value;
+
+      currentOrders = allOrders.filter(o => {
+        const haystack = [
+          getOrderCode(o),
+          getCustomerName(o),
+          getCustomerEmail(o),
+          getCustomerPhone(o),
+          o.shippingAddress || o.shipping_address || ''
+        ].join(' ').toLowerCase();
+
+        return (!kw || haystack.includes(kw))
+          && (!status || getStatus(o) === status)
+          && (!payment || getPaymentStatus(o) === payment);
+      });
+
+      renderTable(currentOrders);
+    }
+
+    function renderTable(orders) {
+      const tbody = document.getElementById('orderTableBody');
+      if (!orders.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>Không có đơn hàng nào</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = orders.map(o => {
+        const id = getOrderId(o);
+        const code = escapeHtml(getOrderCode(o));
+        const customerName = escapeHtml(getCustomerName(o));
+        const customerEmail = escapeHtml(getCustomerEmail(o));
+        const status = getStatus(o);
+        const payment = getPaymentStatus(o);
+
+        // Hiển thị ô "Cần hoàn tiền" khi: đơn đã hủy nhưng vẫn ghi nhận đã thanh toán
+        const needsRefundNotice = (status === 'CANCELLED' && payment === 'PAID');
+
+        const paymentCell = `
+          <span class="badge ${paymentClass(payment)}">${paymentLabel(payment)}</span>
+          ${needsRefundNotice ? `
+            <div class="refund-note" onclick="confirmRefund(${id}, '${escapeJs(code)}')" title="Bấm để xác nhận đã hoàn tiền cho khách">
+              <i class="bi bi-arrow-counterclockwise"></i> Cần hoàn tiền
+            </div>` : ''}
+        `;
+
+        return `
+          <tr>
+            <td>
+              <div class="mono">${code}</div>
+              <div class="muted">#${id || '-'}</div>
+            </td>
+            <td>
+              <div style="font-weight:500;">${customerName}</div>
+              <div class="muted">${customerEmail}</div>
+            </td>
+            <td>${formatDate(getCreatedAt(o))}</td>
+            <td>${getItemCount(o)} sản phẩm</td>
+            <td><span class="price">${formatPrice(getAmount(o))}</span></td>
+            <td>${paymentCell}</td>
+            <td><span class="badge ${statusClass(status)}">${statusLabel(status)}</span></td>
+            <td>
+              <select class="status-select" onchange="updateOrderStatus(${id}, this.value, '${escapeJs(status)}')" ${id ? '' : 'disabled'}>
+                ${ORDER_STATUSES.map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${statusLabel(s)}</option>`).join('')}
+              </select>
+            </td>
+            <td>
+              <button class="action-btn" onclick="openDetail(${id})" title="Xem chi tiết"><i class="bi bi-eye"></i></button>
+              <button class="action-btn del" onclick="deleteOrder(${id}, '${escapeJs(getOrderCode(o))}')" title="Xóa" ${id ? '' : 'disabled'}><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateOrderStatus(id, nextStatus, oldStatus) {
+      if (!id) return;
+      if (nextStatus === oldStatus) return;
+
+      let confirmMsg = `Cập nhật trạng thái đơn hàng sang "${statusLabel(nextStatus)}"?`;
+      if (nextStatus === 'DELIVERED') {
+        confirmMsg += '\n\nLưu ý: trạng thái thanh toán sẽ tự động chuyển sang "Đã thanh toán".';
+      }
+
+      if (!confirm(confirmMsg)) {
+        renderTable(currentOrders);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/orders/${id}/status?status=${encodeURIComponent(nextStatus)}`, {
+          method: 'PUT',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        }
+
+        await loadOrders();
+      } catch (e) {
+        alert(`Không cập nhật được trạng thái: ${e.message}`);
+        renderTable(currentOrders);
+      }
+    }
+
+    // Xác nhận đã hoàn tiền cho đơn đã hủy -> chuyển paymentStatus thành REFUNDED
+    async function confirmRefund(id, code) {
+      if (!id) return;
+      if (!confirm(`Xác nhận đã hoàn tiền cho đơn hàng "${code}"?\n\nSau khi xác nhận, trạng thái thanh toán sẽ chuyển thành "Đã hoàn tiền" và thông báo này sẽ ẩn đi.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/orders/${id}/refund`, {
+          method: 'PUT',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        }
+
+        await loadOrders();
+      } catch (e) {
+        alert(`Không thể xác nhận hoàn tiền: ${e.message}`);
+      }
+    }
+
+    async function deleteOrder(id, code) {
+      if (!id) return;
+      if (!confirm(`Bạn có chắc muốn xóa đơn hàng "${code}"?`)) return;
+
+      try {
+        const res = await fetch(`${API}/orders/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        }
+
+        await loadOrders();
+        alert('Đã xóa đơn hàng!');
+      } catch (e) {
+        alert(`Không thể xóa đơn hàng: ${e.message}`);
+      }
+    }
+
+    function openDetail(id) {
+      const order = allOrders.find(o => Number(getOrderId(o)) === Number(id));
+      if (!order) return;
+
+      document.getElementById('detailTitle').textContent = `Chi Tiết Đơn Hàng ${getOrderCode(order)}`;
+      document.getElementById('detailInfo').innerHTML = `
+        ${detailBox('Khách hàng', `${escapeHtml(getCustomerName(order))}<div class="muted">${escapeHtml(getCustomerEmail(order))}</div>`)}
+        ${detailBox('Số điện thoại', escapeHtml(getCustomerPhone(order) || '-'))}
+        ${detailBox('Địa chỉ giao hàng', escapeHtml(order.shippingAddress || order.shipping_address || '-'))}
+        ${detailBox('Ghi chú', escapeHtml(order.note || '-'))}
+        ${detailBox('Trạng thái', `<span class="badge ${statusClass(getStatus(order))}">${statusLabel(getStatus(order))}</span>`)}
+        ${detailBox('Thanh toán', `<span class="badge ${paymentClass(getPaymentStatus(order))}">${paymentLabel(getPaymentStatus(order))}</span>`)}
+        ${detailBox('Tổng tiền', `<span class="price">${formatPrice(getAmount(order))}</span>`)}
+        ${detailBox('Ngày đặt', escapeHtml(formatDate(getCreatedAt(order))))}
+      `;
+
+      const items = getItems(order);
+      const tbody = document.getElementById('detailItems');
+      if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Đơn hàng chưa có chi tiết sản phẩm</td></tr>`;
+      } else {
+        tbody.innerHTML = items.map(item => {
+          const name = escapeHtml(item.product?.name || item.productName || item.product_name || `Sản phẩm #${item.productId || item.product_id || '-'}`);
+          const quantity = Number(item.quantity || 0);
+          const price = Number(item.price || item.unitPrice || item.unit_price || 0);
+          return `
+            <tr>
+              <td>${name}</td>
+              <td>${quantity}</td>
+              <td>${formatPrice(price)}</td>
+              <td>${formatPrice(price * quantity)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('detailOverlay').classList.add('show');
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('show');
+    }
+
+    function detailBox(label, value) {
+      return `<div class="detail-box"><span>${label}</span><strong>${value}</strong></div>`;
+    }
+
+    function getOrderId(o) {
+      return o.id ?? o.orderId ?? o.order_id ?? null;
+    }
+
+    function getOrderCode(o) {
+      return o.orderCode || o.order_code || `ORDER-${getOrderId(o) || ''}`;
+    }
+
+    function getCustomer(o) {
+      return o.user || o.customer || {};
+    }
+
+    function getCustomerName(o) {
+      const c = getCustomer(o);
+      return c.fullName || c.fullname || c.name || c.username || o.customerName || o.customer_name || 'Khách hàng';
+    }
+
+    function getCustomerEmail(o) {
+      const c = getCustomer(o);
+      return c.email || o.customerEmail || o.customer_email || '';
+    }
+
+    function getCustomerPhone(o) {
+      const c = getCustomer(o);
+      return c.phone || o.customerPhone || o.customer_phone || '';
+    }
+
+    function getCreatedAt(o) {
+      return o.createdAt || o.created_at || o.orderDate || o.order_date || '';
+    }
+
+    function getStatus(o) {
+      return o.status || 'PENDING';
+    }
+
+    function getPaymentStatus(o) {
+      return o.paymentStatus || o.payment_status || o.payment?.status || 'UNPAID';
+    }
+
+    function getAmount(o) {
+      return Number(o.finalAmount ?? o.final_amount ?? o.totalAmount ?? o.total_amount ?? o.amount ?? 0);
+    }
+
+    function getItems(o) {
+      return o.orderItems || o.order_items || o.items || [];
+    }
+
+    function getItemCount(o) {
+      const items = getItems(o);
+      if (Array.isArray(items) && items.length) {
+        return items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+      }
+      return Number(o.itemCount || o.item_count || 0);
+    }
+
+    function statusLabel(status) {
+      return {
+        PENDING: 'Chờ xác nhận',
+        CONFIRMED: 'Đã xác nhận',
+        SHIPPING: 'Đang giao',
+        DELIVERED: 'Đã giao',
+        CANCELLED: 'Đã hủy'
+      }[status] || status || '-';
+    }
+
+    function statusClass(status) {
+      return {
+        PENDING: 'st-pending',
+        CONFIRMED: 'st-confirmed',
+        SHIPPING: 'st-shipping',
+        DELIVERED: 'st-delivered',
+        CANCELLED: 'st-cancelled'
+      }[status] || 'st-pending';
+    }
+
+    function paymentLabel(status) {
+      return {
+        UNPAID: 'Chưa thanh toán',
+        PAID: 'Đã thanh toán',
+        REFUNDED: 'Đã hoàn tiền'
+      }[status] || status || '-';
+    }
+
+    function paymentClass(status) {
+      return {
+        UNPAID: 'pay-unpaid',
+        PAID: 'pay-paid',
+        REFUNDED: 'pay-refunded'
+      }[status] || 'pay-unpaid';
+    }
+
+    function formatPrice(value) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value || 0));
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showServerError(message) {
+      const box = document.getElementById('serverError');
+      box.textContent = message;
+      box.style.display = 'block';
+    }
+
+    function hideServerError() {
+      const box = document.getElementById('serverError');
+      box.textContent = '';
+      box.style.display = 'none';
+    }
+
+    function logout() {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login-admin.html';
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
+    }
+
+    function escapeJs(value) {
+      return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    document.getElementById('detailOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeDetail();
+    });
+
+    loadOrders();
+  </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Giỏ Hàng - PinkGold</title>
+  <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap)" rel="stylesheet">
+  <link rel="stylesheet" href="[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css)">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8b6914;
+      --gold-pale: #fdf5e4; --pink: #d4637a; --pink-light: #f0a0b0;
+      --cream: #faf6f0; --cream-2: #f2ebe0;
+      --dark: #1a1208; --dark-mid: #2d2010;
+      --muted: #8a7a60; --line: rgba(201,168,76,.2);
+      --shadow: 0 4px 20px rgba(26,18,8,.08);
+      --shadow-lg: 0 8px 40px rgba(26,18,8,.14);
+      --radius: 8px; --radius-lg: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* NAVBAR */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 70px; display: flex; align-items: center; padding: 0 40px; gap: 32px;
+      background: rgba(250,246,240,.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 600; color: var(--gold-dark); letter-spacing: 4px; }
+    .nav-links { display: flex; gap: 4px; margin: 0 auto; list-style: none; }
+    .nav-links a { display: block; padding: 8px 14px; border-radius: 6px; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); transition: all .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold-dark); background: var(--gold-pale); }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-icon { position: relative; width: 40px; height: 40px; border-radius: 50%; background: none; border: none; cursor: pointer; color: var(--dark); font-size: 1.05rem; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .nav-icon:hover { background: var(--gold-pale); color: var(--gold-dark); }
+    .cart-badge { position: absolute; top: 2px; right: 2px; background: var(--pink); color: white; width: 17px; height: 17px; border-radius: 50%; font-size: .58rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cream); }
+
+    /* MAIN */
+    .main { padding-top: 70px; min-height: calc(100vh - 70px); }
+
+    /* BREADCRUMB */
+    .breadcrumb { max-width: 1200px; margin: 0 auto; padding: 18px 40px; display: flex; align-items: center; gap: 8px; font-size: .74rem; color: var(--muted); }
+    .breadcrumb a { color: var(--gold-dark); transition: color .2s; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb i { font-size: .58rem; }
+
+    /* PAGE TITLE */
+    .page-header { max-width: 1200px; margin: 0 auto; padding: 0 40px 24px; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 400; color: var(--dark); }
+    .page-title span { color: var(--gold-dark); }
+
+    /* CART LAYOUT */
+    .cart-section { max-width: 1200px; margin: 0 auto; padding: 0 40px 80px; display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start; }
+
+    /* CART ITEMS */
+    .cart-items { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+    .cart-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 50px; gap: 16px; padding: 16px 24px; background: var(--cream-2); font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .cart-item { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 50px; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--line); align-items: center; animation: fadeUp .3s ease; }
+    .cart-item:last-child { border-bottom: none; }
+    .item-product { display: flex; gap: 16px; align-items: center; }
+    .item-img { width: 80px; height: 80px; border-radius: var(--radius); background: var(--cream-2); overflow: hidden; flex: none; display: flex; align-items: center; justify-content: center; }
+    .item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .item-img i { font-size: 1.8rem; color: rgba(201,168,76,.3); }
+    .item-info h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; color: var(--dark); margin-bottom: 4px; line-height: 1.3; }
+    .item-info p { font-size: .75rem; color: var(--muted); }
+    .item-price { font-weight: 500; color: var(--dark); font-size: .9rem; }
+    .item-qty { display: flex; align-items: center; border: 1.5px solid #e8dfd0; border-radius: var(--radius); overflow: hidden; width: fit-content; }
+    .qty-btn { width: 32px; height: 36px; background: none; border: none; cursor: pointer; font-size: .9rem; color: var(--dark); display: flex; align-items: center; justify-content: center; transition: background .2s; }
+    .qty-btn:hover { background: var(--cream-2); }
+    .qty-val { width: 40px; text-align: center; font-size: .88rem; font-weight: 500; border-left: 1px solid #e8dfd0; border-right: 1px solid #e8dfd0; padding: 8px 0; }
+    .item-total { font-weight: 600; color: var(--gold-dark); font-size: .95rem; }
+    .item-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: 8px; border-radius: 50%; transition: all .2s; }
+    .item-remove:hover { background: rgba(212,99,122,.1); color: var(--pink); }
+
+    /* EMPTY CART */
+    .cart-empty { text-align: center; padding: 80px 40px; }
+    .cart-empty i { font-size: 4rem; color: rgba(201,168,76,.25); margin-bottom: 20px; display: block; }
+    .cart-empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--dark); margin-bottom: 10px; }
+    .cart-empty p { color: var(--muted); margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius); border: none; font-size: .78rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all .2s; }
+    .btn-gold { background: var(--gold); color: var(--dark); }
+    .btn-gold:hover { background: var(--gold-dark); color: white; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,.35); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--gold); color: var(--gold-dark); }
+    .btn-outline:hover { background: var(--gold); color: var(--dark); }
+
+    /* CART SUMMARY */
+    .cart-summary { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 28px; position: sticky; top: 90px; }
+    .summary-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--dark); margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: .88rem; }
+    .summary-row span:first-child { color: var(--muted); }
+    .summary-row span:last-child { font-weight: 500; }
+    .summary-row.total { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--line); font-size: 1.1rem; }
+    .summary-row.total span:last-child { color: var(--gold-dark); font-size: 1.3rem; font-weight: 600; }
+
+    /* VOUCHER */
+    .voucher-box { margin: 20px 0; }
+    .voucher-input { display: flex; gap: 8px; }
+    .voucher-input input { flex: 1; padding: 11px 14px; border: 1.5px solid #e8dfd0; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none; transition: border-color .2s; }
+    .voucher-input input:focus { border-color: var(--gold); }
+    .voucher-input button { padding: 11px 18px; background: var(--dark); color: var(--gold-light); border: none; border-radius: var(--radius); cursor: pointer; font-size: .75rem; letter-spacing: 1px; text-transform: uppercase; transition: background .2s; }
+    .voucher-input button:hover { background: var(--dark-mid); }
+    .voucher-msg { font-size: .78rem; margin-top: 8px; }
+    .voucher-msg.success { color: #3a7a44; }
+    .voucher-msg.error { color: var(--pink); }
+
+    .btn-checkout { width: 100%; height: 52px; margin-top: 20px; font-size: .8rem; }
+
+    .summary-perks { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .perk { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: .78rem; color: var(--muted); }
+    .perk i { color: var(--gold-dark); font-size: .9rem; }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: var(--radius); font-size: .85rem; font-weight: 500; animation: fadeUp .3s ease; box-shadow: var(--shadow-lg); max-width: 340px; }
+    .toast-success { background: var(--dark); color: var(--gold-light); border-left: 3px solid var(--gold); }
+    .toast-error { background: #2d0810; color: var(--pink-light); border-left: 3px solid var(--pink); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .breadcrumb, .page-header { padding-left: 20px; padding-right: 20px; }
+      .cart-section { grid-template-columns: 1fr; padding: 0 20px 60px; }
+      .cart-summary { position: static; }
+      .cart-header { display: none; }
+      .cart-item { grid-template-columns: 1fr; gap: 12px; }
+      .item-product { grid-column: 1 / -1; }
+      .cart-item > div:not(.item-product) { display: flex; justify-content: space-between; align-items: center; }
+      .cart-item > div:not(.item-product)::before { font-size: .7rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+      .item-price::before { content: 'Đơn giá: '; }
+      .item-qty::before { content: 'Số lượng: '; display: none; }
+      .item-total::before { content: 'Thành tiền: '; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">PINKGOLD</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Trang Chủ</a></li>
+    <li><a href="products.html">Sản Phẩm</a></li>
+    <li><a href="products.html?cat=6">Trang Sức Cưới</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="login.html" class="nav-icon" title="Tài khoản"><i class="bi bi-person"></i></a>
+    <a href="cart.html" class="nav-icon active" title="Giỏ hàng">
+      <i class="bi bi-bag-fill"></i>
+      <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+    </a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="breadcrumb">
+    <a href="index.html">Trang chủ</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>Giỏ hàng</span>
+  </div>
+
+  <div class="page-header">
+    <h1 class="page-title">Giỏ hàng <span>của bạn</span></h1>
+  </div>
+
+  <div class="cart-section">
+    <div class="cart-items" id="cartItemsContainer">
+      <div class="cart-header">
+        <div>Sản phẩm</div>
+        <div>Đơn giá</div>
+        <div>Số lượng</div>
+        <div>Thành tiền</div>
+        <div></div>
+      </div>
+      <div id="cartItemsList">
+        <div class="cart-empty">
+          <i class="bi bi-bag-x"></i>
+          <h3>Giỏ hàng trống</h3>
+          <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+          <a href="products.html" class="btn btn-gold"><i class="bi bi-gem"></i> Mua sắm ngay</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-summary" id="cartSummary">
+      <h3 class="summary-title">Tóm tắt đơn hàng</h3>
+      
+      <div class="summary-row">
+        <span>Tạm tính (<span id="itemCount">0</span> sản phẩm)</span>
+        <span id="subtotal">0 ₫</span>
+      </div>
+      <div class="summary-row">
+        <span>Phí vận chuyển</span>
+        <span id="shipping">Miễn phí</span>
+      </div>
+      <div class="summary-row" id="discountRow" style="display:none;">
+        <span>Giảm giá</span>
+        <span id="discountAmount" style="color:var(--pink);">-0 ₫</span>
+      </div>
+
+      <div class="voucher-box">
+        <div class="voucher-input">
+          <input type="text" id="voucherCode" placeholder="Nhập mã giảm giá...">
+          <button onclick="applyVoucher()">Áp dụng</button>
+        </div>
+        <div class="voucher-msg" id="voucherMsg"></div>
+      </div>
+
+      <div class="summary-row total">
+        <span>Tổng cộng</span>
+        <span id="totalAmount">0 ₫</span>
+      </div>
+
+      <a href="checkout.html" class="btn btn-gold btn-checkout" id="checkoutBtn">
+        <i class="bi bi-credit-card"></i> Tiến hành thanh toán
+      </a>
+
+      <div class="summary-perks">
+        <div class="perk"><i class="bi bi-shield-check"></i> Thanh toán an toàn 100%</div>
+        <div class="perk"><i class="bi bi-truck"></i> Miễn phí ship đơn từ 2 triệu</div>
+        <div class="perk"><i class="bi bi-arrow-repeat"></i> Đổi trả trong 30 ngày</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = '[localhost](http://localhost:8080/api)';
+const CART_KEY = 'pinkgold_cart';
+
+let appliedVoucher = null;
+
+function getCart() {
+  try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+  catch { return []; }
+}
+function saveCart(cart) { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+function cartTotal() { return getCart().reduce((s, i) => s + (i.quantity || 0), 0); }
+
+function updateCartBadge() {
+  const total = cartTotal();
+  const badge = document.getElementById('cartBadge');
+  if (!badge) return;
+  badge.textContent = total;
+  badge.style.display = total > 0 ? 'flex' : 'none';
+}
+
+function formatPrice(v) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(v || 0));
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2800);
+  setTimeout(() => t.remove(), 3200);
+}
+
+function renderCart() {
+  const cart = getCart();
+  const container = document.getElementById('cartItemsList');
+  const summary = document.getElementById('cartSummary');
+
+  if (!cart.length) {
+    container.innerHTML = `
+      <div class="cart-empty">
+        <i class="bi bi-bag-x"></i>
+        <h3>Giỏ hàng trống</h3>
+        <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+        <a href="products.html" class="btn btn-gold"><i class="bi bi-gem"></i> Mua sắm ngay</a>
+      </div>`;
+    summary.style.display = 'none';
+    updateCartBadge();
+    return;
+  }
+
+  summary.style.display = 'block';
+
+  container.innerHTML = cart.map((item, idx) => `
+    <div class="cart-item" data-idx="${idx}">
+      <div class="item-product">
+        <div class="item-img">
+          ${item.image ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='<i class=\\'bi bi-gem\\'></i>'">` : '<i class="bi bi-gem"></i>'}
+        </div>
+        <div class="item-info">
+          <h4>${item.name || 'Sản phẩm'}</h4>
+          <p>Mã: PG${String(item.id).padStart(4, '0')}</p>
+        </div>
+      </div>
+      <div class="item-price">${formatPrice(item.price)}</div>
+      <div class="item-qty">
+        <button class="qty-btn" onclick="changeQty(${idx}, -1)"><i class="bi bi-dash"></i></button>
+        <span class="qty-val">${item.quantity}</span>
+        <button class="qty-btn" onclick="changeQty(${idx}, 1)"><i class="bi bi-plus"></i></button>
+      </div>
+      <div class="item-total">${formatPrice(item.price * item.quantity)}</div>
+      <button class="item-remove" onclick="removeItem(${idx})" title="Xóa"><i class="bi bi-x-lg"></i></button>
+    </div>
+  `).join('');
+
+  updateSummary();
+  updateCartBadge();
+}
+
+function updateSummary() {
+  const cart = getCart();
+  const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+
+  let discount = 0;
+  if (appliedVoucher) {
+    if (appliedVoucher.discountPercent) {
+      discount = subtotal * appliedVoucher.discountPercent / 100;
+    } else if (appliedVoucher.discountAmount) {
+      discount = Number(appliedVoucher.discountAmount);
+    }
+  }
+
+  const shipping = subtotal >= 2000000 ? 0 : 50000;
+  const total = Math.max(0, subtotal - discount + shipping);
+
+  document.getElementById('itemCount').textContent = itemCount;
+  document.getElementById('subtotal').textContent = formatPrice(subtotal);
+  document.getElementById('shipping').textContent = shipping === 0 ? 'Miễn phí' : formatPrice(shipping);
+
+  const discountRow = document.getElementById('discountRow');
+  if (discount > 0) {
+    discountRow.style.display = 'flex';
+    document.getElementById('discountAmount').textContent = '-' + formatPrice(discount);
+  } else {
+    discountRow.style.display = 'none';
+  }
+
+  document.getElementById('totalAmount').textContent = formatPrice(total);
+
+  // Lưu tổng tiền để checkout dùng
+  localStorage.setItem('pinkgold_checkout', JSON.stringify({
+    subtotal, discount, shipping, total,
+    voucher: appliedVoucher ? appliedVoucher.code : null
+  }));
+}
+
+async function changeQty(idx, delta) {
+  const cart = getCart();
+  if (!cart[idx]) return;
+
+  const newQty = cart[idx].quantity + delta;
+  if (newQty <= 0) {
+    removeItem(idx);
+    return;
+  }
+
+  cart[idx].quantity = newQty;
+  saveCart(cart);
+  renderCart();
+
+  // Sync với CSDL
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (user && user.id) {
+    try {
+      // Cần lấy cartItemId từ server, tạm thời chỉ sync lại toàn bộ
+      // Hoặc có thể gọi clear rồi add lại tất cả
+    } catch (e) {}
+  }
+}
+
+async function removeItem(idx) {
+  const cart = getCart();
+  const removed = cart.splice(idx, 1)[0];
+  saveCart(cart);
+  renderCart();
+  showToast(`Đã xóa "${removed?.name || 'sản phẩm'}" khỏi giỏ hàng`);
+}
+
+async function applyVoucher() {
+  const code = document.getElementById('voucherCode').value.trim().toUpperCase();
+  const msgEl = document.getElementById('voucherMsg');
+
+  if (!code) {
+    msgEl.className = 'voucher-msg error';
+    msgEl.textContent = 'Vui lòng nhập mã giảm giá';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/vouchers/check/${code}`);
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Mã không hợp lệ');
+    }
+    const voucher = await res.json();
+
+    const cart = getCart();
+    const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+
+    if (voucher.minOrderAmount && subtotal < voucher.minOrderAmount) {
+      msgEl.className = 'voucher-msg error';
+      msgEl.textContent = `Đơn hàng tối thiểu ${formatPrice(voucher.minOrderAmount)}`;
+      return;
+    }
+
+    appliedVoucher = voucher;
+    msgEl.className = 'voucher-msg success';
+    msgEl.textContent = `✓ Áp dụng thành công: giảm ${voucher.discountPercent ? voucher.discountPercent + '%' : formatPrice(voucher.discountAmount)}`;
+    updateSummary();
+    showToast('Áp dụng mã giảm giá thành công!');
+
+  } catch (e) {
+    appliedVoucher = null;
+    msgEl.className = 'voucher-msg error';
+    msgEl.textContent = e.message || 'Mã giảm giá không hợp lệ';
+    updateSummary();
+  }
+}
+
+// Init
+renderCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PinkGold - Trang Sức Cao Cấp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dark: #8b6914;
+      --gold-pale: #fdf5e4;
+      --pink: #d4637a;
+      --cream: #faf6f0;
+      --cream-dark: #f2ebe0;
+      --dark: #1a1208;
+      --dark-mid: #2d1a05;
+      --text: #1a1208;
+      --text-muted: #8a7a60;
+      --line: #ede4d4;
+      --shadow: 0 4px 20px rgba(26,18,8,.08);
+      --shadow-lg: 0 8px 40px rgba(26,18,8,.14);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --transition: all .25s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); line-height: 1.6; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    .section-label { font-size: .65rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 10px; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 400; color: var(--dark); line-height: 1.15; }
+    .text-center { text-align: center; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: var(--radius);
+      border: none; font-size: .78rem; font-weight: 500;
+      letter-spacing: 2px; text-transform: uppercase;
+      transition: var(--transition); white-space: nowrap; cursor: pointer;
+    }
+    .btn-gold { background: var(--gold); color: var(--dark); }
+    .btn-gold:hover { background: var(--gold-dark); color: white; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,.35); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--gold); color: var(--gold-dark); }
+    .btn-outline:hover { background: var(--gold); color: var(--dark); }
+    .btn-sm { padding: 8px 16px; font-size: .72rem; }
+    .btn-lg { padding: 16px 32px; font-size: .8rem; }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 70px; display: flex; align-items: center; padding: 0 40px; gap: 24px;
+      background: rgba(250,246,240,.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,168,76,.2);
+      transition: box-shadow .3s;
+    }
+    .navbar.scrolled { box-shadow: 0 2px 20px rgba(26,18,8,.1); }
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem; font-weight: 600; color: var(--gold-dark);
+      letter-spacing: 4px; flex: none;
+    }
+    .navbar-nav { display: flex; gap: 4px; list-style: none; margin: 0 auto; }
+    .navbar-nav a {
+      display: block; padding: 8px 12px; border-radius: 6px;
+      font-size: .72rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-muted); transition: var(--transition);
+    }
+    .navbar-nav a:hover, .navbar-nav a.active { color: var(--gold-dark); background: var(--gold-pale); }
+    .navbar-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+    .nav-icon-btn {
+      position: relative; width: 40px; height: 40px; border-radius: 50%;
+      background: none; border: none; color: var(--text);
+      font-size: 1.05rem; display: flex; align-items: center; justify-content: center;
+      transition: var(--transition); cursor: pointer;
+    }
+    .nav-icon-btn:hover { background: var(--gold-pale); color: var(--gold-dark); }
+    .nav-badge {
+      position: absolute; top: 2px; right: 2px;
+      background: var(--pink); color: white;
+      width: 17px; height: 17px; border-radius: 50%;
+      font-size: .58rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--cream);
+    }
+    .user-dropdown { position: relative; }
+    .nav-user-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 14px; border-radius: 20px;
+      background: none; border: 1.5px solid var(--line);
+      font-size: .8rem; color: var(--text);
+      transition: var(--transition); cursor: pointer;
+      white-space: nowrap; max-width: 160px;
+    }
+    .nav-user-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+    .nav-user-btn span { overflow: hidden; text-overflow: ellipsis; }
+    .user-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 10px);
+      background: white; border: 1.5px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); min-width: 190px; overflow: hidden; z-index: 300;
+    }
+    .user-menu.open { display: block; animation: fadeUp .15s ease; }
+    .user-menu a, .user-menu button {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; font-size: .875rem; color: var(--text);
+      transition: background .15s; text-decoration: none;
+      background: none; border: none; width: 100%; cursor: pointer; font-family: inherit;
+      text-align: left;
+    }
+    .user-menu a:hover, .user-menu button:hover { background: var(--gold-pale); }
+    .user-menu .divider { height: 1px; background: var(--line); margin: 4px 0; }
+    .user-menu .logout { color: var(--pink); }
+
+    /* ===== HERO ===== */
+    .hero {
+      height: 88vh; min-height: 560px;
+      display: flex; align-items: center;
+      background: linear-gradient(135deg, #1a1208 0%, #2d1a05 55%, #3d2210 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 55% 45% at 65% 50%, rgba(201,168,76,.18) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 50% at 20% 70%, rgba(212,99,122,.1) 0%, transparent 70%);
+    }
+    .hero-ornament { position: absolute; inset: 30px; border: 1px solid rgba(201,168,76,.15); pointer-events: none; }
+    .hero-ornament::before { content: ''; position: absolute; inset: 20px; border: 1px solid rgba(201,168,76,.07); }
+    .hero-corner { position: absolute; width: 36px; height: 36px; border-color: rgba(201,168,76,.5); border-style: solid; }
+    .hero-corner.tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+    .hero-corner.tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+    .hero-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+    .hero-corner.br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 1200px; margin: 0 auto; padding: 0 40px;
+      animation: fadeUp .9s ease forwards;
+    }
+    .hero-eyebrow { font-size: .68rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; font-weight: 500; }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6.5vw, 5rem);
+      font-weight: 300; color: white; line-height: 1.08; margin-bottom: 8px;
+    }
+    .hero-title strong { font-weight: 600; color: var(--gold-light); display: block; }
+    .hero-sub { font-size: .95rem; color: rgba(255,255,255,.5); margin: 22px 0 38px; max-width: 440px; line-height: 1.85; }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero-scroll {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.3); font-size: .65rem; letter-spacing: 2px;
+      text-transform: uppercase; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 32px;
+      background: linear-gradient(to bottom, rgba(201,168,76,.5), transparent);
+      animation: scrollLine 1.5s ease infinite;
+    }
+    @keyframes scrollLine { 0%,100%{opacity:1;transform:scaleY(1)} 50%{opacity:.4;transform:scaleY(.6)} }
+
+    /* ===== MARQUEE ===== */
+    .marquee-bar { background: var(--dark-mid); padding: 12px 0; overflow: hidden; white-space: nowrap; }
+    .marquee-track { display: inline-flex; gap: 48px; animation: marquee 24s linear infinite; }
+    .marquee-item { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.4); font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; }
+    .marquee-dot { color: var(--gold); }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ===== CATEGORIES ===== */
+    .categories-section { padding: 80px 0 60px; }
+    .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+    .cat-card {
+      aspect-ratio: .82; border-radius: var(--radius-lg); overflow: hidden;
+      position: relative; cursor: pointer; background: var(--cream-dark);
+      transition: var(--transition);
+    }
+    .cat-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(26,18,8,.85) 0%, rgba(26,18,8,.2) 50%, transparent 100%);
+    }
+    .cat-card-emoji { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; transition: transform .5s ease; }
+    .cat-card:hover .cat-card-emoji { transform: scale(1.08); }
+    .cat-card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px; z-index: 2; }
+    .cat-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: white; margin-bottom: 4px; }
+    .cat-card-count { font-size: .72rem; color: rgba(255,255,255,.6); }
+    .cat-card-arrow {
+      position: absolute; top: 14px; right: 14px; z-index: 2;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: .78rem;
+      opacity: 0; transition: var(--transition);
+    }
+    .cat-card:hover .cat-card-arrow { opacity: 1; }
+    .cat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(26,18,8,.2); }
+
+    /* ===== PRODUCTS SECTION ===== */
+    .products-section { padding: 70px 0 90px; background: white; }
+    .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; gap: 20px; }
+    .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+
+    /* ===== FILTER BAR ===== */
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; align-items: center; }
+    .filter-search { flex: 1; min-width: 220px; position: relative; }
+    .filter-search input {
+      width: 100%; padding: 10px 14px 10px 38px;
+      border: 1.5px solid var(--line); border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif; font-size: .88rem;
+      outline: none; background: var(--cream); color: var(--text);
+      transition: border-color .2s;
+    }
+    .filter-search input:focus { border-color: var(--gold); }
+    .filter-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: .9rem; pointer-events: none; }
+    .filter-select {
+      padding: 10px 14px; border: 1.5px solid var(--line); border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif; font-size: .88rem;
+      outline: none; background: var(--cream); color: var(--text);
+      cursor: pointer; transition: border-color .2s;
+    }
+    .filter-select:focus { border-color: var(--gold); }
+    .products-count { font-size: .8rem; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+    /* ===== PRODUCT CARD ===== */
+    .product-card {
+      background: white; border-radius: var(--radius-lg); overflow: hidden;
+      transition: var(--transition); cursor: pointer;
+      border: 1px solid rgba(201,168,76,.1);
+    }
+    .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: rgba(201,168,76,.25); }
+    .product-card-img { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--cream-dark); }
+    .product-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+    .product-card:hover .product-card-img img { transform: scale(1.07); }
+    .product-card-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--pink); color: white;
+      font-size: .62rem; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; font-weight: 600;
+    }
+    .product-card-wish {
+      position: absolute; top: 10px; right: 10px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.9); border: none;
+      font-size: 1rem; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition); opacity: 0; transform: scale(.8);
+    }
+    .product-card:hover .product-card-wish { opacity: 1; transform: scale(1); }
+    .product-card-wish:hover { background: white; color: var(--pink); }
+    .product-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: rgba(201,168,76,.25); }
+    .product-card-body { padding: 16px 16px 12px; }
+    .product-card-category { font-size: .62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+    .product-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; color: var(--dark); line-height: 1.3; margin-bottom: 10px; }
+    .product-card-price { display: flex; align-items: baseline; gap: 8px; }
+    .price-current { font-size: 1rem; font-weight: 600; color: var(--gold-dark); }
+    .price-original { font-size: .8rem; color: #bbb; text-decoration: line-through; }
+    .product-card-footer {
+      padding: 12px 16px 16px; border-top: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .rating { display: flex; align-items: center; gap: 5px; }
+    .stars { font-size: .78rem; color: var(--gold); letter-spacing: 1px; }
+    .rating-count { font-size: .72rem; color: var(--text-muted); }
+
+    /* ===== EMPTY / LOADING ===== */
+    .state-box { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--gold); border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+
+    /* ===== FEATURES ===== */
+    .features-section { padding: 70px 0; border-top: 1px solid var(--line); background: var(--cream); }
+    .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    .feature-item { text-align: center; padding: 28px 20px; border-radius: var(--radius-lg); transition: var(--transition); }
+    .feature-item:hover { background: white; box-shadow: var(--shadow); }
+    .feature-icon { width: 58px; height: 58px; border-radius: 50%; background: var(--gold-pale); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: var(--gold-dark); }
+    .feature-title { font-weight: 600; margin-bottom: 7px; font-size: .88rem; }
+    .feature-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* ===== FOOTER ===== */
+    .footer { background: var(--dark); color: #e8d9c0; padding: 60px 0 0; }
+    .footer-grid { max-width: 1200px; margin: 0 auto; padding: 0 40px 50px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+    .footer-brand .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: var(--gold-light); letter-spacing: 4px; margin-bottom: 16px; }
+    .footer-brand p { font-size: .82rem; color: rgba(255,255,255,.4); line-height: 1.8; }
+    .footer-col h4 { font-size: .7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+    .footer-col a { font-size: .82rem; color: rgba(255,255,255,.45); transition: color .2s; }
+    .footer-col a:hover { color: var(--gold-light); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 40px; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; font-size: .75rem; color: rgba(255,255,255,.3); }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: var(--radius); font-size: .85rem; font-weight: 500; animation: fadeUp .3s ease; box-shadow: var(--shadow-lg); max-width: 340px; }
+    .toast-success { background: var(--dark); color: var(--gold-light); border-left: 3px solid var(--gold); }
+    .toast-error { background: #2d0810; color: #f0a0b0; border-left: 3px solid var(--pink); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px) {
+      .container, .navbar { padding-left: 20px; padding-right: 20px; }
+      .navbar-nav { display: none; }
+      .cat-grid { grid-template-columns: repeat(2, 1fr); }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+    @media (max-width: 560px) {
+      .hero-content { padding: 0 20px; }
+      .cat-grid { gap: 10px; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .features-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 6px; text-align: center; }
+      .filter-bar { gap: 8px; }
+      .products-count { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="navbar-logo">PINKGOLD</a>
+  <ul class="navbar-nav">
+    <li><a href="index.html" class="active">Trang Chủ</a></li>
+    <li><a href="products.html">Sản Phẩm</a></li>
+    <li><a href="products.html?cat=1">Nhẫn</a></li>
+    <li><a href="products.html?cat=2">Dây Chuyền</a></li>
+    <li><a href="products.html?cat=4">Bông Tai</a></li>
+    <li><a href="products.html?cat=6">Trang Sức Cưới</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <button class="nav-icon-btn" onclick="window.location.href='products.html'" title="Tìm kiếm">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="nav-icon-btn" onclick="window.location.href='cart.html'" title="Giỏ hàng">
+      <i class="bi bi-bag"></i>
+      <span class="nav-badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <div id="navUserArea"></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-ornament"></div>
+  <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div><div class="hero-corner br"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Bộ sưu tập 2025</p>
+    <h1 class="hero-title">
+      Vẻ đẹp vĩnh cửu
+      <strong>trong từng trang sức</strong>
+    </h1>
+    <p class="hero-sub">Mỗi món trang sức PinkGold là một tác phẩm nghệ thuật — được chế tác từ vàng 18K, bạc 925 và đá quý thiên nhiên.</p>
+    <div class="hero-actions">
+      <a href="#products" class="btn btn-gold btn-lg"><i class="bi bi-gem"></i> Khám Phá Ngay</a>
+      <a href="products.html?cat=6" class="btn btn-lg" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.25);">Trang Sức Cưới</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Cuộn xuống</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span class="marquee-item"><i class="bi bi-gem marquee-dot"></i> Vàng 18K Chứng Nhận</span>
+    <span class="marquee-item"><i class="bi bi-star-fill marquee-dot"></i> Kim Cương Thiên Nhiên</span>
+    <span class="marquee-item"><i class="bi bi-shield-check marquee-dot"></i> Bảo Hành 12 Tháng</span>
+    <span class="marquee-item"><i class="bi bi-truck marquee-dot"></i> Giao Hàng Toàn Quốc</span>
+    <span class="marquee-item"><i class="bi bi-box-seam marquee-dot"></i> Hộp Quà Sang Trọng</span>
+    <span class="marquee-item"><i class="bi bi-arrow-repeat marquee-dot"></i> Đổi Trả 30 Ngày</span>
+    <span class="marquee-item"><i class="bi bi-gem marquee-dot"></i> Vàng 18K Chứng Nhận</span>
+    <span class="marquee-item"><i class="bi bi-star-fill marquee-dot"></i> Kim Cương Thiên Nhiên</span>
+    <span class="marquee-item"><i class="bi bi-shield-check marquee-dot"></i> Bảo Hành 12 Tháng</span>
+    <span class="marquee-item"><i class="bi bi-truck marquee-dot"></i> Giao Hàng Toàn Quốc</span>
+    <span class="marquee-item"><i class="bi bi-box-seam marquee-dot"></i> Hộp Quà Sang Trọng</span>
+    <span class="marquee-item"><i class="bi bi-arrow-repeat marquee-dot"></i> Đổi Trả 30 Ngày</span>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="categories-section">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-label">Danh Mục</span>
+      <h2 class="section-title">Khám Phá Bộ Sưu Tập</h2>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="location.href='products.html?cat=1'" style="background:linear-gradient(135deg,#2d1a05,#8b6914)">
+        <div class="cat-card-emoji">💍</div>
+        <div class="cat-card-info"><div class="cat-card-name">Nhẫn</div><div class="cat-card-count">Xem bộ sưu tập</div></div>
+        <div class="cat-card-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+      <div class="cat-card" onclick="location.href='products.html?cat=2'" style="background:linear-gradient(135deg,#051a2d,#14508b)">
+        <div class="cat-card-emoji">📿</div>
+        <div class="cat-card-info"><div class="cat-card-name">Dây Chuyền</div><div class="cat-card-count">Xem bộ sưu tập</div></div>
+        <div class="cat-card-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+      <div class="cat-card" onclick="location.href='products.html?cat=4'" style="background:linear-gradient(135deg,#2d0520,#8b1450)">
+        <div class="cat-card-emoji">💎</div>
+        <div class="cat-card-info"><div class="cat-card-name">Bông Tai</div><div class="cat-card-count">Xem bộ sưu tập</div></div>
+        <div class="cat-card-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+      <div class="cat-card" onclick="location.href='products.html?cat=6'" style="background:linear-gradient(135deg,#1a0828,#6914ab)">
+        <div class="cat-card-emoji">👑</div>
+        <div class="cat-card-info"><div class="cat-card-name">Trang Sức Cưới</div><div class="cat-card-count">Xem bộ sưu tập</div></div>
+        <div class="cat-card-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALL PRODUCTS -->
+<section class="products-section" id="products">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">Tất Cả Sản Phẩm</span>
+        <h2 class="section-title">Bộ Sưu Tập PinkGold</h2>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-search">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="Tìm sản phẩm..." oninput="filterProducts()">
+      </div>
+      <select class="filter-select" id="filterCat" onchange="filterProducts()">
+        <option value="">Tất cả danh mục</option>
+      </select>
+      <select class="filter-select" id="filterSort" onchange="filterProducts()">
+        <option value="">Mặc định</option>
+        <option value="price-asc">Giá tăng dần</option>
+        <option value="price-desc">Giá giảm dần</option>
+        <option value="name-asc">Tên A–Z</option>
+      </select>
+      <span class="products-count" id="productsCount"></span>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+      <div class="state-box">
+        <div class="spinner"></div>
+        Đang tải sản phẩm...
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon"><i class="bi bi-gem"></i></div>
+        <div class="feature-title">Chất Lượng Chứng Nhận</div>
+        <div class="feature-desc">Vàng 18K, bạc 925 có giấy chứng nhận chất lượng quốc tế.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+        <div class="feature-title">Bảo Hành 12 Tháng</div>
+        <div class="feature-desc">Cam kết bảo hành toàn bộ sản phẩm trong 12 tháng.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="bi bi-truck"></i></div>
+        <div class="feature-title">Giao Hàng Toàn Quốc</div>
+        <div class="feature-desc">Đóng gói sang trọng, giao hàng nhanh toàn quốc 2–3 ngày.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="bi bi-arrow-repeat"></i></div>
+        <div class="feature-title">Đổi Trả 30 Ngày</div>
+        <div class="feature-desc">Không hài lòng? Đổi trả miễn phí trong 30 ngày đầu.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">PINKGOLD</div>
+      <p>Chuyên cung cấp trang sức cao cấp từ vàng 18K, bạc 925 và đá quý thiên nhiên. Mỗi sản phẩm là một tác phẩm nghệ thuật tinh tế.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Sản Phẩm</h4>
+      <ul>
+        <li><a href="products.html?cat=1">Nhẫn</a></li>
+        <li><a href="products.html?cat=2">Dây Chuyền</a></li>
+        <li><a href="products.html?cat=3">Lắc Tay</a></li>
+        <li><a href="products.html?cat=4">Bông Tai</a></li>
+        <li><a href="products.html?cat=6">Trang Sức Cưới</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Hỗ Trợ</h4>
+      <ul>
+        <li><a href="#">Chính Sách Đổi Trả</a></li>
+        <li><a href="#">Hướng Dẫn Đặt Hàng</a></li>
+        <li><a href="#">Kiểm Tra Đơn Hàng</a></li>
+        <li><a href="#">Bảo Hành Sản Phẩm</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Liên Hệ</h4>
+      <ul>
+        <li><a href="#">📍 123 Đường ABC, Q.1, HCM</a></li>
+        <li><a href="#">📞 0987 654 321</a></li>
+        <li><a href="#">✉️ hello@pinkgold.com</a></li>
+        <li><a href="#">🕐 T2–T7: 9:00–21:00</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PinkGold. Tất cả quyền được bảo lưu.</span>
+    <span>Thiết kế với ♥ bởi PinkGold Team</span>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CART_KEY = 'pinkgold_cart';
+const API      = 'http://localhost:8080/api';
+const IMG_BASE = 'http://localhost:8080'; // backend phục vụ ảnh tĩnh
+
+/* ============================================================
+   ẢNH — helper lấy URL đầy đủ
+   Ảnh lưu ở images/abc.jpg → http://localhost:8080/images/abc.jpg
+   ============================================================ */
+function resolveImg(path) {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return IMG_BASE + '/' + path.replace(/^\//, '');
+}
+
+/* ============================================================
+   CART
+   ============================================================ */
+function getCart() {
+  try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; }
+}
+function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+function cartTotal() { return getCart().reduce((s, i) => s + (i.quantity || 0), 0); }
+
+function updateCartBadge() {
+  const total = cartTotal();
+  const badge = document.getElementById('cartBadge');
+  if (!badge) return;
+  badge.textContent = total;
+  badge.style.display = total > 0 ? 'flex' : 'none';
+}
+
+async function addToCartStore(id, name, price, image, qty = 1) {
+  const cart = getCart();
+  const idx  = cart.findIndex(i => i.id === id);
+  if (idx > -1) cart[idx].quantity += qty;
+  else cart.push({ id, name, price, image, quantity: qty });
+  saveCart(cart);
+  updateCartBadge();
+
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (user && user.id) {
+    try {
+      await fetch(`${API}/cart/add?userId=${user.id}&productId=${id}&quantity=${qty}`, { method: 'POST' });
+    } catch (e) { console.warn('Cart API error:', e); }
+  }
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2800);
+  setTimeout(() => t.remove(), 3200);
+}
+
+function formatPrice(v) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(v || 0));
+}
+
+/* ============================================================
+   NAVBAR USER
+   ============================================================ */
+function renderNavUser() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const area = document.getElementById('navUserArea');
+  if (!area) return;
+
+  if (user) {
+    const displayName = user.fullName || user.username || 'Tài khoản';
+    area.innerHTML = `
+      <div class="user-dropdown" id="userDropdown">
+        <button class="nav-user-btn" onclick="toggleUserMenu(event)">
+          <i class="bi bi-person-circle"></i>
+          <span title="${displayName}">${displayName}</span>
+          <i class="bi bi-chevron-down" style="font-size:.6rem;flex:none;"></i>
+        </button>
+        <div class="user-menu" id="userMenu">
+          <a href="profile.html"><i class="bi bi-person"></i> Tài Khoản</a>
+          <a href="orders.html"><i class="bi bi-bag"></i> Đơn Hàng Của Tôi</a>
+          <div class="divider"></div>
+          <button class="logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</button>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML = `<a href="login.html" class="btn btn-gold btn-sm"><i class="bi bi-person"></i> Đăng Nhập</a>`;
+  }
+}
+
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  document.getElementById('userMenu')?.classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('userMenu')?.classList.remove('open');
+});
+function logout() {
+  if (confirm('Bạn có chắc muốn đăng xuất?')) {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.reload();
+  }
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ============================================================
+   PRODUCTS
+   ============================================================ */
+let allProducts   = [];
+let allCategories = [];
+
+/**
+ * Map: productId (number) → URL ảnh chính (string)
+ * Được điền bằng loadPrimaryImages() sau khi products đã load.
+ */
+const primaryImageMap = {};
+
+/**
+ * Lấy ảnh chính của sản phẩm:
+ * 1. Ưu tiên ảnh từ bảng product_images (đã cache vào primaryImageMap)
+ * 2. Fallback: imageUrl trên product (ảnh giấy kiểm định — không hiển thị cho khách)
+ */
+function getProductImage(p) {
+  return resolveImg(primaryImageMap[p.id] || '');
+}
+
+/**
+ * Load ảnh chính cho tất cả products song song (Promise.allSettled).
+ * Sau khi xong, re-render card đã hiển thị để cập nhật ảnh.
+ */
+async function loadPrimaryImages(products) {
+  const requests = products.map(p =>
+    fetch(`${API}/product-images/product/${p.id}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(imgs => {
+        if (!Array.isArray(imgs) || !imgs.length) return;
+        // Lấy ảnh isPrimary = true, nếu không có thì lấy ảnh đầu tiên
+        const primary = imgs.find(i => i.isPrimary || i.is_primary) || imgs[0];
+        const url = primary.imageUrl || primary.image_url || '';
+        if (url) {
+          primaryImageMap[p.id] = url;
+          // Cập nhật ảnh trong card đang hiển thị mà không cần re-render toàn bộ
+          const imgEl = document.querySelector(`img[data-pid="${p.id}"]`);
+          const phEl  = document.querySelector(`.product-card-placeholder[data-pid="${p.id}"]`);
+          if (imgEl) {
+            imgEl.src = resolveImg(url);
+            imgEl.style.display = 'block';
+            if (phEl) phEl.style.display = 'none';
+          } else if (phEl) {
+            // Thay placeholder bằng img
+            const imgTag = document.createElement('img');
+            imgTag.setAttribute('data-pid', p.id);
+            imgTag.src = resolveImg(url);
+            imgTag.alt = p.name || '';
+            imgTag.loading = 'lazy';
+            imgTag.style.width = '100%';
+            imgTag.style.height = '100%';
+            imgTag.style.objectFit = 'cover';
+            imgTag.style.transition = 'transform .45s ease';
+            imgTag.onerror = function() { this.style.display = 'none'; phEl.style.display = 'flex'; };
+            phEl.parentNode.insertBefore(imgTag, phEl);
+            phEl.style.display = 'none';
+          }
+        }
+      })
+      .catch(() => {}) // bỏ qua lỗi từng sản phẩm
+  );
+
+  // Chạy song song, không chặn UI
+  await Promise.allSettled(requests);
+}
+
+function productCardHTML(p) {
+  const price      = Number(p.discountPrice ?? p.discount_price ?? p.price ?? 0);
+  const original   = Number(p.price ?? 0);
+  const hasDiscount = price < original && price > 0;
+  const catName    = p.category?.name ?? p.categoryName ?? '';
+  // Lúc render lần đầu, dùng ảnh đã cache nếu có; nếu chưa có thì để placeholder
+  const imgSrc     = primaryImageMap[p.id] ? resolveImg(primaryImageMap[p.id]) : '';
+  const safeName   = (p.name || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+  return `
+    <div class="product-card" onclick="location.href='product-detail.html?id=${p.id}'">
+      <div class="product-card-img">
+        ${hasDiscount ? `<span class="product-card-badge">Sale</span>` : ''}
+        <button class="product-card-wish" onclick="event.stopPropagation();showToast('Đã thêm vào yêu thích')">
+          <i class="bi bi-heart"></i>
+        </button>
+        ${imgSrc
+          ? `<img data-pid="${p.id}" src="${imgSrc}" alt="${safeName}" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;transition:transform .45s ease;"
+               onerror="this.style.display='none';document.querySelector('.product-card-placeholder[data-pid=&quot;${p.id}&quot;]').style.display='flex'">
+             <div class="product-card-placeholder" data-pid="${p.id}" style="display:none">💍</div>`
+          : `<div class="product-card-placeholder" data-pid="${p.id}">💍</div>`}
+      </div>
+      <div class="product-card-body">
+        ${catName ? `<div class="product-card-category">${catName}</div>` : ''}
+        <div class="product-card-name">${p.name || 'Sản phẩm'}</div>
+        <div class="product-card-price">
+          <span class="price-current">${formatPrice(price || original)}</span>
+          ${hasDiscount ? `<span class="price-original">${formatPrice(original)}</span>` : ''}
+        </div>
+      </div>
+      <div class="product-card-footer">
+        <div class="rating">
+          <span class="stars">★★★★★</span>
+          <span class="rating-count">(${Math.floor(Math.random() * 40 + 5)})</span>
+        </div>
+        <button class="btn btn-gold btn-sm"
+          onclick="event.stopPropagation();addToCartStore(${p.id},'${safeName}',${price || original},'${imgSrc}',1);showToast('Đã thêm vào giỏ hàng')">
+          <i class="bi bi-bag-plus"></i>
+        </button>
+      </div>
+    </div>`;
+}
+
+function populateCatFilter() {
+  const sel = document.getElementById('filterCat');
+  allCategories.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+}
+
+function filterProducts() {
+  const kw    = document.getElementById('searchInput').value.trim().toLowerCase();
+  const catId = document.getElementById('filterCat').value;
+  const sort  = document.getElementById('filterSort').value;
+
+  let list = allProducts.filter(p => {
+    const matchKw  = !kw || (p.name || '').toLowerCase().includes(kw);
+    const pCatId   = String(p.category?.id ?? p.categoryId ?? p.category_id ?? '');
+    const matchCat = !catId || pCatId === catId;
+    return matchKw && matchCat;
+  });
+
+  if (sort === 'price-asc')  list.sort((a, b) => getPrice(a) - getPrice(b));
+  else if (sort === 'price-desc') list.sort((a, b) => getPrice(b) - getPrice(a));
+  else if (sort === 'name-asc')   list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'));
+
+  renderProducts(list);
+}
+
+function getPrice(p) {
+  return Number(p.discountPrice ?? p.discount_price ?? p.price ?? 0);
+}
+
+function renderProducts(list) {
+  const grid = document.getElementById('productsGrid');
+  document.getElementById('productsCount').textContent = `${list.length} sản phẩm`;
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="state-box"><i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:12px;"></i>Không tìm thấy sản phẩm nào.</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(productCardHTML).join('');
+}
+
+async function loadAll() {
+  try {
+    // Gọi đồng thời products + categories
+    const [pRes, cRes] = await Promise.all([
+      fetch(`${API}/products`),
+      fetch(`${API}/categories`)
+    ]);
+
+    if (pRes.ok) {
+      const data = await pRes.json();
+      allProducts = (Array.isArray(data) ? data : (data.content || []))
+                    .filter(p => p.status !== false);
+    }
+    if (cRes.ok) {
+      const data = await cRes.json();
+      allCategories = Array.isArray(data) ? data : (data.content || []);
+      populateCatFilter();
+    }
+
+    // Render cards ngay (chưa có ảnh → placeholder)
+    renderProducts(allProducts);
+
+    // Load ảnh product_images cho từng sản phẩm song song → cập nhật card dần dần
+    loadPrimaryImages(allProducts);
+
+  } catch (err) {
+    document.getElementById('productsGrid').innerHTML = `
+      <div class="state-box">
+        <i class="bi bi-exclamation-circle" style="font-size:2rem;display:block;margin-bottom:10px;color:var(--pink)"></i>
+        Không thể kết nối server. Vui lòng kiểm tra backend đang chạy tại port 8080.
+      </div>`;
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderNavUser();
+updateCartBadge();
+loadAll();
+</script>
+</body>
+</html>

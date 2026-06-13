@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sản Phẩm - PinkGold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8b6914;
+      --gold-pale: #fdf5e4; --pink: #d4637a;
+      --cream: #faf6f0; --cream-2: #f2ebe0;
+      --dark: #1a1208; --dark-mid: #2d1a05;
+      --text: #1a1208; --muted: #8a7a60;
+      --line: #ede4d4;
+      --shadow: 0 4px 20px rgba(26,18,8,.08);
+      --shadow-lg: 0 8px 40px rgba(26,18,8,.14);
+      --radius: 8px; --radius-lg: 12px;
+      --transition: all .25s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 70px; display: flex; align-items: center; padding: 0 40px; gap: 24px;
+      background: rgba(250,246,240,.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,168,76,.2);
+      transition: box-shadow .3s;
+    }
+    .navbar.scrolled { box-shadow: 0 2px 20px rgba(26,18,8,.1); }
+    .navbar-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 600; color: var(--gold-dark); letter-spacing: 4px; flex: none; }
+    .navbar-nav { display: flex; gap: 4px; list-style: none; margin: 0 auto; }
+    .navbar-nav a { display: block; padding: 8px 12px; border-radius: 6px; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); transition: var(--transition); }
+    .navbar-nav a:hover, .navbar-nav a.active { color: var(--gold-dark); background: var(--gold-pale); }
+    .navbar-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+    .nav-icon-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; background: none; border: none; color: var(--text); font-size: 1.05rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); cursor: pointer; }
+    .nav-icon-btn:hover { background: var(--gold-pale); color: var(--gold-dark); }
+    .nav-badge { position: absolute; top: 2px; right: 2px; background: var(--pink); color: white; width: 17px; height: 17px; border-radius: 50%; font-size: .58rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid var(--cream); }
+    .user-dropdown { position: relative; }
+    .nav-user-btn { display: flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 20px; background: none; border: 1.5px solid var(--line); font-size: .8rem; color: var(--text); transition: var(--transition); cursor: pointer; white-space: nowrap; max-width: 160px; }
+    .nav-user-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+    .nav-user-btn span { overflow: hidden; text-overflow: ellipsis; }
+    .user-menu { display: none; position: absolute; right: 0; top: calc(100% + 10px); background: white; border: 1.5px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 190px; overflow: hidden; z-index: 300; }
+    .user-menu.open { display: block; animation: fadeUp .15s ease; }
+    .user-menu a, .user-menu button { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: .875rem; color: var(--text); transition: background .15s; text-decoration: none; background: none; border: none; width: 100%; cursor: pointer; font-family: inherit; text-align: left; }
+    .user-menu a:hover, .user-menu button:hover { background: var(--gold-pale); }
+    .user-menu .divider { height: 1px; background: var(--line); margin: 4px 0; }
+    .user-menu .logout { color: var(--pink); }
+
+    /* ── PAGE HERO (category banner) ── */
+    .page-hero {
+      margin-top: 70px;
+      min-height: 260px;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #1a1208 0%, #2d1a05 55%, #3d2210 100%);
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 30% 50%, rgba(201,168,76,.15) 0%, transparent 70%);
+    }
+    .page-hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 48px 40px; animation: fadeUp .7s ease; }
+    .page-hero-eyebrow { font-size: .65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; display: block; }
+    .page-hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; color: white; line-height: 1.1; }
+    .page-hero-title strong { color: var(--gold-light); font-weight: 600; }
+    .page-hero-desc { color: rgba(255,255,255,.45); font-size: .875rem; margin-top: 12px; max-width: 480px; line-height: 1.8; }
+    .page-hero-corner { position: absolute; width: 28px; height: 28px; border-color: rgba(201,168,76,.4); border-style: solid; }
+    .page-hero-corner.tl { top: 16px; left: 16px; border-width: 1.5px 0 0 1.5px; }
+    .page-hero-corner.tr { top: 16px; right: 16px; border-width: 1.5px 1.5px 0 0; }
+    .page-hero-corner.bl { bottom: 16px; left: 16px; border-width: 0 0 1.5px 1.5px; }
+    .page-hero-corner.br { bottom: 16px; right: 16px; border-width: 0 1.5px 1.5px 0; }
+
+    /* ── CATEGORY TABS ── */
+    .cat-tabs-wrap { background: white; border-bottom: 1px solid var(--line); position: sticky; top: 70px; z-index: 100; }
+    .cat-tabs { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+    .cat-tab { padding: 16px 20px; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: var(--transition); background: none; border-left: none; border-right: none; border-top: none; font-family: inherit; flex: none; }
+    .cat-tab:hover { color: var(--gold-dark); }
+    .cat-tab.active { color: var(--gold-dark); border-bottom-color: var(--gold); }
+
+    /* ── MAIN LAYOUT ── */
+    .shop-layout { max-width: 1200px; margin: 0 auto; padding: 32px 40px 80px; display: grid; grid-template-columns: 240px 1fr; gap: 32px; align-items: start; }
+
+    /* ── SIDEBAR FILTERS ── */
+    .sidebar { position: sticky; top: calc(70px + 50px + 16px); }
+    .sidebar-section { background: white; border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+    .sidebar-title { font-size: .68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .sidebar-title i { font-size: .75rem; }
+    .price-range-wrap { padding: 4px 0; }
+    .price-inputs { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .price-inputs input { flex: 1; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .8rem; outline: none; transition: border-color .2s; }
+    .price-inputs input:focus { border-color: var(--gold); }
+    .price-inputs span { color: var(--muted); font-size: .8rem; flex: none; }
+    .checkbox-list { display: flex; flex-direction: column; gap: 8px; }
+    .checkbox-item { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+    .checkbox-item input { display: none; }
+    .checkbox-box { width: 16px; height: 16px; border: 1.5px solid #d4c9b0; border-radius: 4px; flex: none; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .checkbox-item:hover .checkbox-box { border-color: var(--gold); }
+    .checkbox-item input:checked + .checkbox-box { background: var(--gold); border-color: var(--gold); }
+    .checkbox-item input:checked + .checkbox-box::after { content: '✓'; font-size: .65rem; color: white; font-weight: 700; }
+    .checkbox-label { font-size: .84rem; color: var(--text); }
+    .sidebar-clear { width: 100%; padding: 10px; background: transparent; border: 1.5px solid var(--line); border-radius: var(--radius); font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: var(--transition); font-family: inherit; }
+    .sidebar-clear:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+    /* ── PRODUCTS AREA ── */
+    .products-area {}
+    .products-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .search-wrap { flex: 1; min-width: 200px; position: relative; }
+    .search-wrap input { width: 100%; padding: 10px 14px 10px 38px; border: 1.5px solid var(--line); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none; background: white; color: var(--text); transition: border-color .2s; }
+    .search-wrap input:focus { border-color: var(--gold); }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .9rem; pointer-events: none; }
+    .sort-select { padding: 10px 14px; border: 1.5px solid var(--line); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none; background: white; color: var(--text); cursor: pointer; transition: border-color .2s; }
+    .sort-select:focus { border-color: var(--gold); }
+    .view-btns { display: flex; gap: 4px; }
+    .view-btn { width: 36px; height: 36px; border: 1.5px solid var(--line); border-radius: var(--radius); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: var(--transition); font-size: .9rem; }
+    .view-btn.active, .view-btn:hover { background: var(--gold); border-color: var(--gold); color: white; }
+    .results-count { font-size: .8rem; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+    /* Active filters */
+    .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .filter-tag { display: flex; align-items: center; gap: 6px; padding: 4px 12px; background: var(--gold-pale); border: 1px solid rgba(201,168,76,.3); border-radius: 20px; font-size: .72rem; color: var(--gold-dark); }
+    .filter-tag button { background: none; border: none; cursor: pointer; color: var(--gold-dark); font-size: .75rem; padding: 0; line-height: 1; }
+    .filter-tag button:hover { color: var(--pink); }
+
+    /* ── PRODUCT GRID ── */
+    .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .products-grid.list-view { grid-template-columns: 1fr; }
+
+    /* PRODUCT CARD */
+    .product-card { background: white; border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); cursor: pointer; border: 1px solid rgba(201,168,76,.1); }
+    .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: rgba(201,168,76,.25); }
+    .product-card-img { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--cream-2); }
+    .product-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+    .product-card:hover .product-card-img img { transform: scale(1.07); }
+    .product-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: rgba(201,168,76,.2); }
+    .product-card-badge { position: absolute; top: 12px; left: 12px; background: var(--pink); color: white; font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .product-card-badge.new { background: var(--gold-dark); }
+    .product-card-wish { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.9); border: none; font-size: 1rem; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: var(--transition); opacity: 0; transform: scale(.8); }
+    .product-card:hover .product-card-wish { opacity: 1; transform: scale(1); }
+    .product-card-wish:hover { background: white; color: var(--pink); }
+    .product-card-wish.wished { opacity: 1; transform: scale(1); color: var(--pink); }
+    .product-card-body { padding: 16px 16px 12px; }
+    .product-card-cat { font-size: .6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+    .product-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; color: var(--dark); line-height: 1.3; margin-bottom: 10px; }
+    .product-card-price { display: flex; align-items: baseline; gap: 8px; }
+    .price-current { font-size: .95rem; font-weight: 600; color: var(--gold-dark); }
+    .price-original { font-size: .78rem; color: #bbb; text-decoration: line-through; }
+    .product-card-footer { padding: 12px 16px 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .rating { display: flex; align-items: center; gap: 4px; }
+    .stars { font-size: .75rem; color: var(--gold); }
+    .rating-count { font-size: .7rem; color: var(--muted); }
+    .btn-cart-sm { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); border: none; font-size: .7rem; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; transition: var(--transition); cursor: pointer; background: var(--gold); color: var(--dark); }
+    .btn-cart-sm:hover { background: var(--gold-dark); color: white; }
+
+    /* LIST VIEW card */
+    .products-grid.list-view .product-card { display: grid; grid-template-columns: 200px 1fr auto; }
+    .products-grid.list-view .product-card-img { aspect-ratio: 1; width: 200px; height: 200px; border-radius: 0; }
+    .products-grid.list-view .product-card-body { padding: 20px; display: flex; flex-direction: column; justify-content: center; }
+    .products-grid.list-view .product-card-footer { border-top: none; border-left: 1px solid var(--line); flex-direction: column; justify-content: center; gap: 12px; padding: 20px; min-width: 160px; }
+
+    /* EMPTY / LOADING */
+    .state-box { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--muted); }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--gold); border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+
+    /* PAGINATION */
+    .pagination { display: flex; gap: 6px; justify-content: center; margin-top: 40px; align-items: center; }
+    .page-btn { width: 38px; height: 38px; border-radius: var(--radius); border: 1.5px solid var(--line); background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .85rem; color: var(--text); transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+    .page-btn:hover, .page-btn.active { background: var(--gold); border-color: var(--gold); color: white; }
+    .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: var(--radius); font-size: .85rem; font-weight: 500; animation: fadeUp .3s ease; box-shadow: var(--shadow-lg); max-width: 340px; }
+    .toast-success { background: var(--dark); color: var(--gold-light); border-left: 3px solid var(--gold); }
+    .toast-error { background: #2d0810; color: #f0a0b0; border-left: 3px solid var(--pink); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1050px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px) {
+      .shop-layout { grid-template-columns: 1fr; padding: 20px 20px 60px; }
+      .sidebar { position: static; display: none; }
+      .sidebar.mobile-open { display: block; }
+      .navbar { padding: 0 20px; }
+      .navbar-nav { display: none; }
+      .cat-tabs { padding: 0 20px; }
+      .page-hero-inner { padding: 32px 20px; }
+      .products-grid.list-view { grid-template-columns: 1fr; }
+      .products-grid.list-view .product-card { grid-template-columns: 120px 1fr; }
+      .products-grid.list-view .product-card-img { width: 120px; height: 120px; }
+      .products-grid.list-view .product-card-footer { display: none; }
+    }
+    @media (max-width: 560px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
+
+    /* MOBILE FILTER BTN */
+    .mobile-filter-btn { display: none; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius); border: 1.5px solid var(--line); background: white; font-family: 'DM Sans', sans-serif; font-size: .8rem; cursor: pointer; color: var(--text); transition: var(--transition); }
+    .mobile-filter-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+    @media (max-width: 900px) { .mobile-filter-btn { display: flex; } }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="navbar-logo">PINKGOLD</a>
+  <ul class="navbar-nav">
+    <li><a href="index.html">Trang Chủ</a></li>
+    <li><a href="products.html" class="active">Sản Phẩm</a></li>
+    <li><a href="products.html?cat=1">Nhẫn</a></li>
+    <li><a href="products.html?cat=2">Dây Chuyền</a></li>
+    <li><a href="products.html?cat=4">Bông Tai</a></li>
+    <li><a href="products.html?cat=6">Trang Sức Cưới</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <button class="nav-icon-btn" onclick="document.getElementById('searchInput').focus()" title="Tìm kiếm">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="nav-icon-btn" onclick="window.location.href='cart.html'" title="Giỏ hàng">
+      <i class="bi bi-bag"></i>
+      <span class="nav-badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <div id="navUserArea"></div>
+  </div>
+</nav>
+
+<!-- PAGE HERO — nội dung thay đổi theo category -->
+<section class="page-hero" id="pageHero">
+  <div class="page-hero-corner tl"></div>
+  <div class="page-hero-corner tr"></div>
+  <div class="page-hero-corner bl"></div>
+  <div class="page-hero-corner br"></div>
+  <div class="page-hero-inner">
+    <span class="page-hero-eyebrow" id="heroEyebrow">Bộ Sưu Tập 2025</span>
+    <h1 class="page-hero-title" id="heroTitle">Tất Cả <strong>Sản Phẩm</strong></h1>
+    <p class="page-hero-desc" id="heroDesc">Khám phá bộ sưu tập trang sức cao cấp từ vàng 18K, bạc 925 và đá quý thiên nhiên — mỗi món là một tác phẩm tinh tế.</p>
+  </div>
+</section>
+
+<!-- CATEGORY TABS -->
+<div class="cat-tabs-wrap">
+  <div class="cat-tabs" id="catTabs">
+    <button class="cat-tab active" data-cat="" onclick="switchCat('')">Tất Cả</button>
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- SHOP LAYOUT -->
+<div class="shop-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Sort (mobile hides toolbar, sidebar shows sort) -->
+    <div class="sidebar-section">
+      <div class="sidebar-title"><i class="bi bi-sliders"></i> Sắp xếp</div>
+      <select class="sort-select" id="sidebarSort" onchange="applySort(this.value)" style="width:100%;margin-bottom:0;">
+        <option value="">Mặc định</option>
+        <option value="price-asc">Giá: Thấp → Cao</option>
+        <option value="price-desc">Giá: Cao → Thấp</option>
+        <option value="name-asc">Tên A → Z</option>
+        <option value="discount">Đang Giảm Giá</option>
+      </select>
+    </div>
+
+    <!-- Price filter -->
+    <div class="sidebar-section">
+      <div class="sidebar-title"><i class="bi bi-tag"></i> Khoảng giá</div>
+      <div class="price-range-wrap">
+        <div class="price-inputs">
+          <input type="number" id="priceMin" placeholder="Từ" min="0" oninput="applyFilters()">
+          <span>–</span>
+          <input type="number" id="priceMax" placeholder="Đến" min="0" oninput="applyFilters()">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button onclick="setPrice(0,2000000)" style="text-align:left;background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--muted);padding:3px 0;transition:color .2s;" onmouseenter="this.style.color='var(--gold-dark)'" onmouseleave="this.style.color='var(--muted)'">Dưới 2 triệu</button>
+          <button onclick="setPrice(2000000,5000000)" style="text-align:left;background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--muted);padding:3px 0;transition:color .2s;" onmouseenter="this.style.color='var(--gold-dark)'" onmouseleave="this.style.color='var(--muted)'">2 – 5 triệu</button>
+          <button onclick="setPrice(5000000,10000000)" style="text-align:left;background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--muted);padding:3px 0;transition:color .2s;" onmouseenter="this.style.color='var(--gold-dark)'" onmouseleave="this.style.color='var(--muted)'">5 – 10 triệu</button>
+          <button onclick="setPrice(10000000,0)" style="text-align:left;background:none;border:none;cursor:pointer;font-size:.82rem;color:var(--muted);padding:3px 0;transition:color .2s;" onmouseenter="this.style.color='var(--gold-dark)'" onmouseleave="this.style.color='var(--muted)'">Trên 10 triệu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Material filter -->
+    <div class="sidebar-section">
+      <div class="sidebar-title"><i class="bi bi-gem"></i> Chất Liệu</div>
+      <div class="checkbox-list" id="materialFilter">
+        <label class="checkbox-item"><input type="checkbox" value="vàng 18k" onchange="applyFilters()"><div class="checkbox-box"></div><span class="checkbox-label">Vàng 18K</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="bạc 925" onchange="applyFilters()"><div class="checkbox-box"></div><span class="checkbox-label">Bạc 925</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="kim cương" onchange="applyFilters()"><div class="checkbox-box"></div><span class="checkbox-label">Kim Cương</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="ngọc" onchange="applyFilters()"><div class="checkbox-box"></div><span class="checkbox-label">Ngọc & Đá Quý</span></label>
+      </div>
+    </div>
+
+    <!-- Discount only -->
+    <div class="sidebar-section">
+      <div class="sidebar-title"><i class="bi bi-percent"></i> Khuyến Mãi</div>
+      <label class="checkbox-item">
+        <input type="checkbox" id="onlyDiscount" onchange="applyFilters()">
+        <div class="checkbox-box"></div>
+        <span class="checkbox-label">Chỉ sản phẩm giảm giá</span>
+      </label>
+    </div>
+
+    <button class="sidebar-clear" onclick="clearFilters()">Xóa bộ lọc</button>
+  </aside>
+
+  <!-- PRODUCTS AREA -->
+  <div class="products-area">
+
+    <!-- Toolbar -->
+    <div class="products-toolbar">
+      <button class="mobile-filter-btn" onclick="toggleSidebar()"><i class="bi bi-sliders"></i> Bộ Lọc</button>
+      <div class="search-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="Tìm tên, chất liệu..." oninput="applyFilters()">
+      </div>
+      <select class="sort-select" id="toolbarSort" onchange="applySort(this.value)">
+        <option value="">Mặc định</option>
+        <option value="price-asc">Giá tăng dần</option>
+        <option value="price-desc">Giá giảm dần</option>
+        <option value="name-asc">Tên A–Z</option>
+        <option value="discount">Đang giảm giá</option>
+      </select>
+      <div class="view-btns">
+        <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Lưới"><i class="bi bi-grid"></i></button>
+        <button class="view-btn" id="listViewBtn" onclick="setView('list')" title="Danh sách"><i class="bi bi-list-ul"></i></button>
+      </div>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+
+    <!-- Active filter tags -->
+    <div class="active-filters" id="activeFilters"></div>
+
+    <!-- Products grid -->
+    <div class="products-grid" id="productsGrid">
+      <div class="state-box">
+        <div class="spinner"></div>
+        Đang tải sản phẩm...
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ────────────────────────────────────────────
+   CONFIG
+──────────────────────────────────────────── */
+const API      = 'http://localhost:8080/api';
+const CART_KEY = 'pinkgold_cart';
+const PAGE_SIZE = 12;
+
+/* ────────────────────────────────────────────
+   STATE
+──────────────────────────────────────────── */
+let allProducts   = [];
+let allCategories = [];
+let filtered      = [];
+let currentPage   = 1;
+let currentCatId  = '';
+let currentSort   = '';
+let currentView   = 'grid';
+
+/* ────────────────────────────────────────────
+   CART
+──────────────────────────────────────────── */
+function getCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
+function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+function cartTotal() { return getCart().reduce((s, i) => s + (i.quantity || 0), 0); }
+function updateCartBadge() {
+  const total = cartTotal();
+  const badge = document.getElementById('cartBadge');
+  if (!badge) return;
+  badge.textContent = total;
+  badge.style.display = total > 0 ? 'flex' : 'none';
+}
+async function addToCartStore(id, name, price, image, qty = 1) {
+  const cart = getCart();
+  const idx  = cart.findIndex(i => i.id === id);
+  if (idx > -1) cart[idx].quantity += qty;
+  else cart.push({ id, name, price, image, quantity: qty });
+  saveCart(cart);
+  updateCartBadge();
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (user && user.id) {
+    try { await fetch(`${API}/cart/add?userId=${user.id}&productId=${id}&quantity=${qty}`, { method: 'POST' }); } catch {}
+  }
+}
+
+/* ────────────────────────────────────────────
+   TOAST
+──────────────────────────────────────────── */
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2800);
+  setTimeout(() => t.remove(), 3200);
+}
+
+function fmt(v) {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(v || 0));
+}
+
+/* ────────────────────────────────────────────
+   HERO — thay theo danh mục
+──────────────────────────────────────────── */
+const HERO_CONFIG = {
+  '': {
+    eyebrow: 'Bộ Sưu Tập 2025',
+    title: 'Tất Cả <strong>Sản Phẩm</strong>',
+    desc: 'Khám phá bộ sưu tập trang sức cao cấp từ vàng 18K, bạc 925 và đá quý thiên nhiên.',
+    bg: 'linear-gradient(135deg, #1a1208 0%, #2d1a05 55%, #3d2210 100%)'
+  },
+  '1': {
+    eyebrow: 'Danh Mục · Nhẫn',
+    title: 'Nhẫn <strong>Cao Cấp</strong>',
+    desc: 'Từ nhẫn đính hôn kim cương thiên nhiên đến nhẫn vàng thời trang — chế tác tinh tế cho mọi dịp.',
+    bg: 'linear-gradient(135deg, #1a0a00 0%, #4a2000 55%, #6b3510 100%)'
+  },
+  '2': {
+    eyebrow: 'Danh Mục · Dây Chuyền',
+    title: 'Dây Chuyền <strong>Sang Trọng</strong>',
+    desc: 'Dây chuyền vàng, bạc, ngọc trai — điểm nhấn tinh tế cho mỗi bộ trang phục.',
+    bg: 'linear-gradient(135deg, #001a2d 0%, #00345a 55%, #005087 100%)'
+  },
+  '3': {
+    eyebrow: 'Danh Mục · Lắc Tay',
+    title: 'Lắc Tay & <strong>Vòng Tay</strong>',
+    desc: 'Bộ sưu tập lắc tay vàng charm duyên dáng và vòng tay đá quý thiên nhiên.',
+    bg: 'linear-gradient(135deg, #0a1a0a 0%, #1a4020 55%, #2d6030 100%)'
+  },
+  '4': {
+    eyebrow: 'Danh Mục · Bông Tai',
+    title: 'Bông Tai <strong>Tinh Tế</strong>',
+    desc: 'Bông tai vàng, bạc, kim cương và đá quý — tôn lên vẻ đẹp từng khoảnh khắc.',
+    bg: 'linear-gradient(135deg, #2d0520 0%, #580a40 55%, #7a1460 100%)'
+  },
+  '5': {
+    eyebrow: 'Danh Mục · Mặt Dây Chuyền',
+    title: 'Mặt Dây Chuyền <strong>Ý Nghĩa</strong>',
+    desc: 'Phật bản mệnh, hình tượng tâm linh và thiết kế hiện đại — làm phong phú thêm từng bước đi.',
+    bg: 'linear-gradient(135deg, #1a0a28 0%, #3a1460 55%, #5a208a 100%)'
+  },
+  '6': {
+    eyebrow: 'Bộ Sưu Tập · Trang Sức Cưới',
+    title: 'Trang Sức <strong>Cưới Hỏi</strong>',
+    desc: 'Bộ nhẫn cưới vàng và kim cương cao cấp — khoảnh khắc thiêng liêng xứng đáng được lưu giữ mãi mãi.',
+    bg: 'linear-gradient(135deg, #180820 0%, #3a1055 55%, #5a208a 100%)'
+  },
+  '7': {
+    eyebrow: 'Danh Mục · Trang Sức Bạc',
+    title: 'Trang Sức <strong>Bạc 925</strong>',
+    desc: 'Thiết kế hiện đại, giá cả hợp lý — phong cách trẻ trung và thời trang mỗi ngày.',
+    bg: 'linear-gradient(135deg, #0a1020 0%, #182040 55%, #243060 100%)'
+  }
+};
+
+function updateHero(catId) {
+  const conf = HERO_CONFIG[String(catId)] || HERO_CONFIG[''];
+  document.getElementById('heroEyebrow').textContent = conf.eyebrow;
+  document.getElementById('heroTitle').innerHTML    = conf.title;
+  document.getElementById('heroDesc').textContent   = conf.desc;
+  document.getElementById('pageHero').style.background = conf.bg;
+}
+
+/* ────────────────────────────────────────────
+   NAVBAR USER
+──────────────────────────────────────────── */
+function renderNavUser() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const area = document.getElementById('navUserArea');
+  if (!area) return;
+  if (user) {
+    const name = user.fullName || user.username || 'Tài khoản';
+    area.innerHTML = `
+      <div class="user-dropdown" id="userDropdown">
+        <button class="nav-user-btn" onclick="toggleUserMenu(event)">
+          <i class="bi bi-person-circle"></i>
+          <span title="${name}">${name}</span>
+          <i class="bi bi-chevron-down" style="font-size:.6rem;flex:none;"></i>
+        </button>
+        <div class="user-menu" id="userMenu">
+          <a href="profile.html"><i class="bi bi-person"></i> Tài Khoản</a>
+          <a href="orders.html"><i class="bi bi-bag"></i> Đơn Hàng</a>
+          <div class="divider"></div>
+          <button class="logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</button>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML = `<a href="login.html" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:var(--gold);color:var(--dark);font-size:.72rem;font-weight:500;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:all .25s;" onmouseover="this.style.background='var(--gold-dark)';this.style.color='white'" onmouseout="this.style.background='var(--gold)';this.style.color='var(--dark)'"><i class='bi bi-person'></i> Đăng Nhập</a>`;
+  }
+}
+function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('userMenu')?.classList.toggle('open'); }
+document.addEventListener('click', () => document.getElementById('userMenu')?.classList.remove('open'));
+function logout() { if (confirm('Bạn có chắc muốn đăng xuất?')) { localStorage.removeItem('user'); localStorage.removeItem('token'); window.location.reload(); } }
+
+/* ────────────────────────────────────────────
+   CATEGORY TABS
+──────────────────────────────────────────── */
+function buildCatTabs() {
+  const tabs = document.getElementById('catTabs');
+  tabs.innerHTML = `<button class="cat-tab ${currentCatId === '' ? 'active' : ''}" data-cat="" onclick="switchCat('')">Tất Cả</button>`;
+  allCategories.forEach(c => {
+    tabs.innerHTML += `<button class="cat-tab ${String(currentCatId) === String(c.id) ? 'active' : ''}" data-cat="${c.id}" onclick="switchCat('${c.id}')">${c.name}</button>`;
+  });
+}
+
+function switchCat(catId) {
+  currentCatId = catId;
+  currentPage  = 1;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === catId));
+  // Update URL without reload
+  const url = new URL(window.location);
+  catId ? url.searchParams.set('cat', catId) : url.searchParams.delete('cat');
+  window.history.replaceState({}, '', url);
+  updateHero(catId);
+  applyFilters();
+}
+
+/* ────────────────────────────────────────────
+   SORT
+──────────────────────────────────────────── */
+function applySort(val) {
+  currentSort = val;
+  // Sync both selects
+  document.getElementById('sidebarSort').value  = val;
+  document.getElementById('toolbarSort').value  = val;
+  currentPage = 1;
+  applyFilters();
+}
+
+/* ────────────────────────────────────────────
+   VIEW TOGGLE
+──────────────────────────────────────────── */
+function setView(v) {
+  currentView = v;
+  document.getElementById('productsGrid').className = 'products-grid' + (v === 'list' ? ' list-view' : '');
+  document.getElementById('gridViewBtn').classList.toggle('active', v === 'grid');
+  document.getElementById('listViewBtn').classList.toggle('active', v === 'list');
+}
+
+/* ────────────────────────────────────────────
+   PRICE SHORTCUTS
+──────────────────────────────────────────── */
+function setPrice(min, max) {
+  document.getElementById('priceMin').value = min || '';
+  document.getElementById('priceMax').value = max || '';
+  applyFilters();
+}
+
+/* ────────────────────────────────────────────
+   CLEAR FILTERS
+──────────────────────────────────────────── */
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('priceMin').value = '';
+  document.getElementById('priceMax').value = '';
+  document.getElementById('onlyDiscount').checked = false;
+  document.querySelectorAll('#materialFilter input').forEach(cb => cb.checked = false);
+  currentSort = '';
+  document.getElementById('sidebarSort').value = '';
+  document.getElementById('toolbarSort').value = '';
+  currentPage = 1;
+  applyFilters();
+}
+
+/* ────────────────────────────────────────────
+   SIDEBAR MOBILE TOGGLE
+──────────────────────────────────────────── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+
+/* ────────────────────────────────────────────
+   MAIN FILTER + RENDER
+──────────────────────────────────────────── */
+function getEffectivePrice(p) {
+  return Number(p.discountPrice ?? p.discount_price ?? p.price ?? 0);
+}
+
+function applyFilters() {
+  const kw      = document.getElementById('searchInput').value.trim().toLowerCase();
+  const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
+  const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
+  const onlyDisc = document.getElementById('onlyDiscount').checked;
+  const matChecked = Array.from(document.querySelectorAll('#materialFilter input:checked')).map(cb => cb.value.toLowerCase());
+
+  filtered = allProducts.filter(p => {
+    // Category filter
+    if (currentCatId) {
+      const pCat = String(p.category?.id ?? p.categoryId ?? p.category_id ?? '');
+      if (pCat !== String(currentCatId)) return false;
+    }
+
+    // Keyword
+    if (kw) {
+      const hay = [(p.name || ''), (p.description || ''), (p.material || ''), (p.category?.name || '')].join(' ').toLowerCase();
+      if (!hay.includes(kw)) return false;
+    }
+
+    // Price
+    const effPrice = getEffectivePrice(p);
+    if (effPrice < priceMin || effPrice > priceMax) return false;
+
+    // Only discount
+    if (onlyDisc) {
+      const disc = Number(p.discountPrice ?? p.discount_price ?? 0);
+      if (!disc || disc >= Number(p.price)) return false;
+    }
+
+    // Material
+    if (matChecked.length) {
+      const mat = (p.material || '').toLowerCase();
+      if (!matChecked.some(m => mat.includes(m))) return false;
+    }
+
+    return true;
+  });
+
+  // Sort
+  if (currentSort === 'price-asc')  filtered.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+  if (currentSort === 'price-desc') filtered.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+  if (currentSort === 'name-asc')   filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'vi'));
+  if (currentSort === 'discount')   filtered.sort((a, b) => {
+    const dA = Number(a.discountPrice ?? a.discount_price ?? 0) > 0 ? 1 : 0;
+    const dB = Number(b.discountPrice ?? b.discount_price ?? 0) > 0 ? 1 : 0;
+    return dB - dA;
+  });
+
+  currentPage = 1;
+  renderGrid();
+  updateActiveFilterTags();
+}
+
+function updateActiveFilterTags() {
+  const tags = [];
+  const kw = document.getElementById('searchInput').value.trim();
+  if (kw) tags.push({ label: `"${kw}"`, clear: () => { document.getElementById('searchInput').value = ''; applyFilters(); } });
+  const min = document.getElementById('priceMin').value;
+  const max = document.getElementById('priceMax').value;
+  if (min || max) tags.push({ label: `Giá: ${min ? fmt(min) : '0'} – ${max ? fmt(max) : '∞'}`, clear: () => { document.getElementById('priceMin').value=''; document.getElementById('priceMax').value=''; applyFilters(); } });
+  if (document.getElementById('onlyDiscount').checked) tags.push({ label: 'Đang giảm giá', clear: () => { document.getElementById('onlyDiscount').checked=false; applyFilters(); } });
+  document.querySelectorAll('#materialFilter input:checked').forEach(cb => {
+    const val = cb.value;
+    tags.push({ label: cb.closest('.checkbox-item').querySelector('.checkbox-label').textContent, clear: () => { cb.checked=false; applyFilters(); } });
+  });
+
+  const container = document.getElementById('activeFilters');
+  container.innerHTML = tags.map((t, i) => `
+    <div class="filter-tag">${t.label} <button onclick="window._clearFilter(${i})">✕</button></div>
+  `).join('');
+  window._clearFilter = (i) => tags[i].clear();
+}
+
+/* ────────────────────────────────────────────
+   PRODUCT CARD HTML
+──────────────────────────────────────────── */
+function productCardHTML(p) {
+  const price    = getEffectivePrice(p);
+  const original = Number(p.price ?? 0);
+  const hasDisc  = Number(p.discountPrice ?? p.discount_price ?? 0) > 0 && price < original;
+  const catName  = p.category?.name ?? p.categoryName ?? '';
+  const imgSrc   = p.imageUrl ?? p.image_url ?? '';
+  const safeName = (p.name || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+  const pctOff   = hasDisc ? Math.round((1 - price / original) * 100) : 0;
+
+  if (currentView === 'list') {
+    return `
+      <div class="product-card" onclick="location.href='product-detail.html?id=${p.id}'">
+        <div class="product-card-img">
+          ${hasDisc ? `<span class="product-card-badge">-${pctOff}%</span>` : ''}
+          ${imgSrc ? `<img src="${imgSrc}" alt="${safeName}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+          <div class="product-card-placeholder" style="${imgSrc ? 'display:none' : ''}">💍</div>
+        </div>
+        <div class="product-card-body">
+          ${catName ? `<div class="product-card-cat">${catName}</div>` : ''}
+          <div class="product-card-name">${p.name || 'Sản phẩm'}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:10px;line-height:1.6;">${(p.description||'').slice(0,80)}${p.description?.length>80?'...':''}</div>
+          ${p.material ? `<div style="font-size:.75rem;color:var(--muted);">Chất liệu: <strong style="color:var(--text)">${p.material}</strong></div>` : ''}
+        </div>
+        <div class="product-card-footer">
+          <div class="product-card-price" style="flex-direction:column;align-items:flex-end;gap:4px;">
+            <span class="price-current">${fmt(price)}</span>
+            ${hasDisc ? `<span class="price-original">${fmt(original)}</span>` : ''}
+          </div>
+          <button class="btn-cart-sm" onclick="event.stopPropagation();addToCartStore(${p.id},'${safeName}',${price},'${imgSrc}',1);showToast('Đã thêm vào giỏ hàng')">
+            <i class="bi bi-bag-plus"></i> Thêm vào giỏ
+          </button>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="product-card" onclick="location.href='product-detail.html?id=${p.id}'">
+      <div class="product-card-img">
+        ${hasDisc ? `<span class="product-card-badge">-${pctOff}%</span>` : ''}
+        <button class="product-card-wish" onclick="event.stopPropagation();showToast('Đã thêm vào yêu thích')"><i class="bi bi-heart"></i></button>
+        ${imgSrc ? `<img src="${imgSrc}" alt="${safeName}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        <div class="product-card-placeholder" style="${imgSrc ? 'display:none' : ''}">💍</div>
+      </div>
+      <div class="product-card-body">
+        ${catName ? `<div class="product-card-cat">${catName}</div>` : ''}
+        <div class="product-card-name">${p.name || 'Sản phẩm'}</div>
+        <div class="product-card-price">
+          <span class="price-current">${fmt(price)}</span>
+          ${hasDisc ? `<span class="price-original">${fmt(original)}</span>` : ''}
+        </div>
+      </div>
+      <div class="product-card-footer">
+        <div class="rating">
+          <span class="stars">★★★★★</span>
+          <span class="rating-count">(${Math.floor(Math.random() * 40 + 5)})</span>
+        </div>
+        <button class="btn-cart-sm" onclick="event.stopPropagation();addToCartStore(${p.id},'${safeName}',${price},'${imgSrc}',1);showToast('Đã thêm vào giỏ hàng')">
+          <i class="bi bi-bag-plus"></i>
+        </button>
+      </div>
+    </div>`;
+}
+
+/* ────────────────────────────────────────────
+   RENDER GRID + PAGINATION
+──────────────────────────────────────────── */
+function renderGrid() {
+  const grid        = document.getElementById('productsGrid');
+  const paginationEl = document.getElementById('pagination');
+  document.getElementById('resultsCount').textContent = `${filtered.length} sản phẩm`;
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="state-box"><i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:12px;"></i>Không tìm thấy sản phẩm nào.<br><button onclick="clearFilters()" style="margin-top:14px;padding:10px 20px;border-radius:8px;border:1.5px solid var(--gold);background:transparent;color:var(--gold-dark);cursor:pointer;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">Xóa bộ lọc</button></div>`;
+    paginationEl.innerHTML = '';
+    return;
+  }
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = totalPages;
+  const page = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  grid.innerHTML = page.map(productCardHTML).join('');
+
+  // Pagination
+  if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
+  let pg = '';
+  if (currentPage > 1) pg += `<button class="page-btn" onclick="goPage(${currentPage-1})"><i class="bi bi-chevron-left"></i></button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) {
+      pg += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - currentPage) === 3) {
+      pg += `<span style="padding:0 4px;color:var(--muted);">…</span>`;
+    }
+  }
+  if (currentPage < totalPages) pg += `<button class="page-btn" onclick="goPage(${currentPage+1})"><i class="bi bi-chevron-right"></i></button>`;
+  paginationEl.innerHTML = pg;
+}
+
+function goPage(n) {
+  currentPage = n;
+  renderGrid();
+  window.scrollTo({ top: document.querySelector('.cat-tabs-wrap').offsetTop - 80, behavior: 'smooth' });
+}
+
+/* ────────────────────────────────────────────
+   LOAD DATA
+──────────────────────────────────────────── */
+async function loadAll() {
+  try {
+    const [pRes, cRes] = await Promise.all([
+      fetch(`${API}/products`),
+      fetch(`${API}/categories`)
+    ]);
+
+    if (pRes.ok) {
+      const data = await pRes.json();
+      allProducts = (Array.isArray(data) ? data : (data.content || [])).filter(p => p.status !== false);
+    }
+    if (cRes.ok) {
+      const data = await cRes.json();
+      allCategories = Array.isArray(data) ? data : (data.content || []);
+    }
+  } catch (err) {
+    // Fallback: hiển thị trống với thông báo
+    document.getElementById('productsGrid').innerHTML = `
+      <div class="state-box">
+        <i class="bi bi-exclamation-circle" style="font-size:2rem;display:block;margin-bottom:10px;color:var(--pink)"></i>
+        Không thể kết nối server. Vui lòng kiểm tra backend đang chạy tại port 8080.
+      </div>`;
+    buildCatTabs();
+    return;
+  }
+
+  buildCatTabs();
+  filtered = allProducts;
+
+  // Read URL params
+  const params = new URLSearchParams(window.location.search);
+  const catParam = params.get('cat') || '';
+  const kw = params.get('q') || '';
+  if (catParam) { currentCatId = catParam; switchCat(catParam); }
+  if (kw) { document.getElementById('searchInput').value = kw; }
+  updateHero(currentCatId);
+
+  applyFilters();
+}
+
+/* ────────────────────────────────────────────
+   NAVBAR SCROLL
+──────────────────────────────────────────── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ────────────────────────────────────────────
+   INIT
+──────────────────────────────────────────── */
+renderNavUser();
+updateCartBadge();
+loadAll();
+</script>
+</body>
+</html>
